@@ -10,6 +10,7 @@ object Users : Table("users") {
     val userId = varchar("user_id", 50).uniqueIndex()
     val name = varchar("name", 50)
     val count = integer("count").default(0)
+    val status = integer("status").default(UserStatus.PLAYER.ordinal)
 }
 
 object UserDatabase {
@@ -46,7 +47,7 @@ object UserDatabase {
         }
     }
 
-    fun setItems(user: UserEntity) {
+    fun setEventPoints(user: UserEntity) {
         transaction {
             Users.upsert {
                 it[userId] = user.id
@@ -56,7 +57,34 @@ object UserDatabase {
         }
     }
 
-    fun getItemsCountById(userId: String): Int {
+    fun updateUserEntry(user: UserEntity) {
+        transaction {
+            Users.upsert {
+                it[userId] = user.id
+                it[name] = user.name
+                it[count] = user.eventPointCount
+                it[status] = user.status.ordinal
+            }
+        }
+    }
+    
+    fun getUserById(id: String): UserEntity? {
+        return transaction { 
+            Users.selectAll()
+                .where(Users.userId eq id)
+                .map { entry ->
+                    UserEntity(
+                        id = entry[Users.userId],
+                        name = entry[Users.name],
+                        eventPointCount = entry[Users.count],
+                        status = UserStatus.fromInt(entry[Users.status])
+                    )
+                }
+                .singleOrNull()
+        }
+    }
+
+    fun getEventPointCountById(userId: String): Int {
         return transaction {
             Users.select(Users.count)
                 .where(Users.userId eq userId)
@@ -64,7 +92,7 @@ object UserDatabase {
         }
     }
 
-    fun getTopByItems(): List<UserEntity> {
+    fun getTopByEventPoints(): List<UserEntity> {
         return transaction {
             Users.selectAll()
                 .orderBy(Users.count, SortOrder.DESC)

@@ -9,18 +9,18 @@ class EventRepository {
 
     fun setEventPoints(user: User, count: Int) {
         try {
-            UserDatabase.setItems(UserEntity(user.id.chatId.toString(), user.firstName, count))
+            UserDatabase.setEventPoints(UserEntity(user.id.chatId.toString(), user.firstName, count))
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
     fun getEventPointCountById(userId: String): Int {
-        return UserDatabase.getItemsCountById(userId)
+        return UserDatabase.getEventPointCountById(userId)
     }
 
     fun getTopByEventPoints(): List<UserIndexed> {
-        return UserDatabase.getTopByItems()
+        return UserDatabase.getTopByEventPoints()
             .mapIndexed { index, user -> UserIndexed(index + 1, user.id, user.name, user.eventPointCount) }
     }
 

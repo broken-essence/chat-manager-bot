@@ -1,6 +1,14 @@
 package com.ehedgehog.database
 
-enum class UserStatus {PLAYER, ADMIN, SENIOR_ADMIN}
+enum class UserStatus {
+    PLAYER, ADMIN, SENIOR_ADMIN;
+
+    companion object {
+        fun fromInt(value: Int): UserStatus {
+            return entries.first { it.ordinal == value }
+        }
+    }
+}
 
 data class UserEntity(
     val id: String,
