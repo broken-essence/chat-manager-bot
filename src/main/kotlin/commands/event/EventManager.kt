@@ -1,18 +1,15 @@
 package com.ehedgehog.commands.event
 
-import com.ehedgehog.commands.base.BaseManager
+import com.ehedgehog.commands.base.BaseUserManager
 import dev.inmo.tgbotapi.bot.TelegramBot
-import dev.inmo.tgbotapi.extensions.api.chat.get.getChatAdministrators
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
-import dev.inmo.tgbotapi.types.IdChatIdentifier
-import dev.inmo.tgbotapi.types.UserId
 import dev.inmo.tgbotapi.types.message.MarkdownV2
 import dev.inmo.tgbotapi.types.message.content.TextMessage
 import dev.inmo.tgbotapi.utils.RiskFeature
 
-class EventManager(private val bot: TelegramBot): BaseManager(bot) {
+class EventManager(private val bot: TelegramBot): BaseUserManager(bot) {
 
     private val repository = EventRepository()
 

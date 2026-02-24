@@ -1,7 +1,6 @@
 package com.ehedgehog.commands.general
 
-import com.ehedgehog.commands.base.BaseManager
-import com.ehedgehog.database.UserEntity
+import com.ehedgehog.commands.base.BaseUserManager
 import com.ehedgehog.database.UserStatus
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.send.reply
@@ -11,7 +10,7 @@ import dev.inmo.tgbotapi.types.message.MarkdownV2
 import dev.inmo.tgbotapi.types.message.content.TextMessage
 import dev.inmo.tgbotapi.utils.RiskFeature
 
-class GeneralManager(private val bot: TelegramBot): BaseManager(bot) {
+class GeneralManager(private val bot: TelegramBot): BaseUserManager(bot) {
 
     private val repository = GeneralRepository()
 
@@ -40,37 +39,6 @@ class GeneralManager(private val bot: TelegramBot): BaseManager(bot) {
                 """.trimMargin(),
                 MarkdownV2
             )
-        }
-    }
-
-    //TODO: move to admin module
-    @OptIn(RiskFeature::class)
-    suspend fun changeUserStatus(command: TextMessage, statusValue: Int) {
-        val repliedUser = command.replyTo?.from
-
-        if (repliedUser != null && statusValue in 0..<UserStatus.entries.size) {
-            val user = repository.getUserById(repliedUser.id.chatId.toString())
-            val markdownNameString = createMarkdownLink(repliedUser.firstName, repliedUser.id.chatId.toString())
-            val status = UserStatus.fromInt(statusValue)
-
-            repository.setUserStatus(
-                user ?: UserEntity(repliedUser.id.chatId.toString(), repliedUser.firstName),
-                status
-            )
-
-            bot.sendMessage(
-                command.chat.id,
-                "$markdownNameString теперь *${getStatusDescription(status)}*",
-                MarkdownV2
-            )
-        }
-    }
-
-    private fun getStatusDescription(status: UserStatus): String {
-        return when (status) {
-            UserStatus.PLAYER -> "Игрок"
-            UserStatus.ADMIN -> "Администратор"
-            UserStatus.SENIOR_ADMIN -> "Старший администратор"
         }
     }
 

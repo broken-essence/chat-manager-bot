@@ -1,5 +1,7 @@
 package com.ehedgehog
 
+import com.ehedgehog.commands.admin.AdminManager
+import com.ehedgehog.commands.admin.registerAdminCommands
 import com.ehedgehog.commands.event.EventManager
 import com.ehedgehog.commands.event.registerEventCommands
 import com.ehedgehog.commands.general.GeneralManager
@@ -11,8 +13,6 @@ import dev.inmo.tgbotapi.bot.ktor.telegramBot
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.api.getUpdates
 import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPolling
-import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
-import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommandWithArgs
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onText
 import dev.inmo.tgbotapi.types.UpdateId
 import dev.inmo.tgbotapi.utils.PreviewFeature
@@ -58,6 +58,8 @@ suspend fun main(args: Array<String>) {
         registerEventCommands(manager)
 
         registerGeneralCommands(GeneralManager(bot))
+
+        registerAdminCommands(AdminManager(bot))
 
         onText { message ->
             manager.handleRPCommands(message)

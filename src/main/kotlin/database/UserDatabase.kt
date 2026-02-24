@@ -84,6 +84,15 @@ object UserDatabase {
         }
     }
 
+    fun getUserStatusById(id: String): UserStatus {
+        return transaction {
+            Users.select(Users.status)
+                .where(Users.userId eq id)
+                .map { UserStatus.fromInt(it[Users.status]) }
+                .singleOrNull() ?: UserStatus.PLAYER
+        }
+    }
+
     fun getEventPointCountById(userId: String): Int {
         return transaction {
             Users.select(Users.count)
