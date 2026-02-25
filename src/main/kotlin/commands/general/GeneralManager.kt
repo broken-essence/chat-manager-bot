@@ -35,7 +35,7 @@ class GeneralManager(private val bot: TelegramBot): BaseUserManager(bot) {
                 |💊 Активация иммунитета: 2
                 |Иммунитет: действует до 31\.07\.2048 17:41
                 |
-                |⚠️ Предупреждения: 1\/6
+                |⚠️ Предупреждения: ${user?.adminWarns}\/6
                 """.trimMargin(),
                 MarkdownV2
             )

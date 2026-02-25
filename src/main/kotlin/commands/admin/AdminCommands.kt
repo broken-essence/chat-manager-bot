@@ -9,4 +9,12 @@ fun BehaviourContext.registerAdminCommands(manager: AdminManager) {
         manager.changeUserStatus(it, args[0].toInt())
     }
 
+    onCommandWithArgs("admwarn") { it, args ->
+        manager.giveWarn(it, args.joinToString(" "))
+    }
+
+    onCommandWithArgs("admunwarn") { it, args ->
+        manager.takeWarn(it, args.joinToString(" "))
+    }
+
 }

@@ -10,4 +10,8 @@ class AdminRepository: BaseUserRepository() {
         updateUserEntry(UserEntity(user.id, user.name, user.eventPointCount, status))
     }
 
+    fun updateWarns(user: UserEntity, warns: Int) {
+        updateUserEntry(UserEntity(user.id, user.name, user.eventPointCount, user.status, 0, warns))
+    }
+
 }

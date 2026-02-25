@@ -11,6 +11,7 @@ object Users : Table("users") {
     val name = varchar("name", 50)
     val count = integer("count").default(0)
     val status = integer("status").default(UserStatus.PLAYER.ordinal)
+    val warns = integer("warns").default(0)
 }
 
 object UserDatabase {
@@ -64,6 +65,7 @@ object UserDatabase {
                 it[name] = user.name
                 it[count] = user.eventPointCount
                 it[status] = user.status.ordinal
+                it[warns] = user.adminWarns
             }
         }
     }
@@ -77,7 +79,8 @@ object UserDatabase {
                         id = entry[Users.userId],
                         name = entry[Users.name],
                         eventPointCount = entry[Users.count],
-                        status = UserStatus.fromInt(entry[Users.status])
+                        status = UserStatus.fromInt(entry[Users.status]),
+                        adminWarns = entry[Users.warns]
                     )
                 }
                 .singleOrNull()
