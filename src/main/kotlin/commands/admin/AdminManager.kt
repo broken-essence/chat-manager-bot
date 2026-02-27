@@ -26,7 +26,7 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
                 val status = UserStatus.fromInt(statusValue)
 
                 repository.setUserStatus(
-                    user ?: UserEntity(repliedUser.id.chatId.toString(), repliedUser.firstName),
+                    user ?: UserEntity(repliedUser.id.chatId.toString(), repliedUser.firstName, repliedUser.username?.username ?: ""),
                     status
                 )
 
@@ -61,6 +61,9 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
             val firstPart = content.split(" ")[0]
             if (firstPart.all { it in '0'..'9' } && firstPart.length > 1) {
                 val userEntry = repository.getUserById(firstPart)
+                action(userEntry, content.removePrefix(firstPart).trim())
+            } else if (firstPart.startsWith("@") && firstPart.length > 1) {
+                val userEntry = repository.getUserByUsername(firstPart)
                 action(userEntry, content.removePrefix(firstPart).trim())
             } else if (repliedUser != null) {
                 val userEntry = repository.getUserById(repliedUser.id.chatId.toString())

@@ -1,5 +1,6 @@
 package com.ehedgehog.database
 
+import org.jetbrains.exposed.v1.core.Op
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.core.eq
@@ -9,6 +10,7 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 object Users : Table("users") {
     val userId = varchar("user_id", 50).uniqueIndex()
     val name = varchar("name", 50)
+    val username = varchar("username", 50).default("")
     val count = integer("count").default(0)
     val status = integer("status").default(UserStatus.PLAYER.ordinal)
     val warns = integer("warns").default(0)
@@ -63,6 +65,7 @@ object UserDatabase {
             Users.upsert {
                 it[userId] = user.id
                 it[name] = user.name
+                it[username] = user.username
                 it[count] = user.eventPointCount
                 it[status] = user.status.ordinal
                 it[warns] = user.adminWarns
@@ -72,18 +75,13 @@ object UserDatabase {
     
     fun getUserById(id: String): UserEntity? {
         return transaction { 
-            Users.selectAll()
-                .where(Users.userId eq id)
-                .map { entry ->
-                    UserEntity(
-                        id = entry[Users.userId],
-                        name = entry[Users.name],
-                        eventPointCount = entry[Users.count],
-                        status = UserStatus.fromInt(entry[Users.status]),
-                        adminWarns = entry[Users.warns]
-                    )
-                }
-                .singleOrNull()
+            getUserWhere(Users.userId eq id)
+        }
+    }
+
+    fun getUserByUsername(username: String): UserEntity? {
+        return transaction {
+            getUserWhere(Users.username eq username)
         }
     }
 
@@ -124,5 +122,21 @@ object UserDatabase {
         transaction {
             Users.deleteAll()
         }
+    }
+
+    private fun getUserWhere(predicate: Op<Boolean>): UserEntity? {
+        return Users.selectAll()
+            .where(predicate)
+            .map { entry ->
+                UserEntity(
+                    id = entry[Users.userId],
+                    name = entry[Users.name],
+                    username = entry[Users.username],
+                    eventPointCount = entry[Users.count],
+                    status = UserStatus.fromInt(entry[Users.status]),
+                    adminWarns = entry[Users.warns]
+                )
+            }
+            .singleOrNull()
     }
 }

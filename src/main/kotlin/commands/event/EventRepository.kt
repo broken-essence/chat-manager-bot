@@ -9,7 +9,7 @@ class EventRepository {
 
     fun setEventPoints(user: User, count: Int) {
         try {
-            UserDatabase.setEventPoints(UserEntity(user.id.chatId.toString(), user.firstName, count))
+            UserDatabase.setEventPoints(UserEntity(user.id.chatId.toString(), user.firstName, eventPointCount = count))
         } catch (e: Exception) {
             e.printStackTrace()
         }

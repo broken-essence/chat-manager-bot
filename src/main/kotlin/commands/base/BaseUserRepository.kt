@@ -18,6 +18,10 @@ open class BaseUserRepository {
         return UserDatabase.getUserById(userId)
     }
 
+    fun getUserByUsername(username: String): UserEntity? {
+        return UserDatabase.getUserByUsername(username)
+    }
+
     fun getUserStatusById(userId: String): UserStatus {
         return UserDatabase.getUserStatusById(userId)
     }

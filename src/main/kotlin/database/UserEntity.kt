@@ -13,6 +13,7 @@ enum class UserStatus {
 data class UserEntity(
     val id: String,
     val name: String,
+    val username: String = "",
     val eventPointCount: Int = 0,
     val status: UserStatus = UserStatus.PLAYER,
     val balance: Int = 0,
