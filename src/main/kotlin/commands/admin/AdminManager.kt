@@ -4,9 +4,12 @@ import com.ehedgehog.commands.base.BaseUserManager
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus
 import dev.inmo.tgbotapi.bot.TelegramBot
+import dev.inmo.tgbotapi.extensions.api.chat.members.getChatMember
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.types.IdChatIdentifier
+import dev.inmo.tgbotapi.types.RawChatId
+import dev.inmo.tgbotapi.types.UserId
 import dev.inmo.tgbotapi.types.message.MarkdownV2
 import dev.inmo.tgbotapi.types.message.content.TextMessage
 import dev.inmo.tgbotapi.utils.RiskFeature
@@ -60,13 +63,26 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
         if (isSeniorAdminOrOwner(command.from?.id?.chatId.toString())) {
             val firstPart = content.split(" ")[0]
             if (firstPart.all { it in '0'..'9' } && firstPart.length > 1) {
-                val userEntry = repository.getUserById(firstPart)
+                val userEntry = (repository.getUserById(firstPart) ?: run {
+                    val user = bot.getChatMember(command.chat.id, UserId(RawChatId(firstPart.toLong()))).user
+                    UserEntity(user.id.chatId.toString(), user.firstName, user.username?.username ?: "")
+                })
                 action(userEntry, content.removePrefix(firstPart).trim())
             } else if (firstPart.startsWith("@") && firstPart.length > 1) {
-                val userEntry = repository.getUserByUsername(firstPart)
+                val userEntry = repository.getUserByUsername(firstPart) ?: run {
+                    bot.sendMessage(
+                        command.chat.id,
+                        "Пользователь $firstPart не найден.\nПопробуйте использовать id или ответить на его сообщение."
+                    )
+                    return
+                }
                 action(userEntry, content.removePrefix(firstPart).trim())
             } else if (repliedUser != null) {
-                val userEntry = repository.getUserById(repliedUser.id.chatId.toString())
+                val userEntry = repository.getUserById(repliedUser.id.chatId.toString()) ?: UserEntity(
+                    repliedUser.id.chatId.toString(),
+                    repliedUser.firstName,
+                    repliedUser.username?.username ?: ""
+                )
                 action(userEntry, content)
             }
         }
