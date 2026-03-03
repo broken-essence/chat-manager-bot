@@ -1,6 +1,7 @@
 package com.ehedgehog.commands.general
 
 import com.ehedgehog.commands.base.BaseUserManager
+import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.send.reply
@@ -22,20 +23,24 @@ class GeneralManager(private val bot: TelegramBot): BaseUserManager(bot) {
                 bot.reply(command, "Отправлено в личные сообщения.")
             }
 
-            val user = repository.getUserById(sender.id.chatId.toString())
+            val user = repository.getUserById(sender.id.chatId.toString()) ?: run {
+                val newUser = UserEntity(sender.id.chatId.toString(), sender.firstName, sender.username?.username ?: "")
+                repository.updateUserEntry(newUser)
+                newUser
+            }
 
             bot.sendMessage(
                 sender.id,
                 """
                 |🪿 Пользователь *${handleReservedSymbols(sender.firstName)}*
-                |👤 Статус: ${getStatusDescription(user?.status ?: UserStatus.PLAYER)}
+                |👤 Статус: ${getStatusDescription(user.status)}
                 |💰 Ваш баланс: 666 чего\-то
                 |
-                |🧻 Снятие варна: 1
-                |💊 Активация иммунитета: 2
+                |🧻 Снятие варна: ${user.unwarns}
+                |💊 Активация иммунитета: ${user.immunities}
                 |Иммунитет: действует до 31\.07\.2048 17:41
                 |
-                |⚠️ Предупреждения: ${user?.adminWarns}\/6
+                |⚠️ Предупреждения: ${user.adminWarns}\/6
                 """.trimMargin(),
                 MarkdownV2
             )

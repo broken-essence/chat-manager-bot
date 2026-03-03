@@ -13,10 +13,11 @@ abstract class BaseManager(private val bot: TelegramBot) {
 
     fun createMarkdownLink(name: String, userId: String): String = "[${handleReservedSymbols(name)}](tg://user?id=${userId})"
 
-    fun createAmountString(actionWord: String, amount: Int) = when(amount) {
-        1 -> "${actionWord}а 1 печенюшка"
-        in 2..4 -> "${actionWord}о $amount печенюшки"
-        else -> "${actionWord}о $amount печенюшек"
+    //TODO: add more variants
+    fun createAmountString(actionWord: String, itemWord: String, amount: Int) = when(amount) {
+        1 -> "$actionWord $itemWord"
+        in 2..4 -> "${actionWord}о $amount ${itemWord}а"
+        else -> "${actionWord}о \\$amount ${itemWord}ов"
     }
 
     fun handleReservedSymbols(text: String): String {

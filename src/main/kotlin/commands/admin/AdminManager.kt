@@ -50,9 +50,23 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
     }
 
     suspend fun takeWarn(command: TextMessage, content: String) {
-        onGiveCommand(command, content) { userEntity, count ->
+        onGiveCommand(command, content) { user, count ->
             val newCount = if (count.isNotBlank()) count.trim().toInt() else 1
-            removeWarn(userEntity, newCount, command.chat.id)
+            removeWarn(user, newCount, command.chat.id)
+        }
+    }
+
+    suspend fun giveImmunity(command: TextMessage, content: String) {
+        onGiveCommand(command, content) { user, count ->
+            val newCount = if (count.isNotBlank()) count.trim().toInt() else 1
+            addImmunity(user, newCount, command.chat.id)
+        }
+    }
+
+    suspend fun giveUnwarn(command: TextMessage, content: String) {
+        onGiveCommand(command, content) { user, count ->
+            val newCount = if (count.isNotBlank()) count.trim().toInt() else 1
+            addUnwarn(user, newCount, command.chat.id)
         }
     }
 
@@ -123,6 +137,32 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
                     MarkdownV2
                 )
             }
+        }
+    }
+
+    private suspend fun addImmunity(userEntity: UserEntity?, count: Int = 1, chatId: IdChatIdentifier) {
+        userEntity?.let {
+            val newCount = userEntity.immunities + count
+            repository.updateImmunities(it, newCount)
+            val actionString = createAmountString("подарен", "иммунитет", count)
+            bot.sendMessage(
+                chatId,
+                "Пользователю ${createMarkdownLink(it.name, it.id)} ${actionString}\\.",
+                MarkdownV2
+            )
+        }
+    }
+
+    private suspend fun addUnwarn(userEntity: UserEntity?, count: Int = 1, chatId: IdChatIdentifier) {
+        userEntity?.let {
+            val newCount = userEntity.unwarns + count
+            repository.updateUnwarns(it, newCount)
+            val actionString = createAmountString("подарен", "анварн", count)
+            bot.sendMessage(
+                chatId,
+                "Пользователю ${createMarkdownLink(it.name, it.id)} ${actionString}\\.",
+                MarkdownV2
+            )
         }
     }
 

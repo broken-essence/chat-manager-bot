@@ -22,7 +22,7 @@ class EventManager(private val bot: TelegramBot): BaseUserManager(bot) {
             if (isAdmin(command.chat.id, command.from!!.id)) {
                 val eventPointCount = repository.getEventPointCountById(repliedUser.id.chatId.toString()) + amount
                 repository.setEventPoints(repliedUser, eventPointCount)
-                val amountString = createAmountString("начислен", amount)
+                val amountString = createAmountString("начислен", "что-то", amount)
                 bot.sendMessage(
                     command.chat.id,
                     """Пользователю $markdownNameString $amountString\!
@@ -47,7 +47,7 @@ class EventManager(private val bot: TelegramBot): BaseUserManager(bot) {
                     if (amount <= eventPointCount) {
                         val newCount = eventPointCount - amount
                         repository.setEventPoints(repliedUser, newCount)
-                        val amountString = createAmountString("отобран", amount)
+                        val amountString = createAmountString("отобран", "что-то", amount)
 
                         bot.sendMessage(
                             command.chat.id,

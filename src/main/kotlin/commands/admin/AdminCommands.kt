@@ -17,4 +17,12 @@ fun BehaviourContext.registerAdminCommands(manager: AdminManager) {
         manager.takeWarn(it, args.joinToString(" "))
     }
 
+    onCommandWithArgs("give_immun") { it, args ->
+        manager.giveImmunity(it, args.joinToString(" "))
+    }
+
+    onCommandWithArgs("give_unwarn") { it, args ->
+        manager.giveUnwarn(it, args.joinToString(" "))
+    }
+
 }
