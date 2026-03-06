@@ -16,6 +16,7 @@ object Users : Table("users") {
     val warns = integer("warns").default(0)
     val immunities = integer("immunities").default(0)
     val unwarns = integer("unwarns").default(0)
+    val balance = integer("balance").default(0)
 }
 
 object UserDatabase {
@@ -73,6 +74,7 @@ object UserDatabase {
                 it[warns] = user.adminWarns
                 it[immunities] = user.immunities
                 it[unwarns] = user.unwarns
+                it[balance] = user.balance
             }
         }
     }
@@ -140,7 +142,8 @@ object UserDatabase {
                     status = UserStatus.fromInt(entry[Users.status]),
                     adminWarns = entry[Users.warns],
                     immunities = entry[Users.immunities],
-                    unwarns = entry[Users.unwarns]
+                    unwarns = entry[Users.unwarns],
+                    balance = entry[Users.balance]
                 )
             }
             .singleOrNull()

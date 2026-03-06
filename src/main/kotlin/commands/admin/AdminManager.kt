@@ -70,13 +70,20 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
         }
     }
 
+    suspend fun giveBalance(command: TextMessage, content: String) {
+        onGiveCommand(command, content) { user, amount ->
+            val newAmount = if (amount.isNotBlank()) amount.trim().toInt() else 1
+            addBalance(user, newAmount, command.chat.id)
+        }
+    }
+
     @OptIn(RiskFeature::class)
     private suspend fun onGiveCommand(command: TextMessage, content: String, action: suspend (UserEntity?, String) -> Unit) {
         val repliedUser = command.replyTo?.from
 
         if (isSeniorAdminOrOwner(command.from?.id?.chatId.toString())) {
             val firstPart = content.split(" ")[0]
-            if (firstPart.all { it in '0'..'9' } && firstPart.length > 1) {
+            if (firstPart.all { it in '0'..'9' } && firstPart.length >= 9) {
                 val userEntry = (repository.getUserById(firstPart) ?: run {
                     val user = bot.getChatMember(command.chat.id, UserId(RawChatId(firstPart.toLong()))).user
                     UserEntity(user.id.chatId.toString(), user.firstName, user.username?.username ?: "")
@@ -142,7 +149,7 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
 
     private suspend fun addImmunity(userEntity: UserEntity?, count: Int = 1, chatId: IdChatIdentifier) {
         userEntity?.let {
-            val newCount = userEntity.immunities + count
+            val newCount = it.immunities + count
             repository.updateImmunities(it, newCount)
             val actionString = createAmountString("подарен", "иммунитет", count)
             bot.sendMessage(
@@ -155,12 +162,25 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
 
     private suspend fun addUnwarn(userEntity: UserEntity?, count: Int = 1, chatId: IdChatIdentifier) {
         userEntity?.let {
-            val newCount = userEntity.unwarns + count
+            val newCount = it.unwarns + count
             repository.updateUnwarns(it, newCount)
             val actionString = createAmountString("подарен", "анварн", count)
             bot.sendMessage(
                 chatId,
                 "Пользователю ${createMarkdownLink(it.name, it.id)} ${actionString}\\.",
+                MarkdownV2
+            )
+        }
+    }
+
+    private suspend fun addBalance(userEntity: UserEntity?, amount: Int = 0, chatId: IdChatIdentifier) {
+        userEntity?.let {
+            val newAmount = it.balance + amount
+            repository.updateBalance(it, newAmount)
+
+            bot.sendMessage(
+                chatId,
+                "Пользователю ${createMarkdownLink(it.name, it.id)} выдано $amount \uD83D\uDCB8",
                 MarkdownV2
             )
         }

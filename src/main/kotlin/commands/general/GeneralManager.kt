@@ -34,7 +34,7 @@ class GeneralManager(private val bot: TelegramBot): BaseUserManager(bot) {
                 """
                 |🪿 Пользователь *${handleReservedSymbols(sender.firstName)}*
                 |👤 Статус: ${getStatusDescription(user.status)}
-                |💰 Ваш баланс: 666 чего\-то
+                |💰 Ваш баланс: ${user.balance} 💸
                 |
                 |🧻 Снятие варна: ${user.unwarns}
                 |💊 Активация иммунитета: ${user.immunities}

@@ -25,4 +25,8 @@ fun BehaviourContext.registerAdminCommands(manager: AdminManager) {
         manager.giveUnwarn(it, args.joinToString(" "))
     }
 
+    onCommandWithArgs("give_balance") { it, args ->
+        manager.giveBalance(it, args.joinToString(" "))
+    }
+
 }
