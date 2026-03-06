@@ -1,15 +1,13 @@
 package com.ehedgehog.commands.admin
 
 import com.ehedgehog.commands.base.BaseUserManager
+import com.ehedgehog.database.ChatUser
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus
+import com.ehedgehog.getChatUserById
 import dev.inmo.tgbotapi.bot.TelegramBot
-import dev.inmo.tgbotapi.extensions.api.chat.members.getChatMember
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
-import dev.inmo.tgbotapi.types.IdChatIdentifier
-import dev.inmo.tgbotapi.types.RawChatId
-import dev.inmo.tgbotapi.types.UserId
 import dev.inmo.tgbotapi.types.message.MarkdownV2
 import dev.inmo.tgbotapi.types.message.content.TextMessage
 import dev.inmo.tgbotapi.utils.RiskFeature
@@ -44,51 +42,53 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
 
     @OptIn(RiskFeature::class)
     suspend fun giveWarn(command: TextMessage, content: String) {
-        onGiveCommand(command, content) { userEntity, reason ->
-            addWarn(userEntity, reason, command.chat.id)
+        onGiveCommand(command, content) { user, reason ->
+            addWarn(user, reason)
         }
     }
 
     suspend fun takeWarn(command: TextMessage, content: String) {
         onGiveCommand(command, content) { user, count ->
             val newCount = if (count.isNotBlank()) count.trim().toInt() else 1
-            removeWarn(user, newCount, command.chat.id)
+            removeWarn(user, newCount)
         }
     }
 
     suspend fun giveImmunity(command: TextMessage, content: String) {
         onGiveCommand(command, content) { user, count ->
             val newCount = if (count.isNotBlank()) count.trim().toInt() else 1
-            addImmunity(user, newCount, command.chat.id)
+            addImmunity(user, newCount)
         }
     }
 
     suspend fun giveUnwarn(command: TextMessage, content: String) {
         onGiveCommand(command, content) { user, count ->
             val newCount = if (count.isNotBlank()) count.trim().toInt() else 1
-            addUnwarn(user, newCount, command.chat.id)
+            addUnwarn(user, newCount)
         }
     }
 
     suspend fun giveBalance(command: TextMessage, content: String) {
         onGiveCommand(command, content) { user, amount ->
             val newAmount = if (amount.isNotBlank()) amount.trim().toInt() else 1
-            addBalance(user, newAmount, command.chat.id)
+            addBalance(user, newAmount)
         }
     }
 
     @OptIn(RiskFeature::class)
-    private suspend fun onGiveCommand(command: TextMessage, content: String, action: suspend (UserEntity?, String) -> Unit) {
+    private suspend fun onGiveCommand(command: TextMessage, content: String, action: suspend (ChatUser, String) -> Unit) {
         val repliedUser = command.replyTo?.from
 
         if (isSeniorAdminOrOwner(command.from?.id?.chatId.toString())) {
             val firstPart = content.split(" ")[0]
             if (firstPart.all { it in '0'..'9' } && firstPart.length >= 9) {
-                val userEntry = (repository.getUserById(firstPart) ?: run {
-                    val user = bot.getChatMember(command.chat.id, UserId(RawChatId(firstPart.toLong()))).user
-                    UserEntity(user.id.chatId.toString(), user.firstName, user.username?.username ?: "")
-                })
-                action(userEntry, content.removePrefix(firstPart).trim())
+                val chatMember = bot.getChatUserById(command.chat.id, firstPart.toLong())
+                val userEntry = repository.getUserById(firstPart) ?: UserEntity(
+                    chatMember.id.chatId.toString(),
+                    chatMember.firstName,
+                    chatMember.username?.username ?: ""
+                )
+                action(ChatUser(command.chat.id,userEntry, chatMember), content.removePrefix(firstPart).trim())
             } else if (firstPart.startsWith("@") && firstPart.length > 1) {
                 val userEntry = repository.getUserByUsername(firstPart) ?: run {
                     bot.sendMessage(
@@ -97,93 +97,84 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
                     )
                     return
                 }
-                action(userEntry, content.removePrefix(firstPart).trim())
+                val chatMember = bot.getChatUserById(command.chat.id, userEntry.id.toLong())
+                action(ChatUser(command.chat.id, userEntry, chatMember), content.removePrefix(firstPart).trim())
             } else if (repliedUser != null) {
                 val userEntry = repository.getUserById(repliedUser.id.chatId.toString()) ?: UserEntity(
                     repliedUser.id.chatId.toString(),
                     repliedUser.firstName,
                     repliedUser.username?.username ?: ""
                 )
-                action(userEntry, content)
+                action(ChatUser(command.chat.id, userEntry, repliedUser), content)
             }
         }
     }
 
-    private suspend fun addWarn(userEntity: UserEntity?, reason: String, chatId: IdChatIdentifier) {
-        userEntity?.let {
-            if (it.status >= UserStatus.ADMIN) {
-                val newCount = it.adminWarns + 1
-                repository.updateWarns(it, newCount)
+    private suspend fun addWarn(chatUser: ChatUser, reason: String) {
+        if (chatUser.storedUser.status >= UserStatus.ADMIN) {
+            val newCount = chatUser.storedUser.adminWarns + 1
+            repository.updateWarns(chatUser, newCount)
 
-                bot.sendMessage(
-                    chatId,
-                    """
-                    |Администратору ${createMarkdownLink(it.name, it.id)} выдано $newCount\/6 предупреждений\.
+            bot.sendMessage(
+                chatUser.chatId,
+                """
+                    |Администратору ${createMarkdownLink(chatUser.chatMember.firstName, chatUser.storedUser.id)} выдано $newCount\/6 предупреждений\.
                     |${if (reason.isNotBlank()) "*Причина:* $reason" else ""}
                     """.trimMargin(),
-                    MarkdownV2
-                )
+                MarkdownV2
+            )
+        }
+    }
+
+    private suspend fun removeWarn(chatUser: ChatUser, count: Int = 1) {
+        if (chatUser.storedUser.status >= UserStatus.ADMIN) {
+            if (count <= 0 || count > chatUser.storedUser.adminWarns) {
+                bot.sendMessage(chatUser.chatId, "Неправильное количество предупреждений.")
+                return
             }
-        }
-    }
 
-    private suspend fun removeWarn(userEntity: UserEntity?, count: Int = 1, chatId: IdChatIdentifier) {
-        userEntity?.let {
-            if (it.status >= UserStatus.ADMIN) {
-                if (count <= 0 || count > it.adminWarns) {
-                    bot.sendMessage(chatId, "Неправильное количество предупреждений.")
-                    return
-                }
-
-                val newCount = it.adminWarns - count
-                val message = if (newCount == 0) "больше не имеет предупреждений\\." else "имеет $newCount\\/6 предупреждений\\."
-                repository.updateWarns(it, newCount)
-                bot.sendMessage(
-                    chatId,
-                    "Администратор ${createMarkdownLink(it.name, it.id)} $message",
-                    MarkdownV2
-                )
-            }
-        }
-    }
-
-    private suspend fun addImmunity(userEntity: UserEntity?, count: Int = 1, chatId: IdChatIdentifier) {
-        userEntity?.let {
-            val newCount = it.immunities + count
-            repository.updateImmunities(it, newCount)
-            val actionString = createAmountString("подарен", "иммунитет", count)
+            val newCount = chatUser.storedUser.adminWarns - count
+            val message = if (newCount == 0) "больше не имеет предупреждений\\." else "имеет $newCount\\/6 предупреждений\\."
+            repository.updateWarns(chatUser, newCount)
             bot.sendMessage(
-                chatId,
-                "Пользователю ${createMarkdownLink(it.name, it.id)} ${actionString}\\.",
+                chatUser.chatId,
+                "Администратор ${createMarkdownLink(chatUser.chatMember.firstName, chatUser.storedUser.id)} $message",
                 MarkdownV2
             )
         }
     }
 
-    private suspend fun addUnwarn(userEntity: UserEntity?, count: Int = 1, chatId: IdChatIdentifier) {
-        userEntity?.let {
-            val newCount = it.unwarns + count
-            repository.updateUnwarns(it, newCount)
-            val actionString = createAmountString("подарен", "анварн", count)
-            bot.sendMessage(
-                chatId,
-                "Пользователю ${createMarkdownLink(it.name, it.id)} ${actionString}\\.",
-                MarkdownV2
-            )
-        }
+    private suspend fun addImmunity(chatUser: ChatUser, count: Int = 1) {
+        val newCount = chatUser.storedUser.immunities + count
+        repository.updateImmunities(chatUser, newCount)
+        val actionString = createAmountString("подарен", "иммунитет", count)
+        bot.sendMessage(
+            chatUser.chatId,
+            "Пользователю ${createMarkdownLink(chatUser.chatMember.firstName, chatUser.storedUser.id)} ${actionString}\\.",
+            MarkdownV2
+        )
     }
 
-    private suspend fun addBalance(userEntity: UserEntity?, amount: Int = 0, chatId: IdChatIdentifier) {
-        userEntity?.let {
-            val newAmount = it.balance + amount
-            repository.updateBalance(it, newAmount)
+    private suspend fun addUnwarn(chatUser: ChatUser, count: Int = 1) {
+        val newCount = chatUser.storedUser.unwarns + count
+        repository.updateUnwarns(chatUser, newCount)
+        val actionString = createAmountString("подарен", "анварн", count)
+        bot.sendMessage(
+            chatUser.chatId,
+            "Пользователю ${createMarkdownLink(chatUser.chatMember.firstName, chatUser.storedUser.id)} ${actionString}\\.",
+            MarkdownV2
+        )
+    }
 
-            bot.sendMessage(
-                chatId,
-                "Пользователю ${createMarkdownLink(it.name, it.id)} выдано $amount \uD83D\uDCB8",
-                MarkdownV2
-            )
-        }
+    private suspend fun addBalance(chatUser: ChatUser, amount: Int = 0) {
+        val newAmount = chatUser.storedUser.balance + amount
+        repository.updateBalance(chatUser, newAmount)
+
+        bot.sendMessage(
+            chatUser.chatId,
+            "Пользователю ${createMarkdownLink(chatUser.chatMember.firstName, chatUser.storedUser.id)} выдано $amount \uD83D\uDCB8",
+            MarkdownV2
+        )
     }
 
 }

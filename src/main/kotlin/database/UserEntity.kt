@@ -1,5 +1,10 @@
 package com.ehedgehog.database
 
+import dev.inmo.tgbotapi.types.IdChatIdentifier
+import dev.inmo.tgbotapi.types.chat.PreviewChat
+import dev.inmo.tgbotapi.types.chat.PreviewUser
+import dev.inmo.tgbotapi.types.chat.User
+
 enum class UserStatus {
     PLAYER, ADMIN, SENIOR_ADMIN;
 
@@ -27,4 +32,10 @@ data class UserIndexed(
     val id: String,
     val name: String,
     val eventPointCount: Int
+)
+
+data class ChatUser(
+    val chatId: IdChatIdentifier,
+    val storedUser: UserEntity,
+    val chatMember: User
 )

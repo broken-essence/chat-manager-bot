@@ -11,10 +11,16 @@ import com.ehedgehog.database.UserDatabase
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.bot.ktor.telegramBot
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
+import dev.inmo.tgbotapi.extensions.api.chat.members.getChatMember
 import dev.inmo.tgbotapi.extensions.api.getUpdates
 import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPolling
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onText
+import dev.inmo.tgbotapi.types.ChatIdentifier
+import dev.inmo.tgbotapi.types.RawChatId
 import dev.inmo.tgbotapi.types.UpdateId
+import dev.inmo.tgbotapi.types.UserId
+import dev.inmo.tgbotapi.types.chat.PreviewUser
+import dev.inmo.tgbotapi.types.chat.User
 import dev.inmo.tgbotapi.utils.PreviewFeature
 import dev.inmo.tgbotapi.utils.RiskFeature
 import kotlinx.coroutines.CoroutineScope
@@ -82,3 +88,6 @@ suspend fun TelegramBot.skipOldUpdates() {
         this.getUpdates(offset = lastId + 1)
     }
 }
+
+suspend fun TelegramBot.getChatUserById(chatId: ChatIdentifier, userId: Long): User =
+    getChatMember(chatId, UserId(RawChatId(userId))).user
