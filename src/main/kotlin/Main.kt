@@ -8,6 +8,8 @@ import com.ehedgehog.commands.general.GeneralManager
 import com.ehedgehog.commands.general.registerGeneralCommands
 import com.ehedgehog.config.Config
 import com.ehedgehog.database.UserDatabase
+import com.ehedgehog.screens.ScreenRouter
+import com.ehedgehog.screens.profile.ProfileScreen
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.bot.ktor.telegramBot
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
@@ -19,7 +21,6 @@ import dev.inmo.tgbotapi.types.ChatIdentifier
 import dev.inmo.tgbotapi.types.RawChatId
 import dev.inmo.tgbotapi.types.UpdateId
 import dev.inmo.tgbotapi.types.UserId
-import dev.inmo.tgbotapi.types.chat.PreviewUser
 import dev.inmo.tgbotapi.types.chat.User
 import dev.inmo.tgbotapi.utils.PreviewFeature
 import dev.inmo.tgbotapi.utils.RiskFeature
@@ -66,6 +67,8 @@ suspend fun main(args: Array<String>) {
         registerGeneralCommands(GeneralManager(bot))
 
         registerAdminCommands(AdminManager(bot))
+
+        ScreenRouter.registerScreen(ProfileScreen(bot))
 
         onText { message ->
             manager.handleRPCommands(message)
