@@ -1,11 +1,5 @@
 package com.ehedgehog
 
-import com.ehedgehog.commands.admin.AdminManager
-import com.ehedgehog.commands.admin.registerAdminCommands
-import com.ehedgehog.commands.event.EventManager
-import com.ehedgehog.commands.event.registerEventCommands
-import com.ehedgehog.commands.general.GeneralManager
-import com.ehedgehog.commands.general.registerGeneralCommands
 import com.ehedgehog.config.Config
 import com.ehedgehog.database.UserDatabase
 import com.ehedgehog.screens.ScreenRouter
@@ -45,7 +39,6 @@ suspend fun main(args: Array<String>) {
 //    val bot = telegramBot(System.getenv("BOT_TOKEN"))
 
     val scope = CoroutineScope(Dispatchers.Default)
-    val manager = EventManager(bot)
 
     UserDatabase.init()
 
@@ -62,17 +55,10 @@ suspend fun main(args: Array<String>) {
             println("TEXT RECEIVED: ${message.content.text}")
         }
 
-        registerEventCommands(manager)
-
-        registerGeneralCommands(GeneralManager(bot))
-
-        registerAdminCommands(AdminManager(bot))
+        registerCommands(bot, this)
+        registerScreens(bot)
 
         ScreenRouter.registerScreen(ProfileScreen(bot))
-
-        onText { message ->
-            manager.handleRPCommands(message)
-        }
 
         println(me)
     }.join()
