@@ -2,15 +2,18 @@ package com.ehedgehog
 
 import com.ehedgehog.config.Config
 import com.ehedgehog.database.UserDatabase
+import com.ehedgehog.screens.ScreenContext
 import com.ehedgehog.screens.ScreenRouter
-import com.ehedgehog.screens.profile.ProfileScreen
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.bot.ktor.telegramBot
+import dev.inmo.tgbotapi.extensions.api.answers.answerCallbackQuery
 import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.api.chat.members.getChatMember
 import dev.inmo.tgbotapi.extensions.api.getUpdates
 import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPolling
+import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onText
+import dev.inmo.tgbotapi.extensions.utils.extensions.raw.message
 import dev.inmo.tgbotapi.types.ChatIdentifier
 import dev.inmo.tgbotapi.types.RawChatId
 import dev.inmo.tgbotapi.types.UpdateId
@@ -58,7 +61,13 @@ suspend fun main(args: Array<String>) {
         registerCommands(bot, this)
         registerScreens(bot)
 
-        ScreenRouter.registerScreen(ProfileScreen(bot))
+        onDataCallbackQuery { callback ->
+            answerCallbackQuery(callback)
+
+            val message = callback.message ?: return@onDataCallbackQuery
+            val context = ScreenContext(message.chat.id, callback.from, message.messageId)
+            ScreenRouter.openScreen(bot, context, callback.data)
+        }
 
         println(me)
     }.join()
