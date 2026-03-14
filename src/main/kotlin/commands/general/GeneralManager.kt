@@ -1,6 +1,6 @@
 package com.ehedgehog.commands.general
 
-import com.ehedgehog.commands.base.BaseUserManager
+import com.ehedgehog.base.BaseUserManager
 import com.ehedgehog.screens.ScreenContext
 import com.ehedgehog.screens.ScreenRouter
 import dev.inmo.tgbotapi.bot.TelegramBot

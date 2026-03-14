@@ -1,4 +1,4 @@
-package com.ehedgehog.commands.base
+package com.ehedgehog.base
 
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.chat.get.getChatAdministrators

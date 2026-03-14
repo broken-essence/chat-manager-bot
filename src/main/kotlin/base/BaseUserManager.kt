@@ -1,4 +1,4 @@
-package com.ehedgehog.commands.base
+package com.ehedgehog.base
 
 import com.ehedgehog.database.UserStatus
 import dev.inmo.tgbotapi.bot.TelegramBot

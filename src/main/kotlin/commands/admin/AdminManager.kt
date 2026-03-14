@@ -1,6 +1,6 @@
 package com.ehedgehog.commands.admin
 
-import com.ehedgehog.commands.base.BaseUserManager
+import com.ehedgehog.base.BaseUserManager
 import com.ehedgehog.database.ChatUser
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus

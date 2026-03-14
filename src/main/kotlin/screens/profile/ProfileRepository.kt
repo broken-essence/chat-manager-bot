@@ -1,6 +1,6 @@
 package com.ehedgehog.screens.profile
 
-import com.ehedgehog.commands.base.BaseUserRepository
+import com.ehedgehog.base.BaseUserRepository
 import com.ehedgehog.database.UserEntity
 import dev.inmo.tgbotapi.types.chat.User
 

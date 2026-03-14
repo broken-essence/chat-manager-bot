@@ -1,6 +1,6 @@
 package com.ehedgehog.screens.profile
 
-import com.ehedgehog.commands.base.BaseUserManager
+import com.ehedgehog.base.BaseUserManager
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.types.chat.User
 

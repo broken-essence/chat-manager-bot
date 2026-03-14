@@ -1,6 +1,6 @@
 package com.ehedgehog.screens
 
-import com.ehedgehog.commands.base.BaseScreen
+import com.ehedgehog.base.BaseScreen
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.edit.text.editMessageText
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage

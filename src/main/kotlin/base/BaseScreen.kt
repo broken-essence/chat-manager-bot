@@ -1,4 +1,4 @@
-package com.ehedgehog.commands.base
+package com.ehedgehog.base
 
 import com.ehedgehog.screens.ScreenContent
 import com.ehedgehog.screens.ScreenContext

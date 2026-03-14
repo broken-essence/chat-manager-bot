@@ -1,6 +1,6 @@
 package com.ehedgehog.commands.event
 
-import com.ehedgehog.commands.base.BaseUserManager
+import com.ehedgehog.base.BaseUserManager
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
