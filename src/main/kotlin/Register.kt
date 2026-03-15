@@ -9,6 +9,7 @@ import com.ehedgehog.commands.general.registerGeneralCommands
 import com.ehedgehog.screens.ScreenRouter
 import com.ehedgehog.screens.inventory.InventoryScreen
 import com.ehedgehog.screens.profile.ProfileScreen
+import com.ehedgehog.screens.shop.ShopScreen
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 
@@ -21,4 +22,5 @@ fun registerCommands(bot: TelegramBot, context: BehaviourContext) {
 fun registerScreens(bot: TelegramBot) {
     ScreenRouter.registerScreen(ProfileScreen(bot))
     ScreenRouter.registerScreen(InventoryScreen(bot))
+    ScreenRouter.registerScreen(ShopScreen(bot))
 }
