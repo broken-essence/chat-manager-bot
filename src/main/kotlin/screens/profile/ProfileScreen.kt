@@ -6,6 +6,7 @@ import com.ehedgehog.screens.ScreenContext
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
+import dev.inmo.tgbotapi.extensions.utils.types.buttons.urlButton
 import dev.inmo.tgbotapi.utils.row
 
 class ProfileScreen(bot: TelegramBot): BaseScreen {
@@ -21,6 +22,9 @@ class ProfileScreen(bot: TelegramBot): BaseScreen {
             }
             row {
                 dataButton("\uD83D\uDED2 Магазин", "shop")
+            }
+            row {
+                urlButton("\uD83D\uDCAC Поддержка", System.getenv("SUPPORT_URL"))
             }
         }
 
