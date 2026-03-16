@@ -2,6 +2,7 @@ package com.ehedgehog
 
 import com.ehedgehog.config.Config
 import com.ehedgehog.database.UserDatabase
+import com.ehedgehog.screens.ActionRouter
 import com.ehedgehog.screens.ScreenContext
 import com.ehedgehog.screens.ScreenRouter
 import dev.inmo.tgbotapi.bot.TelegramBot
@@ -60,13 +61,17 @@ suspend fun main(args: Array<String>) {
 
         registerCommands(bot, this)
         registerScreens(bot)
+        registerActions(bot)
 
         onDataCallbackQuery { callback ->
             answerCallbackQuery(callback)
 
             val message = callback.message ?: return@onDataCallbackQuery
             val context = ScreenContext(message.chat.id, callback.from, message.messageId)
-            ScreenRouter.openScreen(bot, context, callback.data)
+            if (callback.data.startsWith("action:"))
+                ActionRouter.executeAction(bot, context, callback.data)
+            else
+                ScreenRouter.openScreen(bot, context, callback.data)
         }
 
         println(me)
