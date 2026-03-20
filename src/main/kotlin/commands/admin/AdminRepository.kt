@@ -21,34 +21,4 @@ class AdminRepository: BaseUserRepository() {
         )
     }
 
-    fun updateImmunities(user: ChatUser, immunCount: Int) {
-        updateUserEntry(
-            user.storedUser.copy(
-                name = user.chatMember.firstName,
-                username = user.chatMember.username?.username ?: "",
-                immunities = immunCount
-            )
-        )
-    }
-
-    fun updateUnwarns(user: ChatUser, unwarnCount: Int) {
-        updateUserEntry(
-            user.storedUser.copy(
-                name = user.chatMember.firstName,
-                username = user.chatMember.username?.username ?: "",
-                unwarns = unwarnCount
-            )
-        )
-    }
-
-    fun updateBalance(user: ChatUser, amount: Int) {
-        updateUserEntry(
-            user.storedUser.copy(
-                name = user.chatMember.firstName,
-                username = user.chatMember.username?.username ?: "",
-                balance = amount
-            )
-        )
-    }
-
 }

@@ -21,7 +21,7 @@ class GeneralManager(private val bot: TelegramBot): BaseUserManager(bot) {
                 bot.reply(command, "Отправлено в личные сообщения.")
             }
 
-            ScreenRouter.openScreen(bot, ScreenContext(command.chat.id, sender), "profile")
+            ScreenRouter.openScreen(bot, ScreenContext(sender.id, sender), "profile")
         }
     }
 

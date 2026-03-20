@@ -21,9 +21,9 @@ object ScreenRouter {
         val content = screen?.render(context) ?: return
 
         if (context.messageId == null) {
-            bot.sendMessage(context.user.id, content.text, MarkdownV2, replyMarkup = content.keyboard)
+            bot.sendMessage(context.chatId, content.text, MarkdownV2, replyMarkup = content.keyboard)
         } else {
-            bot.editMessageText(context.user.id, context.messageId, content.text, MarkdownV2, replyMarkup = content.keyboard)
+            bot.editMessageText(context.chatId, context.messageId, content.text, MarkdownV2, replyMarkup = content.keyboard)
         }
     }
 

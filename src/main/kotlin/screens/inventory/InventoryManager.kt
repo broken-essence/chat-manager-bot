@@ -1,9 +1,14 @@
 package com.ehedgehog.screens.inventory
 
 import com.ehedgehog.base.BaseUserManager
+import com.ehedgehog.database.ChatUser
+import com.ehedgehog.screens.ScreenContext
+import com.ehedgehog.screens.ScreenRouter
 import dev.inmo.tgbotapi.bot.TelegramBot
+import dev.inmo.tgbotapi.types.ChatId
+import dev.inmo.tgbotapi.types.RawChatId
 
-class InventoryManager(bot: TelegramBot) : BaseUserManager(bot) {
+class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
 
     private val repository = InventoryRepository()
 
@@ -20,6 +25,18 @@ class InventoryManager(bot: TelegramBot) : BaseUserManager(bot) {
             Иммунитет: не активен\.
             _📌 После активации обязательно необходимо добавить в ваш никнейм эмодзи «`🚩`», чтобы другие игроки видели наличие у вас активного иммунитета\._
         """.trimIndent()
+    }
+
+    suspend fun useUnwarn(context: ScreenContext) {
+        val userEntry = repository.getStoredUser(context.user.id.chatId.toString()) ?: return
+
+        if (userEntry.unwarns > 0) {
+            //TODO: replace id with env of admin system chat
+            val unwarnContext = ScreenContext(ChatId(RawChatId(-1002158551287)), context.user)
+            repository.useUnwarn(ChatUser(context.chatId, userEntry, context.user))
+            ScreenRouter.openScreen(bot, unwarnContext, "request_unwarn")
+            ScreenRouter.openScreen(bot, context, "inventory")
+        }
     }
 
 }

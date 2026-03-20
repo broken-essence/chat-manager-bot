@@ -1,7 +1,6 @@
 package com.ehedgehog.screens
 
 import com.ehedgehog.base.BaseAction
-import dev.inmo.tgbotapi.bot.TelegramBot
 
 object ActionRouter {
 
@@ -13,7 +12,7 @@ object ActionRouter {
 
     fun get(id: String): BaseAction? = actions[id]
 
-    suspend fun executeAction(bot: TelegramBot, context: ScreenContext, actionId: String) {
+    suspend fun executeAction(context: ScreenContext, actionId: String) {
         val action = actions[actionId]
         action?.execute(context)
     }
