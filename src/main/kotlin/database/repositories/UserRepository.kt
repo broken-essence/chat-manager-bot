@@ -1,57 +1,18 @@
-package com.ehedgehog.database
+package com.ehedgehog.database.repositories
 
+import com.ehedgehog.database.UserEntity
+import com.ehedgehog.database.UserStatus
+import com.ehedgehog.database.Users
 import org.jetbrains.exposed.v1.core.Op
 import org.jetbrains.exposed.v1.core.SortOrder
-import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.core.eq
-import org.jetbrains.exposed.v1.jdbc.*
+import org.jetbrains.exposed.v1.jdbc.deleteAll
+import org.jetbrains.exposed.v1.jdbc.select
+import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.upsert
 
-object Users : Table("users") {
-    val userId = varchar("user_id", 50).uniqueIndex()
-    val name = varchar("name", 50)
-    val username = varchar("username", 50).default("")
-    val count = integer("count").default(0)
-    val status = integer("status").default(UserStatus.PLAYER.ordinal)
-    val warns = integer("warns").default(0)
-    val immunities = integer("immunities").default(0)
-    val unwarns = integer("unwarns").default(0)
-    val balance = integer("balance").default(0)
-}
-
-object UserDatabase {
-    fun init() {
-        /* local running */
-        Database.connect("jdbc:sqlite:users.db", driver = "org.sqlite.JDBC")
-
-        /* running with railway */
-//        val host = System.getenv("PGHOST") ?: "localhost"
-//        val port = System.getenv("PGPORT") ?: "5432"
-//        val database = System.getenv("PGDATABASE") ?: "postgres"
-//        val user = System.getenv("PGUSER") ?: "postgres"
-//        val password = System.getenv("PGPASSWORD") ?: ""
-//
-//        val config = HikariConfig().apply {
-//            this.jdbcUrl = "jdbc:postgresql://$host:$port/$database"
-//            this.username = user
-//            this.password = password
-//            this.driverClassName = "org.postgresql.Driver"
-//
-//            maximumPoolSize = 5
-//            minimumIdle = 1
-//            connectionTimeout = 30_000
-//            idleTimeout = 600_000
-//            maxLifetime = 1_800_000
-//
-//            isAutoCommit = false
-//            transactionIsolation = "TRANSACTION_REPEATABLE_READ"
-//        }
-//
-//        Database.connect(HikariDataSource(config))
-        transaction {
-            SchemaUtils.create(Users)
-        }
-    }
+class UserRepository {
 
     fun setEventPoints(user: UserEntity) {
         transaction {
@@ -78,9 +39,9 @@ object UserDatabase {
             }
         }
     }
-    
+
     fun getUserById(id: String): UserEntity? {
-        return transaction { 
+        return transaction {
             getUserWhere(Users.userId eq id)
         }
     }
@@ -148,4 +109,5 @@ object UserDatabase {
             }
             .singleOrNull()
     }
+
 }

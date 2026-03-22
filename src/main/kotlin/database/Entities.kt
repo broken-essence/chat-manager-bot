@@ -1,8 +1,6 @@
 package com.ehedgehog.database
 
 import dev.inmo.tgbotapi.types.IdChatIdentifier
-import dev.inmo.tgbotapi.types.chat.PreviewChat
-import dev.inmo.tgbotapi.types.chat.PreviewUser
 import dev.inmo.tgbotapi.types.chat.User
 
 enum class UserStatus {

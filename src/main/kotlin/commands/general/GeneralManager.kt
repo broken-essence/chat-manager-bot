@@ -11,8 +11,6 @@ import dev.inmo.tgbotapi.utils.RiskFeature
 
 class GeneralManager(private val bot: TelegramBot): BaseUserManager(bot) {
 
-    private val repository = GeneralRepository()
-
     @OptIn(RiskFeature::class)
     suspend fun getProfile(command: TextMessage) {
         val sender = command.from

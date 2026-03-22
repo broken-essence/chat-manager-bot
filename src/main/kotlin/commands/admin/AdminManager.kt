@@ -4,6 +4,7 @@ import com.ehedgehog.base.BaseUserManager
 import com.ehedgehog.database.ChatUser
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus
+import com.ehedgehog.database.repositories.UserRepository
 import com.ehedgehog.getChatUserById
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
@@ -14,7 +15,7 @@ import dev.inmo.tgbotapi.utils.RiskFeature
 
 class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
 
-    private val repository = AdminRepository()
+    private val repository = UserRepository()
 
     @OptIn(RiskFeature::class)
     suspend fun changeUserStatus(command: TextMessage, statusValue: Int) {
@@ -26,7 +27,7 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
                 val markdownNameString = createMarkdownLink(repliedUser.firstName, repliedUser.id.chatId.toString())
                 val status = UserStatus.fromInt(statusValue)
 
-                repository.setUserStatus(
+                setUserStatus(
                     user ?: UserEntity(repliedUser.id.chatId.toString(), repliedUser.firstName, repliedUser.username?.username ?: ""),
                     status
                 )
@@ -113,7 +114,7 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
     private suspend fun addWarn(chatUser: ChatUser, reason: String) {
         if (chatUser.storedUser.status >= UserStatus.ADMIN) {
             val newCount = chatUser.storedUser.adminWarns + 1
-            repository.updateWarns(chatUser, newCount)
+            updateWarns(chatUser, newCount)
 
             bot.sendMessage(
                 chatUser.chatId,
@@ -135,7 +136,7 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
 
             val newCount = chatUser.storedUser.adminWarns - count
             val message = if (newCount == 0) "больше не имеет предупреждений\\." else "имеет $newCount\\/6 предупреждений\\."
-            repository.updateWarns(chatUser, newCount)
+            updateWarns(chatUser, newCount)
             bot.sendMessage(
                 chatUser.chatId,
                 "Администратор ${createMarkdownLink(chatUser.chatMember.firstName, chatUser.storedUser.id)} $message",
@@ -146,7 +147,7 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
 
     private suspend fun addImmunity(chatUser: ChatUser, count: Int = 1) {
         val newCount = chatUser.storedUser.immunities + count
-        repository.updateImmunities(chatUser, newCount)
+        updateImmunities(chatUser, newCount)
         val actionString = createAmountString("подарен", "иммунитет", count)
         bot.sendMessage(
             chatUser.chatId,
@@ -157,7 +158,7 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
 
     private suspend fun addUnwarn(chatUser: ChatUser, count: Int = 1) {
         val newCount = chatUser.storedUser.unwarns + count
-        repository.updateUnwarns(chatUser, newCount)
+        updateUnwarns(chatUser, newCount)
         val actionString = createAmountString("подарен", "анварн", count)
         bot.sendMessage(
             chatUser.chatId,
@@ -168,12 +169,26 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
 
     private suspend fun addBalance(chatUser: ChatUser, amount: Int = 0) {
         val newAmount = chatUser.storedUser.balance + amount
-        repository.updateBalance(chatUser, newAmount)
+        updateBalance(chatUser, newAmount)
 
         bot.sendMessage(
             chatUser.chatId,
             "Пользователю ${createMarkdownLink(chatUser.chatMember.firstName, chatUser.storedUser.id)} выдано $amount \uD83D\uDCB8",
             MarkdownV2
+        )
+    }
+
+    private fun setUserStatus(user: UserEntity, status: UserStatus) {
+        updateUserEntry(user.copy(status = status))
+    }
+
+    private fun updateWarns(user: ChatUser, warns: Int) {
+        updateUserEntry(
+            user.storedUser.copy(
+                name = user.chatMember.firstName,
+                username = user.chatMember.username?.username ?: "",
+                adminWarns = warns
+            )
         )
     }
 
