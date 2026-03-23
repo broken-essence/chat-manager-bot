@@ -37,3 +37,9 @@ data class ChatUser(
     val storedUser: UserEntity,
     val chatMember: User
 )
+
+data class UnwarnRequest(
+    val id: Int,
+    val userId: String,
+    val createdAt: Long
+)
