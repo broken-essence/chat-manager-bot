@@ -20,7 +20,7 @@ class UnwarnRequestManager(private val bot: TelegramBot): BaseUserManager(bot) {
             bot.editMessageText(context.chatId, context.messageId, newMessage, MarkdownV2)
     }
 
-    suspend fun declineUnwarn(context: ScreenContext) {
+    suspend fun declineUnwarn(context: ScreenContext, requestId: Int) {
         val newMessage = getUnwarnRequestMessage(context.user).plus("\n\n❌ Снятие отклонено\\.")
         if (context.messageId != null)
             bot.editMessageText(context.chatId, context.messageId, newMessage, MarkdownV2)

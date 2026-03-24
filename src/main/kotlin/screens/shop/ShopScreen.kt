@@ -13,7 +13,7 @@ class ShopScreen(bot: TelegramBot) : BaseScreen {
     override val id: String = "shop"
     override val manager = ShopManager(bot)
 
-    override suspend fun render(context: ScreenContext): ScreenContent {
+    override suspend fun render(context: ScreenContext, data: String?): ScreenContent {
         val keyboard = inlineKeyboard {
             row {
                 dataButton("\uD83E\uDDFB Снятие предупреждения – 2 \uD83D\uDCB8", "action:buy_unwarn")

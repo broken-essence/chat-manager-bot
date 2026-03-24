@@ -12,9 +12,9 @@ object ActionRouter {
 
     fun get(id: String): BaseAction? = actions[id]
 
-    suspend fun executeAction(context: ScreenContext, actionId: String) {
+    suspend fun executeAction(context: ScreenContext, actionId: String, data: String? = null) {
         val action = actions[actionId]
-        action?.execute(context)
+        action?.execute(context, data)
     }
 
 }

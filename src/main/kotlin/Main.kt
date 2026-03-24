@@ -68,10 +68,14 @@ suspend fun main(args: Array<String>) {
 
             val message = callback.message ?: return@onDataCallbackQuery
             val context = ScreenContext(message.chat.id, callback.from, message.messageId)
+
+            val id = callback.data.substringBefore("?")
+            val data = callback.data.substringAfter("?", "")
+
             if (callback.data.startsWith("action:"))
-                ActionRouter.executeAction(context, callback.data)
+                ActionRouter.executeAction(context, id, data)
             else
-                ScreenRouter.openScreen(bot, context, callback.data)
+                ScreenRouter.openScreen(bot, context, id, data)
         }
 
         println(me)

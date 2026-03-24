@@ -13,7 +13,7 @@ class InventoryScreen(bot: TelegramBot): BaseScreen {
     override val id: String = "inventory"
     override val manager: InventoryManager = InventoryManager(bot)
 
-    override suspend fun render(context: ScreenContext): ScreenContent {
+    override suspend fun render(context: ScreenContext, data: String?): ScreenContent {
         val keyboard = inlineKeyboard {
             row {
                 dataButton("\uD83E\uDDFB Снять предупреждение", "action:use_unwarn")

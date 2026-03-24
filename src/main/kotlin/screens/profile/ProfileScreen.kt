@@ -15,7 +15,7 @@ class ProfileScreen(bot: TelegramBot): BaseScreen {
 
     override val manager = ProfileManager(bot)
 
-    override suspend fun render(context: ScreenContext): ScreenContent {
+    override suspend fun render(context: ScreenContext, data: String?): ScreenContent {
         val keyboard = inlineKeyboard {
             row {
                 dataButton("\uD83D\uDCE6 Инвентарь", "inventory")

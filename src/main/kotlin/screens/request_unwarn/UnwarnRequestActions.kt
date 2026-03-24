@@ -7,7 +7,7 @@ class ConfirmUnwarnAction(private val manager: UnwarnRequestManager) : BaseActio
 
     override val id: String = "action:confirm_unwarn"
 
-    override suspend fun execute(context: ScreenContext) {
+    override suspend fun execute(context: ScreenContext, data: String?) {
         println("Action: unwarn confirmed")
         manager.confirmUnwarn(context)
     }
@@ -17,8 +17,9 @@ class DeclineUnwarnAction(private val manager: UnwarnRequestManager) : BaseActio
 
     override val id: String = "action:decline_unwarn"
 
-    override suspend fun execute(context: ScreenContext) {
-        println("Action: unwarn declined")
-        manager.declineUnwarn(context)
+    override suspend fun execute(context: ScreenContext, data: String?) {
+        println("Action: unwarn declined $data")
+        val requestId = data?.toInt() ?: return
+        manager.declineUnwarn(context, requestId)
     }
 }

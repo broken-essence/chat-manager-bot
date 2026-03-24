@@ -2,6 +2,7 @@ package com.ehedgehog.screens.inventory
 
 import com.ehedgehog.base.BaseUserManager
 import com.ehedgehog.database.ChatUser
+import com.ehedgehog.database.repositories.UnwarnRequestRepository
 import com.ehedgehog.database.repositories.UserRepository
 import com.ehedgehog.screens.ScreenContext
 import com.ehedgehog.screens.ScreenRouter
@@ -11,10 +12,11 @@ import dev.inmo.tgbotapi.types.RawChatId
 
 class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
 
-    private val repository = UserRepository()
+    private val userRepository = UserRepository()
+    private val unwarnRequestRepository = UnwarnRequestRepository()
 
     fun getInventoryMessage(userId: String): String {
-        val userEntry = repository.getUserById(userId)
+        val userEntry = userRepository.getUserById(userId)
 
         return """
             *Ваш инвентарь:*
@@ -29,7 +31,7 @@ class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
     }
 
     suspend fun useUnwarn(context: ScreenContext) {
-        val userEntry = repository.getUserById(context.user.id.chatId.toString()) ?: return
+        val userEntry = userRepository.getUserById(context.user.id.chatId.toString()) ?: return
 
         if (userEntry.unwarns > 0) {
             //TODO: replace id with env of admin system chat
@@ -38,7 +40,8 @@ class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
                 ChatUser(context.chatId, userEntry, context.user),
                 userEntry.unwarns - 1
             )
-            ScreenRouter.openScreen(bot, unwarnContext, "request_unwarn")
+            val requestId = unwarnRequestRepository.createRequest(userEntry.id)
+            ScreenRouter.openScreen(bot, unwarnContext, "request_unwarn", requestId.toString())
             ScreenRouter.openScreen(bot, context, "inventory")
         }
     }

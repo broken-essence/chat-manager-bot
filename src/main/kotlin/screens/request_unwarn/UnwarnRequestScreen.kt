@@ -13,12 +13,12 @@ class UnwarnRequestScreen(bot: TelegramBot): BaseScreen {
     override val id: String = "request_unwarn"
     override val manager = UnwarnRequestManager(bot)
 
-    override suspend fun render(context: ScreenContext): ScreenContent {
+    override suspend fun render(context: ScreenContext, data: String?): ScreenContent {
         val keyboard = inlineKeyboard {
             if (context.messageId == null) {
                 row {
                     dataButton("✅ Подтвердить", "action:confirm_unwarn")
-                    dataButton("❌ Отклонить", "action:decline_unwarn")
+                    dataButton("❌ Отклонить", "action:decline_unwarn?$data")
                 }
             }
         }

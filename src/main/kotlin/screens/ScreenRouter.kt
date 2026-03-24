@@ -16,9 +16,9 @@ object ScreenRouter {
 
     fun get(id: String): BaseScreen? = screens[id]
 
-    suspend fun openScreen(bot: TelegramBot, context: ScreenContext, screenId: String) {
+    suspend fun openScreen(bot: TelegramBot, context: ScreenContext, screenId: String, data: String? = null) {
         val screen = screens[screenId]
-        val content = screen?.render(context) ?: return
+        val content = screen?.render(context, data) ?: return
 
         if (context.messageId == null) {
             bot.sendMessage(context.chatId, content.text, MarkdownV2, replyMarkup = content.keyboard)
