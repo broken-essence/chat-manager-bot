@@ -17,13 +17,13 @@ class UnwarnRequestScreen(bot: TelegramBot): BaseScreen {
         val keyboard = inlineKeyboard {
             if (context.messageId == null) {
                 row {
-                    dataButton("✅ Подтвердить", "action:confirm_unwarn")
+                    dataButton("✅ Подтвердить", "action:confirm_unwarn?$data")
                     dataButton("❌ Отклонить", "action:decline_unwarn?$data")
                 }
             }
         }
 
-        val text = manager.getUnwarnRequestMessage(context.user)
+        val text = manager.getUnwarnRequestMessage(context.user.id.chatId.toString(), context.user.firstName)
         return ScreenContent(text, keyboard)
     }
 }

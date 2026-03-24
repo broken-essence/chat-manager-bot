@@ -10,6 +10,7 @@ import org.jetbrains.exposed.v1.jdbc.deleteAll
 import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.update
 import org.jetbrains.exposed.v1.jdbc.upsert
 
 class UserRepository {
@@ -36,6 +37,14 @@ class UserRepository {
                 it[immunities] = user.immunities
                 it[unwarns] = user.unwarns
                 it[balance] = user.balance
+            }
+        }
+    }
+
+    fun updateUnwarnCount(userId: String, count: Int) {
+        transaction {
+            Users.update({ Users.userId eq userId }) {
+                it[unwarns] = count
             }
         }
     }

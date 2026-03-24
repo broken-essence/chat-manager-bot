@@ -9,7 +9,8 @@ class ConfirmUnwarnAction(private val manager: UnwarnRequestManager) : BaseActio
 
     override suspend fun execute(context: ScreenContext, data: String?) {
         println("Action: unwarn confirmed")
-        manager.confirmUnwarn(context)
+        val requestId = data?.toInt() ?: return
+        manager.confirmUnwarn(context, requestId)
     }
 }
 
