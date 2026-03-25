@@ -1,11 +1,20 @@
 package com.ehedgehog.screens.shop
 
 import com.ehedgehog.base.BaseUserManager
+import com.ehedgehog.database.repositories.UserRepository
+import com.ehedgehog.screens.ScreenContext
+import com.ehedgehog.screens.ScreenRouter
 import dev.inmo.tgbotapi.bot.TelegramBot
 
-class ShopManager(bot: TelegramBot) : BaseUserManager(bot) {
+internal const val PRICE_UNWARN = 2
+internal const val PRICE_IMMUNITY = 6
 
-    fun getShopMessage(): String {
+class ShopManager(private val bot: TelegramBot) : BaseUserManager(bot) {
+
+    val repository = UserRepository()
+
+    fun getShopMessage(userId: String): String {
+        val user = repository.getUserById(userId)
         return """
             *Доступные товары:*
             
@@ -16,7 +25,41 @@ class ShopManager(bot: TelegramBot) : BaseUserManager(bot) {
             Позволяет на 24 часа получить иммунитет от убийства и посещения активными ролями в *первые 2 игровые ночи*\.
             
             _📌 Приобретенные товары можно активировать в инвентаре в любое время\._
+            
+            💰 Ваш баланс: ${user?.balance ?: 0} 💸
         """.trimIndent()
+    }
+
+    suspend fun buyUnwarn(context: ScreenContext) {
+        val userEntry = repository.getUserById(context.user.id.chatId.toString()) ?: return
+
+        if (userEntry.balance >= PRICE_UNWARN) {
+            updateUserEntry(
+                userEntry.copy(
+                    name = context.user.firstName,
+                    username = context.user.username?.username ?: "",
+                    balance = userEntry.balance - PRICE_UNWARN,
+                    unwarns = userEntry.unwarns + 1
+                )
+            )
+            ScreenRouter.openScreen(bot, context, "shop")
+        }
+    }
+
+    suspend fun buyImmunity(context: ScreenContext) {
+        val userEntry = repository.getUserById(context.user.id.chatId.toString()) ?: return
+
+        if (userEntry.balance >= PRICE_IMMUNITY) {
+            updateUserEntry(
+                userEntry.copy(
+                    name = context.user.firstName,
+                    username = context.user.username?.username ?: "",
+                    balance = userEntry.balance - PRICE_IMMUNITY,
+                    immunities = userEntry.immunities + 1
+                )
+            )
+            ScreenRouter.openScreen(bot, context, "shop")
+        }
     }
 
 }

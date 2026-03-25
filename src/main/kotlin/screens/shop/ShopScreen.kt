@@ -16,17 +16,17 @@ class ShopScreen(bot: TelegramBot) : BaseScreen {
     override suspend fun render(context: ScreenContext, data: String?): ScreenContent {
         val keyboard = inlineKeyboard {
             row {
-                dataButton("\uD83E\uDDFB Снятие предупреждения – 2 \uD83D\uDCB8", "action:buy_unwarn")
+                dataButton("\uD83E\uDDFB Снятие предупреждения – $PRICE_UNWARN \uD83D\uDCB8", "action:buy_unwarn")
             }
             row {
-                dataButton("\uD83D\uDC8A Иммунитет – 6 \uD83D\uDCB8", "action:buy_immunity")
+                dataButton("\uD83D\uDC8A Иммунитет – $PRICE_IMMUNITY \uD83D\uDCB8", "action:buy_immunity")
             }
             row {
                 dataButton("\uD83D\uDD19 Назад", "profile")
             }
         }
 
-        val text = manager.getShopMessage()
+        val text = manager.getShopMessage(context.user.id.chatId.toString())
 
         return ScreenContent(text, keyboard)
     }
