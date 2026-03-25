@@ -13,12 +13,12 @@ class UseUnwarnAction(private val manager: InventoryManager): BaseAction {
     }
 }
 
-class UseImmunityAction(manager: InventoryManager): BaseAction {
+class UseImmunityAction(private val manager: InventoryManager): BaseAction {
 
     override val id: String = "action:use_immunity"
 
     override suspend fun execute(context: ScreenContext, data: String?) {
         println("Action: use immunity")
-        TODO("Not yet implemented")
+        manager.useImmunity(context)
     }
 }

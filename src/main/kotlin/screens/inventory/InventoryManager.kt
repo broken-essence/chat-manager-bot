@@ -46,4 +46,16 @@ class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
         }
     }
 
+    suspend fun useImmunity(context: ScreenContext) {
+        val userEntry = userRepository.getUserById(context.user.id.chatId.toString()) ?: return
+
+        if (userEntry.immunities > 0) {
+            updateImmunities(
+                ChatUser(context.chatId, userEntry, context.user),
+                userEntry.immunities - 1
+            )
+            ScreenRouter.openScreen(bot, context, "inventory")
+        }
+    }
+
 }
