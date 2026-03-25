@@ -23,7 +23,7 @@ abstract class BaseUserManager(bot: TelegramBot) : BaseManager(bot) {
         return status == UserStatus.SENIOR_ADMIN || userId == System.getenv("BOT_OWNER_ID")
     }
 
-    fun updateImmunities(user: ChatUser, immunCount: Int) {
+    protected fun updateImmunities(user: ChatUser, immunCount: Int) {
         updateUserEntry(
             user.storedUser.copy(
                 name = user.chatMember.firstName,
@@ -33,7 +33,7 @@ abstract class BaseUserManager(bot: TelegramBot) : BaseManager(bot) {
         )
     }
 
-    fun updateUnwarns(user: ChatUser, unwarnCount: Int) {
+    protected fun updateUnwarns(user: ChatUser, unwarnCount: Int) {
         updateUserEntry(
             user.storedUser.copy(
                 name = user.chatMember.firstName,
@@ -43,7 +43,7 @@ abstract class BaseUserManager(bot: TelegramBot) : BaseManager(bot) {
         )
     }
 
-    fun updateBalance(user: ChatUser, amount: Int) {
+    protected fun updateBalance(user: ChatUser, amount: Int) {
         updateUserEntry(
             user.storedUser.copy(
                 name = user.chatMember.firstName,
@@ -53,7 +53,7 @@ abstract class BaseUserManager(bot: TelegramBot) : BaseManager(bot) {
         )
     }
 
-    fun updateUserEntry(user: UserEntity) {
+    protected fun updateUserEntry(user: UserEntity) {
         try {
             repository.updateUserEntry(user)
         } catch (e: Exception) {
