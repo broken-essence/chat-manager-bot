@@ -4,6 +4,11 @@ import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.chat.get.getChatAdministrators
 import dev.inmo.tgbotapi.types.IdChatIdentifier
 import dev.inmo.tgbotapi.types.UserId
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+
+private const val DATE_FORMAT = " HH:mm dd.MM.yyyy"
 
 abstract class BaseManager(private val bot: TelegramBot) {
 
@@ -34,5 +39,10 @@ abstract class BaseManager(private val bot: TelegramBot) {
 
         return resultString
     }
+
+    fun dateFromMillis(millis: Long): String =
+        Instant.ofEpochMilli(millis)
+            .atZone(ZoneId.of("UTC+03"))
+            .format(DateTimeFormatter.ofPattern(DATE_FORMAT))
 
 }

@@ -23,6 +23,13 @@ abstract class BaseUserManager(bot: TelegramBot) : BaseManager(bot) {
         return status == UserStatus.SENIOR_ADMIN || userId == System.getenv("BOT_OWNER_ID")
     }
 
+    fun hasActiveImmunity(user: UserEntity): Boolean = user.immunityExpiresAt > System.currentTimeMillis()
+
+    fun getImmunityStatus(user: UserEntity?): String =
+        if (user != null && hasActiveImmunity(user))
+            handleReservedSymbols("действует до ${dateFromMillis(user.immunityExpiresAt)} по МСК")
+        else "не активен"
+
     protected fun updateImmunities(user: ChatUser, immunCount: Int) {
         updateUserEntry(
             user.storedUser.copy(

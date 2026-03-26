@@ -9,6 +9,7 @@ import com.ehedgehog.screens.ScreenRouter
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.RawChatId
+import korlibs.time.hours
 
 class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
 
@@ -25,7 +26,7 @@ class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
             _📌 Предупреждение будет снято сразу после обработки запроса администратором\._
             
             💊 *Активация иммунитета:* ${userEntry?.immunities ?: 0}
-            Иммунитет: не активен\.
+            Иммунитет: ${getImmunityStatus(userEntry)}\.
             _📌 После активации обязательно необходимо добавить в ваш никнейм эмодзи «`🚩`», чтобы другие игроки видели наличие у вас активного иммунитета\._
         """.trimIndent()
     }
@@ -49,10 +50,14 @@ class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
     suspend fun useImmunity(context: ScreenContext) {
         val userEntry = userRepository.getUserById(context.user.id.chatId.toString()) ?: return
 
-        if (userEntry.immunities > 0) {
-            updateImmunities(
-                ChatUser(context.chatId, userEntry, context.user),
-                userEntry.immunities - 1
+        if (userEntry.immunities > 0 && !hasActiveImmunity(userEntry)) {
+            updateUserEntry(
+                userEntry.copy(
+                    name = context.user.firstName,
+                    username = context.user.username?.username ?: "",
+                    immunities = userEntry.immunities - 1,
+                    immunityExpiresAt = System.currentTimeMillis() + 24.hours.inWholeMilliseconds
+                )
             )
             ScreenRouter.openScreen(bot, context, "inventory")
         }

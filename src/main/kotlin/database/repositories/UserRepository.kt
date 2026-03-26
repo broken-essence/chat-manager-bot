@@ -37,6 +37,7 @@ class UserRepository {
                 it[immunities] = user.immunities
                 it[unwarns] = user.unwarns
                 it[balance] = user.balance
+                it[immunityExpiresAt] = user.immunityExpiresAt
             }
         }
     }
@@ -113,7 +114,8 @@ class UserRepository {
                     adminWarns = entry[Users.warns],
                     immunities = entry[Users.immunities],
                     unwarns = entry[Users.unwarns],
-                    balance = entry[Users.balance]
+                    balance = entry[Users.balance],
+                    immunityExpiresAt = entry[Users.immunityExpiresAt]
                 )
             }
             .singleOrNull()

@@ -19,7 +19,7 @@ class ProfileManager(bot: TelegramBot) : BaseUserManager(bot) {
                 |
                 |🧻 Снятие варна: ${userEntry.unwarns}
                 |💊 Активация иммунитета: ${userEntry.immunities}
-                |Иммунитет: действует до 31\.07\.2048 17:41
+                |Иммунитет: ${getImmunityStatus(userEntry)}
                 |
                 |⚠️ Предупреждения: ${userEntry.adminWarns}\/6
                 """.trimMargin()
