@@ -4,8 +4,10 @@ import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus
 import com.ehedgehog.database.Users
 import org.jetbrains.exposed.v1.core.Op
+import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.greaterEq
 import org.jetbrains.exposed.v1.jdbc.deleteAll
 import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
@@ -71,6 +73,15 @@ class UserRepository {
         }
     }
 
+    fun getUsersWithActiveImmunity(): List<UserEntity> {
+        return transaction {
+            Users.selectAll()
+                .where { Users.immunityExpiresAt greaterEq System.currentTimeMillis() }
+                .orderBy(Users.immunityExpiresAt)
+                .map { it.toUserEntity() }
+        }
+    }
+
     fun getEventPointCountById(userId: String): Int {
         return transaction {
             Users.select(Users.count)
@@ -104,21 +115,21 @@ class UserRepository {
     private fun getUserWhere(predicate: Op<Boolean>): UserEntity? {
         return Users.selectAll()
             .where(predicate)
-            .map { entry ->
-                UserEntity(
-                    id = entry[Users.userId],
-                    name = entry[Users.name],
-                    username = entry[Users.username],
-                    eventPointCount = entry[Users.count],
-                    status = UserStatus.fromInt(entry[Users.status]),
-                    adminWarns = entry[Users.warns],
-                    immunities = entry[Users.immunities],
-                    unwarns = entry[Users.unwarns],
-                    balance = entry[Users.balance],
-                    immunityExpiresAt = entry[Users.immunityExpiresAt]
-                )
-            }
+            .map { it.toUserEntity() }
             .singleOrNull()
     }
 
 }
+
+fun ResultRow.toUserEntity(): UserEntity = UserEntity(
+    id = this[Users.userId],
+    name = this[Users.name],
+    username = this[Users.username],
+    eventPointCount = this[Users.count],
+    status = UserStatus.fromInt(this[Users.status]),
+    adminWarns = this[Users.warns],
+    immunities = this[Users.immunities],
+    unwarns = this[Users.unwarns],
+    balance = this[Users.balance],
+    immunityExpiresAt = this[Users.immunityExpiresAt]
+)

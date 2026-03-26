@@ -6,7 +6,11 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onComman
 fun BehaviourContext.registerGeneralCommands(manager: GeneralManager) {
 
     onCommand("prof") {
-        manager.getProfile(it)
+        manager.showProfile(it)
+    }
+
+    onCommand("immunities") {
+        manager.showImmunitiesList(it)
     }
 
 }

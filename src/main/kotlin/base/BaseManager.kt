@@ -8,7 +8,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-private const val DATE_FORMAT = " HH:mm dd.MM.yyyy"
+private const val DATE_FORMAT = "HH:mm dd.MM.yyyy"
 
 abstract class BaseManager(private val bot: TelegramBot) {
 
