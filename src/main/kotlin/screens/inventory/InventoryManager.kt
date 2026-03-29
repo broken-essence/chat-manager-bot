@@ -1,5 +1,6 @@
 package com.ehedgehog.screens.inventory
 
+import com.ehedgehog.ImmunityScheduler
 import com.ehedgehog.base.BaseUserManager
 import com.ehedgehog.database.ChatUser
 import com.ehedgehog.database.repositories.UnwarnRequestRepository
@@ -9,12 +10,18 @@ import com.ehedgehog.screens.ScreenRouter
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.RawChatId
-import korlibs.time.hours
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+
+private const val IMMUNITY_DURATION = 24 * 60 * 60 * 1000
+private const val TEST_IMMUNITY_DURATION = 60 * 1000
 
 class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
 
     private val userRepository = UserRepository()
     private val unwarnRequestRepository = UnwarnRequestRepository()
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
+    private val immunityScheduler = ImmunityScheduler(bot, userRepository, coroutineScope)
 
     fun getInventoryMessage(userId: String): String {
         val userEntry = userRepository.getUserById(userId)
@@ -27,7 +34,7 @@ class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
             
             💊 *Активация иммунитета:* ${userEntry?.immunities ?: 0}
             Иммунитет: ${getImmunityStatus(userEntry)}\.
-            _📌 После активации обязательно необходимо добавить в ваш никнейм эмодзи «`🚩`», чтобы другие игроки видели наличие у вас активного иммунитета\._
+            _📌 После активации необходимо добавить в ваш никнейм эмодзи «`🚩`», чтобы другие игроки видели наличие у вас активного иммунитета\._
         """.trimIndent()
     }
 
@@ -51,14 +58,17 @@ class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
         val userEntry = userRepository.getUserById(context.user.id.chatId.toString()) ?: return
 
         if (userEntry.immunities > 0 && !hasActiveImmunity(userEntry)) {
+            val expiresAt = System.currentTimeMillis() + TEST_IMMUNITY_DURATION
             updateUserEntry(
                 userEntry.copy(
                     name = context.user.firstName,
                     username = context.user.username?.username ?: "",
                     immunities = userEntry.immunities - 1,
-                    immunityExpiresAt = System.currentTimeMillis() + 24.hours.inWholeMilliseconds
+                    immunityExpiresAt = expiresAt
                 )
             )
+
+            immunityScheduler.scheduleExpirationNotification(userEntry.id, expiresAt)
             ScreenRouter.openScreen(bot, context, "inventory")
         }
     }

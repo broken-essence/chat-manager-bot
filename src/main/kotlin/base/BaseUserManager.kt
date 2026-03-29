@@ -30,12 +30,12 @@ abstract class BaseUserManager(bot: TelegramBot) : BaseManager(bot) {
             handleReservedSymbols("действует до ${dateFromMillis(user.immunityExpiresAt)} по МСК")
         else "не активен"
 
-    protected fun updateImmunities(user: ChatUser, immunCount: Int) {
+    protected fun updateImmunities(user: ChatUser, immunityCount: Int) {
         updateUserEntry(
             user.storedUser.copy(
                 name = user.chatMember.firstName,
                 username = user.chatMember.username?.username ?: "",
-                immunities = immunCount
+                immunities = immunityCount
             )
         )
     }

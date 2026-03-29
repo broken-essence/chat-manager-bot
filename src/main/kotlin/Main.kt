@@ -2,6 +2,7 @@ package com.ehedgehog
 
 import com.ehedgehog.config.Config
 import com.ehedgehog.database.DatabaseFactory
+import com.ehedgehog.database.repositories.UserRepository
 import com.ehedgehog.screens.ActionRouter
 import com.ehedgehog.screens.ScreenContext
 import com.ehedgehog.screens.ScreenRouter
@@ -43,8 +44,10 @@ suspend fun main(args: Array<String>) {
 //    val bot = telegramBot(System.getenv("BOT_TOKEN"))
 
     val scope = CoroutineScope(Dispatchers.Default)
+    val immunityScheduler = ImmunityScheduler(bot, UserRepository(), scope)
 
     DatabaseFactory.init()
+    immunityScheduler.restoreNotifications()
 
     bot.skipOldUpdates()
     bot.buildBehaviourWithLongPolling(scope,
