@@ -67,10 +67,8 @@ suspend fun main(args: Array<String>) {
         registerActions(bot)
 
         onDataCallbackQuery { callback ->
-            answerCallbackQuery(callback)
-
             val message = callback.message ?: return@onDataCallbackQuery
-            val context = ScreenContext(message.chat.id, callback.from, message.messageId)
+            val context = ScreenContext(message.chat.id, callback.from, message.messageId, callback.id)
 
             val id = callback.data.substringBefore("?")
             val data = callback.data.substringAfter("?", "")
@@ -79,6 +77,13 @@ suspend fun main(args: Array<String>) {
                 ActionRouter.executeAction(context, id, data)
             else
                 ScreenRouter.openScreen(bot, context, id, data)
+
+            context.callbackId?.let {
+                if (!context.callbackAnswered) {
+                    answerCallbackQuery(it)
+                    context.callbackAnswered = true
+                }
+            }
         }
 
         println(me)
@@ -101,3 +106,10 @@ suspend fun TelegramBot.skipOldUpdates() {
 
 suspend fun TelegramBot.getChatUserById(chatId: ChatIdentifier, userId: Long): User =
     getChatMember(chatId, UserId(RawChatId(userId))).user
+
+suspend fun TelegramBot.showPopup(context: ScreenContext, text: String, showAlert: Boolean = false) {
+    context.callbackId?.let {
+        answerCallbackQuery(it, text, showAlert)
+        context.callbackAnswered = true
+    }
+}

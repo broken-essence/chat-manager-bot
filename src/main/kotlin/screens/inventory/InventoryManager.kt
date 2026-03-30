@@ -7,6 +7,7 @@ import com.ehedgehog.database.repositories.UnwarnRequestRepository
 import com.ehedgehog.database.repositories.UserRepository
 import com.ehedgehog.screens.ScreenContext
 import com.ehedgehog.screens.ScreenRouter
+import com.ehedgehog.showPopup
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.RawChatId
@@ -50,7 +51,10 @@ class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
             )
             val requestId = unwarnRequestRepository.createRequest(userEntry.id)
             ScreenRouter.openScreen(bot, unwarnContext, "request_unwarn", requestId.toString())
+            bot.showPopup(context, "Запрос отправлен админам ✅")
             ScreenRouter.openScreen(bot, context, "inventory")
+        } else {
+            bot.showPopup(context, "Недостаточно анварнов ❌")
         }
     }
 
@@ -69,7 +73,10 @@ class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
             )
 
             immunityScheduler.scheduleExpirationNotification(userEntry.id, expiresAt)
+            bot.showPopup(context, "Иммунитет активирован ✅")
             ScreenRouter.openScreen(bot, context, "inventory")
+        } else {
+            bot.showPopup(context, "Что-то пошло не так ☹\uFE0F")
         }
     }
 

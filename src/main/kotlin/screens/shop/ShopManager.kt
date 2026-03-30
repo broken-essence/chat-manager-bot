@@ -4,6 +4,7 @@ import com.ehedgehog.base.BaseUserManager
 import com.ehedgehog.database.repositories.UserRepository
 import com.ehedgehog.screens.ScreenContext
 import com.ehedgehog.screens.ScreenRouter
+import com.ehedgehog.showPopup
 import dev.inmo.tgbotapi.bot.TelegramBot
 
 internal const val PRICE_UNWARN = 2
@@ -42,7 +43,10 @@ class ShopManager(private val bot: TelegramBot) : BaseUserManager(bot) {
                     unwarns = userEntry.unwarns + 1
                 )
             )
+            bot.showPopup(context, "Покупка совершена ✅")
             ScreenRouter.openScreen(bot, context, "shop")
+        } else {
+            bot.showPopup(context, "Недостаточно средств ❌")
         }
     }
 
@@ -58,7 +62,10 @@ class ShopManager(private val bot: TelegramBot) : BaseUserManager(bot) {
                     immunities = userEntry.immunities + 1
                 )
             )
+            bot.showPopup(context, "Покупка совершена ✅")
             ScreenRouter.openScreen(bot, context, "shop")
+        } else {
+            bot.showPopup(context, "Недостаточно средств ❌")
         }
     }
 
