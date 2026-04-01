@@ -3,15 +3,13 @@ package com.ehedgehog.screens.shop
 import com.ehedgehog.base.BaseScreen
 import com.ehedgehog.screens.ScreenContent
 import com.ehedgehog.screens.ScreenContext
-import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
 import dev.inmo.tgbotapi.utils.row
 
-class ShopScreen(bot: TelegramBot) : BaseScreen {
+class ShopScreen(private val manager: ShopManager) : BaseScreen {
 
     override val id: String = "shop"
-    override val manager = ShopManager(bot)
 
     override suspend fun render(context: ScreenContext, data: String?): ScreenContent {
         val keyboard = inlineKeyboard {

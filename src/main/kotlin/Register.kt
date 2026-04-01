@@ -12,6 +12,7 @@ import com.ehedgehog.screens.inventory.InventoryManager
 import com.ehedgehog.screens.inventory.InventoryScreen
 import com.ehedgehog.screens.inventory.UseImmunityAction
 import com.ehedgehog.screens.inventory.UseUnwarnAction
+import com.ehedgehog.screens.profile.ProfileManager
 import com.ehedgehog.screens.profile.ProfileScreen
 import com.ehedgehog.screens.request_unwarn.ConfirmUnwarnAction
 import com.ehedgehog.screens.request_unwarn.DeclineUnwarnAction
@@ -31,10 +32,10 @@ fun registerCommands(bot: TelegramBot, context: BehaviourContext) {
 }
 
 fun registerScreens(bot: TelegramBot) {
-    ScreenRouter.registerScreen(ProfileScreen(bot))
-    ScreenRouter.registerScreen(InventoryScreen(bot))
-    ScreenRouter.registerScreen(ShopScreen(bot))
-    ScreenRouter.registerScreen(UnwarnRequestScreen(bot))
+    ScreenRouter.registerScreen(ProfileScreen(ProfileManager(bot)))
+    ScreenRouter.registerScreen(InventoryScreen(InventoryManager(bot)))
+    ScreenRouter.registerScreen(ShopScreen(ShopManager(bot)))
+    ScreenRouter.registerScreen(UnwarnRequestScreen(UnwarnRequestManager(bot)))
 }
 
 fun registerActions(bot: TelegramBot) {
