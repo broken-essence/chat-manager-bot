@@ -5,6 +5,7 @@ import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.RawChatId
+import dev.inmo.tgbotapi.types.message.MarkdownV2
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -24,7 +25,8 @@ class ImmunityScheduler(
 
             bot.sendMessage(
                 ChatId(RawChatId(userId.toLong())),
-                "\uD83D\uDD14 Срок действия вашего иммунитета истек! Пожалуйста, уберите эмодзи «\uD83D\uDEA9» из ника."
+                "\uD83D\uDD14 *Срок действия вашего иммунитета истек\\!*\n\nПожалуйста, уберите эмодзи «\uD83D\uDEA9» из ника\\.",
+                MarkdownV2
             )
         }
     }

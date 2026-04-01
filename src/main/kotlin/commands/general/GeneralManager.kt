@@ -36,12 +36,12 @@ class GeneralManager(private val bot: TelegramBot): BaseUserManager(bot) {
         bot.sendMessage(
             command.chat.id,
             """
-                *Игроки с активным иммунитетом:*
-                
-                $immunitiesListString
-                
-                ❗ Иммунитет обозначается эмодзи 🚩 в нике\. Игроков с иммунитетом *запрещено в первые 2 игровые ночи* убивать и посещать активным ролям\.
-                """.trimIndent(),
+                |*Игроки с активным иммунитетом:*
+                |
+                |$immunitiesListString
+                |
+                |❗ Иммунитет обозначается эмодзи 🚩 в нике\. Игроков с иммунитетом *запрещено в первые 2 игровые ночи* убивать и посещать активным ролям\.
+                """.trimMargin(),
             MarkdownV2
         )
     }

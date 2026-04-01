@@ -4,6 +4,7 @@ import com.ehedgehog.database.ChatUser
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus
 import com.ehedgehog.database.repositories.UserRepository
+import com.ehedgehog.screens.inventory.IMMUNITY_DURATION
 import dev.inmo.tgbotapi.bot.TelegramBot
 
 abstract class BaseUserManager(bot: TelegramBot) : BaseManager(bot) {
@@ -26,9 +27,11 @@ abstract class BaseUserManager(bot: TelegramBot) : BaseManager(bot) {
     fun hasActiveImmunity(user: UserEntity): Boolean = user.immunityExpiresAt > System.currentTimeMillis()
 
     fun getImmunityStatus(user: UserEntity?): String =
-        if (user != null && hasActiveImmunity(user))
-            handleReservedSymbols("действует до ${dateFromMillis(user.immunityExpiresAt)} по МСК")
-        else "не активен"
+        if (user != null && hasActiveImmunity(user)) {
+            if (user.immunityExpiresAt - IMMUNITY_DURATION > System.currentTimeMillis())
+                "в очереди"
+            else handleReservedSymbols("действует до ${dateFromMillis(user.immunityExpiresAt)} по МСК")
+        } else "не активен"
 
     protected fun updateImmunities(user: ChatUser, immunityCount: Int) {
         updateUserEntry(

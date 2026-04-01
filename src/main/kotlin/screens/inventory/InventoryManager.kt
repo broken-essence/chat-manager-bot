@@ -9,13 +9,16 @@ import com.ehedgehog.screens.ScreenContext
 import com.ehedgehog.screens.ScreenRouter
 import com.ehedgehog.showPopup
 import dev.inmo.tgbotapi.bot.TelegramBot
+import dev.inmo.tgbotapi.extensions.api.answers.answerCallbackQuery
 import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.RawChatId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
-private const val IMMUNITY_DURATION = 24 * 60 * 60 * 1000
-private const val TEST_IMMUNITY_DURATION = 60 * 1000
+const val TEST_IMMUNITY_DURATION = 60 * 1000
+const val IMMUNITY_DURATION = /*24 * 60 * 60 * 1000*/ TEST_IMMUNITY_DURATION
+const val TEST_IMMUNITIES_COUNT_LIMIT = 1
+const val IMMUNITIES_COUNT_LIMIT = /*5*/ TEST_IMMUNITIES_COUNT_LIMIT
 
 class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
 
@@ -60,9 +63,17 @@ class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
 
     suspend fun useImmunity(context: ScreenContext) {
         val userEntry = userRepository.getUserById(context.user.id.chatId.toString()) ?: return
+        val immunities = userRepository.getUsersWithActiveImmunity()
 
         if (userEntry.immunities > 0 && !hasActiveImmunity(userEntry)) {
-            val expiresAt = System.currentTimeMillis() + TEST_IMMUNITY_DURATION
+            if (immunities.size >= IMMUNITIES_COUNT_LIMIT) {
+                context.callbackId?.let { bot.answerCallbackQuery(it) }
+                val queueContext = ScreenContext(context.chatId, context.user)
+                ScreenRouter.openScreen(bot, queueContext, "immunity_queue")
+                return
+            }
+
+            val expiresAt = System.currentTimeMillis() + IMMUNITY_DURATION
             updateUserEntry(
                 userEntry.copy(
                     name = context.user.firstName,
