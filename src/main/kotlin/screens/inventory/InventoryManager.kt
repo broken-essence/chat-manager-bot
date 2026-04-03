@@ -2,6 +2,8 @@ package com.ehedgehog.screens.inventory
 
 import com.ehedgehog.ImmunityScheduler
 import com.ehedgehog.base.BaseUserManager
+import com.ehedgehog.base.IMMUNITIES_COUNT_LIMIT
+import com.ehedgehog.base.IMMUNITY_DURATION
 import com.ehedgehog.database.ChatUser
 import com.ehedgehog.database.repositories.UnwarnRequestRepository
 import com.ehedgehog.database.repositories.UserRepository
@@ -14,11 +16,6 @@ import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.RawChatId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-
-const val TEST_IMMUNITY_DURATION = 60 * 1000
-const val IMMUNITY_DURATION = /*24 * 60 * 60 * 1000*/ TEST_IMMUNITY_DURATION
-const val TEST_IMMUNITIES_COUNT_LIMIT = 1
-const val IMMUNITIES_COUNT_LIMIT = /*5*/ TEST_IMMUNITIES_COUNT_LIMIT
 
 class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
 
@@ -63,13 +60,11 @@ class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
 
     suspend fun useImmunity(context: ScreenContext) {
         val userEntry = userRepository.getUserById(context.user.id.chatId.toString()) ?: return
-        val immunities = userRepository.getUsersWithActiveImmunity()
+        val activeImmunities = userRepository.getUsersWithActiveImmunity()
 
-        if (userEntry.immunities > 0 && !hasActiveImmunity(userEntry)) {
-            if (immunities.size >= IMMUNITIES_COUNT_LIMIT) {
-                context.callbackId?.let { bot.answerCallbackQuery(it) }
-                val queueContext = ScreenContext(context.chatId, context.user)
-                ScreenRouter.openScreen(bot, queueContext, "immunity_queue")
+        if (userEntry.immunities > 0 && !hasActiveImmunity(userEntry) && !hasImmunityCooldown(userEntry)) {
+            if (activeImmunities.size >= IMMUNITIES_COUNT_LIMIT) {
+                showImmunityQueueScreen(context)
                 return
             }
 
@@ -89,6 +84,12 @@ class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
         } else {
             bot.showPopup(context, "Что-то пошло не так ☹\uFE0F")
         }
+    }
+
+    private suspend fun showImmunityQueueScreen(context: ScreenContext) {
+        context.callbackId?.let { bot.answerCallbackQuery(it) }
+        val queueContext = ScreenContext(context.chatId, context.user)
+        ScreenRouter.openScreen(bot, queueContext, "immunity_queue")
     }
 
 }

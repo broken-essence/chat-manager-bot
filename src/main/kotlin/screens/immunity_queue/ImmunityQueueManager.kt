@@ -2,10 +2,10 @@ package com.ehedgehog.screens.immunity_queue
 
 import com.ehedgehog.ImmunityScheduler
 import com.ehedgehog.base.BaseUserManager
+import com.ehedgehog.base.IMMUNITIES_COUNT_LIMIT
+import com.ehedgehog.base.IMMUNITY_DURATION
 import com.ehedgehog.database.repositories.UserRepository
 import com.ehedgehog.screens.ScreenContext
-import com.ehedgehog.screens.inventory.IMMUNITIES_COUNT_LIMIT
-import com.ehedgehog.screens.inventory.IMMUNITY_DURATION
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.delete
 import dev.inmo.tgbotapi.extensions.api.deleteMessage
@@ -27,7 +27,7 @@ class ImmunityQueueManager(private val bot: TelegramBot) : BaseUserManager(bot) 
         val user = userRepository.getUserById(context.user.id.chatId.toString()) ?: return
         val immunities = userRepository.getUsersWithActiveImmunity()
 
-        if (user.immunities > 0 && !hasActiveImmunity(user)) {
+        if (user.immunities > 0 && !hasActiveImmunity(user) && !hasImmunityCooldown(user)) {
             val startsAt = if (immunities.size >= IMMUNITIES_COUNT_LIMIT)
                 immunities[immunities.size - IMMUNITIES_COUNT_LIMIT].immunityExpiresAt
             else System.currentTimeMillis()
