@@ -4,6 +4,8 @@ import com.ehedgehog.ImmunityScheduler
 import com.ehedgehog.base.BaseUserManager
 import com.ehedgehog.base.IMMUNITIES_COUNT_LIMIT
 import com.ehedgehog.base.IMMUNITY_DURATION
+import com.ehedgehog.base.hasActiveImmunity
+import com.ehedgehog.base.hasImmunityCooldown
 import com.ehedgehog.database.ChatUser
 import com.ehedgehog.database.repositories.UnwarnRequestRepository
 import com.ehedgehog.database.repositories.UserRepository
@@ -62,7 +64,7 @@ class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
         val userEntry = userRepository.getUserById(context.user.id.chatId.toString()) ?: return
         val activeImmunities = userRepository.getUsersWithActiveImmunity()
 
-        if (userEntry.immunities > 0 && !hasActiveImmunity(userEntry) && !hasImmunityCooldown(userEntry)) {
+        if (userEntry.immunities > 0 && !userEntry.hasActiveImmunity() && !userEntry.hasImmunityCooldown()) {
             if (activeImmunities.size >= IMMUNITIES_COUNT_LIMIT) {
                 showImmunityQueueScreen(context)
                 return

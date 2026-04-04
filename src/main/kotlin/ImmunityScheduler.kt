@@ -1,5 +1,7 @@
 package com.ehedgehog
 
+import com.ehedgehog.base.isInImmunityQueue
+import com.ehedgehog.base.immunityStartsAt
 import com.ehedgehog.database.repositories.UserRepository
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
@@ -31,10 +33,27 @@ class ImmunityScheduler(
         }
     }
 
+    fun scheduleImmunityActivatedNotification(userId: String, startsAt: Long) {
+        val delayMillis = startsAt - System.currentTimeMillis()
+        if (delayMillis <= 0) return
+
+        scope.launch {
+            delay(delayMillis)
+
+            bot.sendMessage(
+                ChatId(RawChatId(userId.toLong())),
+                "\uD83D\uDC8A *Иммунитет активирован\\!*\n\nПеред игрой не забудьте добавить эмодзи «`\uD83D\uDEA9`» в ваш никнейм\\.",
+                MarkdownV2
+            )
+        }
+    }
+
     fun restoreNotifications() {
         val users = repository.getUsersWithActiveImmunity()
 
         users.forEach {
+            if (it.isInImmunityQueue())
+                scheduleImmunityActivatedNotification(it.id, it.immunityStartsAt)
             scheduleExpirationNotification(it.id, it.immunityExpiresAt)
         }
     }

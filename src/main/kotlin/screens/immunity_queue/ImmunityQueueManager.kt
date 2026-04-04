@@ -4,6 +4,8 @@ import com.ehedgehog.ImmunityScheduler
 import com.ehedgehog.base.BaseUserManager
 import com.ehedgehog.base.IMMUNITIES_COUNT_LIMIT
 import com.ehedgehog.base.IMMUNITY_DURATION
+import com.ehedgehog.base.hasActiveImmunity
+import com.ehedgehog.base.hasImmunityCooldown
 import com.ehedgehog.database.repositories.UserRepository
 import com.ehedgehog.screens.ScreenContext
 import dev.inmo.tgbotapi.bot.TelegramBot
@@ -27,7 +29,7 @@ class ImmunityQueueManager(private val bot: TelegramBot) : BaseUserManager(bot) 
         val user = userRepository.getUserById(context.user.id.chatId.toString()) ?: return
         val immunities = userRepository.getUsersWithActiveImmunity()
 
-        if (user.immunities > 0 && !hasActiveImmunity(user) && !hasImmunityCooldown(user)) {
+        if (user.immunities > 0 && !user.hasActiveImmunity() && !user.hasImmunityCooldown()) {
             val startsAt = if (immunities.size >= IMMUNITIES_COUNT_LIMIT)
                 immunities[immunities.size - IMMUNITIES_COUNT_LIMIT].immunityExpiresAt
             else System.currentTimeMillis()
@@ -42,6 +44,7 @@ class ImmunityQueueManager(private val bot: TelegramBot) : BaseUserManager(bot) 
                 )
             )
 
+            immunityScheduler.scheduleImmunityActivatedNotification(user.id, startsAt)
             immunityScheduler.scheduleExpirationNotification(user.id, expiresAt)
             val newMessage = "*Вы заняли место в очереди\\.*\n\n✅ Ваш иммунитет активируется ${dateFromMillis(startsAt)} по МСК"
             context.messageId?.let {

@@ -30,17 +30,11 @@ abstract class BaseUserManager(bot: TelegramBot) : BaseManager(bot) {
         return status == UserStatus.SENIOR_ADMIN || userId == System.getenv("BOT_OWNER_ID")
     }
 
-    fun hasActiveImmunity(user: UserEntity): Boolean = user.immunityExpiresAt > System.currentTimeMillis()
-
-    fun isInImmunityQueue(user: UserEntity): Boolean = user.immunityExpiresAt - IMMUNITY_DURATION > System.currentTimeMillis()
-
-    fun hasImmunityCooldown(user: UserEntity): Boolean = System.currentTimeMillis() - user.immunityExpiresAt < IMMUNITY_COOLDOWN
-
     fun getImmunityStatus(user: UserEntity?): String = when {
         user == null -> "не активен"
-        isInImmunityQueue(user) -> "в очереди"
-        hasActiveImmunity(user) -> handleReservedSymbols("действует до ${dateFromMillis(user.immunityExpiresAt)} по МСК")
-        hasImmunityCooldown(user) -> "восстанавливается"
+        user.isInImmunityQueue() -> "в очереди"
+        user.hasActiveImmunity() -> handleReservedSymbols("действует до ${dateFromMillis(user.immunityExpiresAt)} по МСК")
+        user.hasImmunityCooldown() -> "восстанавливается"
         else -> "не активен"
     }
 
@@ -83,3 +77,12 @@ abstract class BaseUserManager(bot: TelegramBot) : BaseManager(bot) {
     }
 
 }
+
+val UserEntity.immunityStartsAt
+    get() = immunityExpiresAt - IMMUNITY_DURATION
+
+fun UserEntity.hasActiveImmunity(): Boolean = immunityExpiresAt > System.currentTimeMillis()
+
+fun UserEntity.isInImmunityQueue(): Boolean = immunityStartsAt > System.currentTimeMillis()
+
+fun UserEntity.hasImmunityCooldown(): Boolean = System.currentTimeMillis() - immunityExpiresAt < IMMUNITY_COOLDOWN
