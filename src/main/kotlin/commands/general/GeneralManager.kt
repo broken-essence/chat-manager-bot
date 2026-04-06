@@ -46,6 +46,25 @@ class GeneralManager(private val bot: TelegramBot): BaseUserManager(bot) {
         )
     }
 
+    suspend fun randomize(command: TextMessage, args: Array<String>) {
+        val count = if (args.size > 1) args[1].toInt() else 1
+        val until = args.firstOrNull()?.toInt() ?: 10
+
+        if (count <= 0 || until <= 0 || until < count) {
+            bot.reply(command.chat.id, command.messageId, "Ты делаешь что-то не так \uD83D\uDE10")
+            return
+        }
+
+        val resultString = (1..until).shuffled().take(count).joinToString()
+
+        bot.reply(
+            command.chat.id,
+            command.messageId,
+            "\uD83C\uDFB2 *Рандом от 1 до ${until}:*\n\n${resultString}",
+            MarkdownV2
+        )
+    }
+
     private fun formatImmunitiesList(list: List<UserEntity>): String =
         if (list.isNotEmpty()) {
             list.mapIndexed { index, user ->
