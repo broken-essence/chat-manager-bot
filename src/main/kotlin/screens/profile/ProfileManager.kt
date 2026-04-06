@@ -2,6 +2,7 @@ package com.ehedgehog.screens.profile
 
 import com.ehedgehog.base.BaseUserManager
 import com.ehedgehog.database.UserEntity
+import com.ehedgehog.database.UserStatus
 import com.ehedgehog.database.repositories.UserRepository
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.types.chat.User
@@ -12,6 +13,7 @@ class ProfileManager(bot: TelegramBot) : BaseUserManager(bot) {
 
     fun getProfileMessage(user: User): String {
         val userEntry = getStoredUserOrNew(user)
+        val warnsVisible = userEntry.status > UserStatus.PLAYER
 
         return """|🪿 Пользователь *${handleReservedSymbols(user.firstName)}*
                 |👤 Статус: ${getStatusDescription(userEntry.status)}
@@ -21,7 +23,7 @@ class ProfileManager(bot: TelegramBot) : BaseUserManager(bot) {
                 |💊 Активация иммунитета: ${userEntry.immunities}
                 |Иммунитет: ${getImmunityStatus(userEntry)}
                 |
-                |⚠️ Предупреждения: ${userEntry.adminWarns}\/6
+                |${if (warnsVisible) "⚠️ Предупреждения: ${userEntry.adminWarns}\\/6" else ""}
                 """.trimMargin()
     }
 
