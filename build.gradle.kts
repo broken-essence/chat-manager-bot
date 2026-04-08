@@ -24,10 +24,10 @@ tasks.shadowJar {
 
 
 dependencies {
-    implementation("dev.inmo:tgbotapi:29.0.1")
-    implementation("io.ktor:ktor-client-core:3.3.1")
-    implementation("io.ktor:ktor-client-cio:3.3.1")
-    implementation("io.ktor:ktor-client-okhttp:3.3.1")
+    implementation("dev.inmo:tgbotapi:31.2.0")
+    implementation("io.ktor:ktor-client-core:3.3.2")
+    implementation("io.ktor:ktor-client-cio:3.3.2")
+    implementation("io.ktor:ktor-client-okhttp:3.3.2")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
 
     implementation("org.jetbrains.exposed:exposed-core:1.0.0-rc-2")
@@ -36,6 +36,10 @@ dependencies {
     implementation("org.xerial:sqlite-jdbc:3.50.3.0")
     implementation("org.postgresql:postgresql:42.7.2")
     implementation("com.zaxxer:HikariCP:5.1.0")
+
+    implementation("ch.qos.logback:logback-classic:1.5.32")
+    implementation("org.slf4j:slf4j-api:2.0.17")
+    implementation("org.slf4j:jul-to-slf4j:2.0.17")
 }
 
 kotlin {

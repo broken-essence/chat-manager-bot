@@ -1,0 +1,17 @@
+<configuration>
+
+    <logger name="dev.inmo.tgbotapi.bot.ktor.base" level="ERROR"/>
+    <logger name="KSLog" level="OFF"/>
+    <logger name="com.ehedgehog" level="INFO"/>
+
+    <root level="ERROR">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss} [%level] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+</configuration>

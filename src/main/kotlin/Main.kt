@@ -27,7 +27,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
+import org.slf4j.bridge.SLF4JBridgeHandler
 import java.io.File
+import java.util.logging.LogManager
 
 @OptIn(PreviewFeature::class, RiskFeature::class)
 suspend fun main(args: Array<String>) {
@@ -45,6 +47,9 @@ suspend fun main(args: Array<String>) {
 
     val scope = CoroutineScope(Dispatchers.Default)
     val immunityScheduler = ImmunityScheduler(bot, UserRepository(), scope)
+
+    LogManager.getLogManager().reset()
+    SLF4JBridgeHandler.install()
 
     DatabaseFactory.init()
     immunityScheduler.restoreNotifications()
