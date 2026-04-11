@@ -6,6 +6,8 @@ import com.ehedgehog.base.IMMUNITIES_COUNT_LIMIT
 import com.ehedgehog.base.IMMUNITY_DURATION
 import com.ehedgehog.base.hasActiveImmunity
 import com.ehedgehog.base.hasImmunityCooldown
+import com.ehedgehog.data.ActionResult
+import com.ehedgehog.data.Reason
 import com.ehedgehog.database.repositories.UserRepository
 import com.ehedgehog.data.ScreenContext
 import dev.inmo.tgbotapi.bot.TelegramBot
@@ -25,8 +27,8 @@ class ImmunityQueueManager(private val bot: TelegramBot) : BaseUserManager(bot) 
         return "\uD83D\uDDD3 *Достигнуто максимальное количество пользователей с активным иммунитетом\\.*\n\nЖелаете встать в очередь?"
     }
 
-    suspend fun confirmQueue(context: ScreenContext) {
-        val user = userRepository.getUserById(context.user.id.chatId.toString()) ?: return
+    suspend fun confirmQueue(context: ScreenContext): ActionResult {
+        val user = userRepository.getUserById(context.user.id.chatId.toString()) ?: return ActionResult.Failure(Reason.UserNotFound)
         val immunities = userRepository.getUsersWithActiveImmunity()
 
         if (user.immunities > 0 && !user.hasActiveImmunity() && !user.hasImmunityCooldown()) {
@@ -50,13 +52,16 @@ class ImmunityQueueManager(private val bot: TelegramBot) : BaseUserManager(bot) 
             context.messageId?.let {
                 bot.editMessageText(context.chatId, it, newMessage, MarkdownV2)
             }
+            return ActionResult.Success
         } else {
             context.messageId?.let { bot.delete(context.chatId, it) }
+            return ActionResult.Failure(Reason.NotAvailable)
         }
     }
 
-    suspend fun declineQueue(context: ScreenContext) {
+    suspend fun declineQueue(context: ScreenContext): ActionResult {
         context.messageId?.let { bot.deleteMessage(context.chatId, it) }
+        return ActionResult.Success
     }
 
 }

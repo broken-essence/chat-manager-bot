@@ -1,6 +1,8 @@
 package com.ehedgehog.screens.shop
 
 import com.ehedgehog.base.BaseUserManager
+import com.ehedgehog.data.ActionResult
+import com.ehedgehog.data.Reason
 import com.ehedgehog.database.repositories.UserRepository
 import com.ehedgehog.data.ScreenContext
 import com.ehedgehog.screens.ScreenRouter
@@ -31,8 +33,8 @@ class ShopManager(private val bot: TelegramBot) : BaseUserManager(bot) {
         """.trimIndent()
     }
 
-    suspend fun buyUnwarn(context: ScreenContext) {
-        val userEntry = repository.getUserById(context.user.id.chatId.toString()) ?: return
+    suspend fun buyUnwarn(context: ScreenContext): ActionResult {
+        val userEntry = repository.getUserById(context.user.id.chatId.toString()) ?: return ActionResult.Failure(Reason.UserNotFound)
 
         if (userEntry.balance >= PRICE_UNWARN) {
             updateUserEntry(
@@ -45,13 +47,15 @@ class ShopManager(private val bot: TelegramBot) : BaseUserManager(bot) {
             )
             bot.showPopup(context, "Покупка совершена ✅")
             ScreenRouter.openScreen(bot, context, "shop")
+            return ActionResult.Success
         } else {
             bot.showPopup(context, "Недостаточно средств ❌")
+            return ActionResult.Failure(Reason.NotEnoughBalance)
         }
     }
 
-    suspend fun buyImmunity(context: ScreenContext) {
-        val userEntry = repository.getUserById(context.user.id.chatId.toString()) ?: return
+    suspend fun buyImmunity(context: ScreenContext): ActionResult {
+        val userEntry = repository.getUserById(context.user.id.chatId.toString()) ?: return ActionResult.Failure(Reason.UserNotFound)
 
         if (userEntry.balance >= PRICE_IMMUNITY) {
             updateUserEntry(
@@ -64,8 +68,10 @@ class ShopManager(private val bot: TelegramBot) : BaseUserManager(bot) {
             )
             bot.showPopup(context, "Покупка совершена ✅")
             ScreenRouter.openScreen(bot, context, "shop")
+            return ActionResult.Success
         } else {
             bot.showPopup(context, "Недостаточно средств ❌")
+            return ActionResult.Failure(Reason.NotEnoughBalance)
         }
     }
 

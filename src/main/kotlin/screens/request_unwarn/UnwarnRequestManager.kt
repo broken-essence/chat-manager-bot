@@ -1,6 +1,8 @@
 package com.ehedgehog.screens.request_unwarn
 
 import com.ehedgehog.base.BaseUserManager
+import com.ehedgehog.data.ActionResult
+import com.ehedgehog.data.Reason
 import com.ehedgehog.database.repositories.UnwarnRequestRepository
 import com.ehedgehog.database.repositories.UserRepository
 import com.ehedgehog.data.ScreenContext
@@ -18,23 +20,25 @@ class UnwarnRequestManager(private val bot: TelegramBot): BaseUserManager(bot) {
         return "⚠\uFE0F Пользователь $markdownLink \\[`${userId}`\\] запрашивает снятие варна\\!"
     }
 
-    suspend fun confirmUnwarn(context: ScreenContext, requestId: Int) {
+    suspend fun confirmUnwarn(context: ScreenContext, requestId: Int): ActionResult {
         if (isSeniorAdminOrOwner(context.user.id.chatId.toString())) {
-            val request = unwarnRequestRepository.getRequest(requestId) ?: return
-            val user = userRepository.getUserById(request.userId) ?: return
+            val request = unwarnRequestRepository.getRequest(requestId) ?: return ActionResult.Failure(Reason.RequestNotFound)
+            val user = userRepository.getUserById(request.userId) ?: return ActionResult.Failure(Reason.UserNotFound)
 
             val adminMarkdownLink = createMarkdownLink(context.user.firstName, context.user.id.chatId.toString())
             val newMessage = getUnwarnRequestMessage(user.id, user.name)
                 .plus("\n\n✅ *Снятие подтверждено*\n — \uD83D\uDC6E\uD83C\uDFFC $adminMarkdownLink \\[`${context.user.id.chatId}`\\]")
             if (context.messageId != null)
                 bot.editMessageText(context.chatId, context.messageId, newMessage, MarkdownV2)
+            return ActionResult.Success
         }
+        return ActionResult.Failure(Reason.AccessDenied)
     }
 
-    suspend fun declineUnwarn(context: ScreenContext, requestId: Int) {
+    suspend fun declineUnwarn(context: ScreenContext, requestId: Int): ActionResult {
         if (isSeniorAdminOrOwner(context.user.id.chatId.toString())) {
-            val request = unwarnRequestRepository.getRequest(requestId) ?: return
-            val user = userRepository.getUserById(request.userId) ?: return
+            val request = unwarnRequestRepository.getRequest(requestId) ?: return ActionResult.Failure(Reason.RequestNotFound)
+            val user = userRepository.getUserById(request.userId) ?: return ActionResult.Failure(Reason.UserNotFound)
 
             val adminMarkdownLink = createMarkdownLink(context.user.firstName, context.user.id.chatId.toString())
             val newMessage = getUnwarnRequestMessage(user.id, user.name)
@@ -43,7 +47,9 @@ class UnwarnRequestManager(private val bot: TelegramBot): BaseUserManager(bot) {
                 bot.editMessageText(context.chatId, context.messageId, newMessage, MarkdownV2)
 
             userRepository.updateUnwarnCount(user.id, user.unwarns + 1)
+            return ActionResult.Success
         }
+        return ActionResult.Failure(Reason.AccessDenied)
     }
 
 }

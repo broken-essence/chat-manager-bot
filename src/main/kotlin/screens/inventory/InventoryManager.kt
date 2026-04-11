@@ -6,6 +6,8 @@ import com.ehedgehog.base.IMMUNITIES_COUNT_LIMIT
 import com.ehedgehog.base.IMMUNITY_DURATION
 import com.ehedgehog.base.hasActiveImmunity
 import com.ehedgehog.base.hasImmunityCooldown
+import com.ehedgehog.data.ActionResult
+import com.ehedgehog.data.Reason
 import com.ehedgehog.database.ChatUser
 import com.ehedgehog.database.repositories.UnwarnRequestRepository
 import com.ehedgehog.database.repositories.UserRepository
@@ -41,8 +43,8 @@ class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
         """.trimIndent()
     }
 
-    suspend fun useUnwarn(context: ScreenContext) {
-        val userEntry = userRepository.getUserById(context.user.id.chatId.toString()) ?: return
+    suspend fun useUnwarn(context: ScreenContext): ActionResult {
+        val userEntry = userRepository.getUserById(context.user.id.chatId.toString()) ?: return ActionResult.Failure(Reason.UserNotFound)
 
         if (userEntry.unwarns > 0) {
             //TODO: replace id with env of admin system chat
@@ -55,19 +57,21 @@ class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
             ScreenRouter.openScreen(bot, unwarnContext, "request_unwarn", requestId.toString())
             bot.showPopup(context, "Запрос отправлен админам ✅")
             ScreenRouter.openScreen(bot, context, "inventory")
+            return ActionResult.Success
         } else {
             bot.showPopup(context, "Недостаточно анварнов ❌")
+            return ActionResult.Failure(Reason.NotEnoughItems)
         }
     }
 
-    suspend fun useImmunity(context: ScreenContext) {
-        val userEntry = userRepository.getUserById(context.user.id.chatId.toString()) ?: return
+    suspend fun useImmunity(context: ScreenContext): ActionResult {
+        val userEntry = userRepository.getUserById(context.user.id.chatId.toString()) ?: return ActionResult.Failure(Reason.UserNotFound)
         val activeImmunities = userRepository.getUsersWithActiveImmunity()
 
         if (userEntry.immunities > 0 && !userEntry.hasActiveImmunity() && !userEntry.hasImmunityCooldown()) {
             if (activeImmunities.size >= IMMUNITIES_COUNT_LIMIT) {
                 showImmunityQueueScreen(context)
-                return
+                return ActionResult.Failure(Reason.LimitExceeded)
             }
 
             val expiresAt = System.currentTimeMillis() + IMMUNITY_DURATION
@@ -83,8 +87,10 @@ class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
             immunityScheduler.scheduleExpirationNotification(userEntry.id, expiresAt)
             bot.showPopup(context, "Иммунитет активирован ✅")
             ScreenRouter.openScreen(bot, context, "inventory")
+            return ActionResult.Success
         } else {
             bot.showPopup(context, "Что-то пошло не так ☹\uFE0F")
+            return ActionResult.Failure(Reason.NotAvailable)
         }
     }
 
