@@ -4,7 +4,7 @@ import com.ehedgehog.config.Config
 import com.ehedgehog.database.DatabaseFactory
 import com.ehedgehog.database.repositories.UserRepository
 import com.ehedgehog.screens.ActionRouter
-import com.ehedgehog.screens.ScreenContext
+import com.ehedgehog.data.ScreenContext
 import com.ehedgehog.screens.ScreenRouter
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.bot.ktor.telegramBot

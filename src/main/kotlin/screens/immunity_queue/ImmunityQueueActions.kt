@@ -1,7 +1,7 @@
 package com.ehedgehog.screens.immunity_queue
 
 import com.ehedgehog.base.BaseAction
-import com.ehedgehog.screens.ScreenContext
+import com.ehedgehog.data.ScreenContext
 
 class ImmunityQueueConfirmAction(private val manager: ImmunityQueueManager) : BaseAction {
 

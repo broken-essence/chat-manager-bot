@@ -1,4 +1,4 @@
-package com.ehedgehog.screens
+package com.ehedgehog.data
 
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardMarkup
 

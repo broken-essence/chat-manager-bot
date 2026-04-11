@@ -1,7 +1,7 @@
 package com.ehedgehog.screens.inventory
 
 import com.ehedgehog.base.BaseAction
-import com.ehedgehog.screens.ScreenContext
+import com.ehedgehog.data.ScreenContext
 
 class UseUnwarnAction(private val manager: InventoryManager): BaseAction {
 

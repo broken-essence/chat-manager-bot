@@ -1,8 +1,8 @@
 package com.ehedgehog.screens.profile
 
 import com.ehedgehog.base.BaseScreen
-import com.ehedgehog.screens.ScreenContent
-import com.ehedgehog.screens.ScreenContext
+import com.ehedgehog.data.ScreenContent
+import com.ehedgehog.data.ScreenContext
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.urlButton

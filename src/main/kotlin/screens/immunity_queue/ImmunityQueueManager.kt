@@ -7,7 +7,7 @@ import com.ehedgehog.base.IMMUNITY_DURATION
 import com.ehedgehog.base.hasActiveImmunity
 import com.ehedgehog.base.hasImmunityCooldown
 import com.ehedgehog.database.repositories.UserRepository
-import com.ehedgehog.screens.ScreenContext
+import com.ehedgehog.data.ScreenContext
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.delete
 import dev.inmo.tgbotapi.extensions.api.deleteMessage

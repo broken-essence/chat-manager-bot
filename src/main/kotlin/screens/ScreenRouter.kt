@@ -1,6 +1,8 @@
 package com.ehedgehog.screens
 
+import com.ehedgehog.Logger
 import com.ehedgehog.base.BaseScreen
+import com.ehedgehog.data.ScreenContext
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.edit.text.editMessageText
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
@@ -19,6 +21,8 @@ object ScreenRouter {
     suspend fun openScreen(bot: TelegramBot, context: ScreenContext, screenId: String, data: String? = null) {
         val screen = screens[screenId]
         val content = screen?.render(context, data) ?: return
+
+        Logger.screen(screenId, context.user.id.chatId.toString())
 
         if (context.messageId == null) {
             bot.sendMessage(context.chatId, content.text, MarkdownV2, replyMarkup = content.keyboard)

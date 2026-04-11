@@ -3,7 +3,7 @@ package com.ehedgehog.commands.general
 import com.ehedgehog.base.BaseUserManager
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.repositories.UserRepository
-import com.ehedgehog.screens.ScreenContext
+import com.ehedgehog.data.ScreenContext
 import com.ehedgehog.screens.ScreenRouter
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.send.reply

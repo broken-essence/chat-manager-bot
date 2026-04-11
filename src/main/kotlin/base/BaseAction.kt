@@ -1,6 +1,6 @@
 package com.ehedgehog.base
 
-import com.ehedgehog.screens.ScreenContext
+import com.ehedgehog.data.ScreenContext
 
 interface BaseAction {
     val id: String

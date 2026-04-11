@@ -1,7 +1,7 @@
 package com.ehedgehog.base
 
-import com.ehedgehog.screens.ScreenContent
-import com.ehedgehog.screens.ScreenContext
+import com.ehedgehog.data.ScreenContent
+import com.ehedgehog.data.ScreenContext
 
 interface BaseScreen {
     val id: String

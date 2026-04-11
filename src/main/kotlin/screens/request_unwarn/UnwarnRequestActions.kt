@@ -1,7 +1,7 @@
 package com.ehedgehog.screens.request_unwarn
 
 import com.ehedgehog.base.BaseAction
-import com.ehedgehog.screens.ScreenContext
+import com.ehedgehog.data.ScreenContext
 
 class ConfirmUnwarnAction(private val manager: UnwarnRequestManager) : BaseAction {
 

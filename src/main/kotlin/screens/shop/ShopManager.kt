@@ -2,7 +2,7 @@ package com.ehedgehog.screens.shop
 
 import com.ehedgehog.base.BaseUserManager
 import com.ehedgehog.database.repositories.UserRepository
-import com.ehedgehog.screens.ScreenContext
+import com.ehedgehog.data.ScreenContext
 import com.ehedgehog.screens.ScreenRouter
 import com.ehedgehog.showPopup
 import dev.inmo.tgbotapi.bot.TelegramBot

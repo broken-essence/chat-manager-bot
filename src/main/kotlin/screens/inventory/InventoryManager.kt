@@ -9,7 +9,7 @@ import com.ehedgehog.base.hasImmunityCooldown
 import com.ehedgehog.database.ChatUser
 import com.ehedgehog.database.repositories.UnwarnRequestRepository
 import com.ehedgehog.database.repositories.UserRepository
-import com.ehedgehog.screens.ScreenContext
+import com.ehedgehog.data.ScreenContext
 import com.ehedgehog.screens.ScreenRouter
 import com.ehedgehog.showPopup
 import dev.inmo.tgbotapi.bot.TelegramBot

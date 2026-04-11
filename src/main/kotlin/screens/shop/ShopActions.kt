@@ -1,7 +1,7 @@
 package com.ehedgehog.screens.shop
 
 import com.ehedgehog.base.BaseAction
-import com.ehedgehog.screens.ScreenContext
+import com.ehedgehog.data.ScreenContext
 
 class BuyUnwarnAction(private val manager: ShopManager): BaseAction {
 
