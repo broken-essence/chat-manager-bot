@@ -12,6 +12,7 @@ private const val DATE_FORMAT = "dd MMMM yyyy HH:mm"
 
 abstract class BaseManager(private val bot: TelegramBot) {
 
+    // TODO: must be extension fun
     suspend fun isAdmin(chatId: IdChatIdentifier, userId: UserId): Boolean {
         return bot.getChatAdministrators(chatId).any { it.user.id == userId }
     }

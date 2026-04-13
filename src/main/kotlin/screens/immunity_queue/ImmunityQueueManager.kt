@@ -1,24 +1,16 @@
 package com.ehedgehog.screens.immunity_queue
 
 import com.ehedgehog.ImmunityScheduler
-import com.ehedgehog.base.BaseUserManager
-import com.ehedgehog.base.IMMUNITIES_COUNT_LIMIT
-import com.ehedgehog.base.IMMUNITY_DURATION
-import com.ehedgehog.base.hasActiveImmunity
-import com.ehedgehog.base.hasImmunityCooldown
+import com.ehedgehog.base.*
 import com.ehedgehog.data.ActionResult
 import com.ehedgehog.data.Reason
-import com.ehedgehog.database.repositories.UserRepository
 import com.ehedgehog.data.ScreenContext
+import com.ehedgehog.database.repositories.UserRepository
 import dev.inmo.tgbotapi.bot.TelegramBot
-import dev.inmo.tgbotapi.extensions.api.delete
-import dev.inmo.tgbotapi.extensions.api.deleteMessage
-import dev.inmo.tgbotapi.extensions.api.edit.text.editMessageText
-import dev.inmo.tgbotapi.types.message.MarkdownV2
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
-class ImmunityQueueManager(private val bot: TelegramBot) : BaseUserManager(bot) {
+class ImmunityQueueManager(bot: TelegramBot) : BaseUserManager(bot) {
 
     private val userRepository = UserRepository()
     private val immunityScheduler = ImmunityScheduler(bot, userRepository, CoroutineScope(Dispatchers.Default))
@@ -27,7 +19,7 @@ class ImmunityQueueManager(private val bot: TelegramBot) : BaseUserManager(bot) 
         return "\uD83D\uDDD3 *Достигнуто максимальное количество пользователей с активным иммунитетом\\.*\n\nЖелаете встать в очередь?"
     }
 
-    suspend fun confirmQueue(context: ScreenContext): ActionResult {
+    fun confirmQueue(context: ScreenContext): ActionResult {
         val user = userRepository.getUserById(context.user.id.chatId.toString()) ?: return ActionResult.Failure(Reason.UserNotFound)
         val immunities = userRepository.getUsersWithActiveImmunity()
 
@@ -49,19 +41,10 @@ class ImmunityQueueManager(private val bot: TelegramBot) : BaseUserManager(bot) 
             immunityScheduler.scheduleImmunityActivatedNotification(user.id, startsAt)
             immunityScheduler.scheduleExpirationNotification(user.id, expiresAt)
             val newMessage = "*Вы заняли место в очереди\\.*\n\n✅ Ваш иммунитет активируется ${dateFromMillis(startsAt)} по МСК"
-            context.messageId?.let {
-                bot.editMessageText(context.chatId, it, newMessage, MarkdownV2)
-            }
-            return ActionResult.Success
-        } else {
-            context.messageId?.let { bot.delete(context.chatId, it) }
-            return ActionResult.Failure(Reason.NotAvailable)
+            return ActionResult.Success(newMessage)
         }
-    }
 
-    suspend fun declineQueue(context: ScreenContext): ActionResult {
-        context.messageId?.let { bot.deleteMessage(context.chatId, it) }
-        return ActionResult.Success
+        return ActionResult.Failure(Reason.NotAvailable)
     }
 
 }

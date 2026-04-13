@@ -1,27 +1,18 @@
 package com.ehedgehog.screens.inventory
 
 import com.ehedgehog.ImmunityScheduler
-import com.ehedgehog.base.BaseUserManager
-import com.ehedgehog.base.IMMUNITIES_COUNT_LIMIT
-import com.ehedgehog.base.IMMUNITY_DURATION
-import com.ehedgehog.base.hasActiveImmunity
-import com.ehedgehog.base.hasImmunityCooldown
+import com.ehedgehog.base.*
 import com.ehedgehog.data.ActionResult
 import com.ehedgehog.data.Reason
+import com.ehedgehog.data.ScreenContext
 import com.ehedgehog.database.ChatUser
 import com.ehedgehog.database.repositories.UnwarnRequestRepository
 import com.ehedgehog.database.repositories.UserRepository
-import com.ehedgehog.data.ScreenContext
-import com.ehedgehog.screens.ScreenRouter
-import com.ehedgehog.showPopup
 import dev.inmo.tgbotapi.bot.TelegramBot
-import dev.inmo.tgbotapi.extensions.api.answers.answerCallbackQuery
-import dev.inmo.tgbotapi.types.ChatId
-import dev.inmo.tgbotapi.types.RawChatId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
-class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
+class InventoryManager(bot: TelegramBot) : BaseUserManager(bot) {
 
     private val userRepository = UserRepository()
     private val unwarnRequestRepository = UnwarnRequestRepository()
@@ -43,34 +34,27 @@ class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
         """.trimIndent()
     }
 
-    suspend fun useUnwarn(context: ScreenContext): ActionResult {
+    fun useUnwarn(context: ScreenContext): ActionResult {
         val userEntry = userRepository.getUserById(context.user.id.chatId.toString()) ?: return ActionResult.Failure(Reason.UserNotFound)
 
         if (userEntry.unwarns > 0) {
-            //TODO: replace id with env of admin system chat
-            val unwarnContext = ScreenContext(ChatId(RawChatId(-1002158551287)), context.user)
             updateUnwarns(
                 ChatUser(context.chatId, userEntry, context.user),
                 userEntry.unwarns - 1
             )
             val requestId = unwarnRequestRepository.createRequest(userEntry.id)
-            ScreenRouter.openScreen(bot, unwarnContext, "request_unwarn", requestId.toString())
-            bot.showPopup(context, "Запрос отправлен админам ✅")
-            ScreenRouter.openScreen(bot, context, "inventory")
-            return ActionResult.Success
+            return ActionResult.Success(requestId.toString())
         } else {
-            bot.showPopup(context, "Недостаточно анварнов ❌")
             return ActionResult.Failure(Reason.NotEnoughItems)
         }
     }
 
-    suspend fun useImmunity(context: ScreenContext): ActionResult {
+    fun useImmunity(context: ScreenContext): ActionResult {
         val userEntry = userRepository.getUserById(context.user.id.chatId.toString()) ?: return ActionResult.Failure(Reason.UserNotFound)
         val activeImmunities = userRepository.getUsersWithActiveImmunity()
 
         if (userEntry.immunities > 0 && !userEntry.hasActiveImmunity() && !userEntry.hasImmunityCooldown()) {
             if (activeImmunities.size >= IMMUNITIES_COUNT_LIMIT) {
-                showImmunityQueueScreen(context)
                 return ActionResult.Failure(Reason.LimitExceeded)
             }
 
@@ -85,19 +69,10 @@ class InventoryManager(private val bot: TelegramBot) : BaseUserManager(bot) {
             )
 
             immunityScheduler.scheduleExpirationNotification(userEntry.id, expiresAt)
-            bot.showPopup(context, "Иммунитет активирован ✅")
-            ScreenRouter.openScreen(bot, context, "inventory")
-            return ActionResult.Success
-        } else {
-            bot.showPopup(context, "Что-то пошло не так ☹\uFE0F")
-            return ActionResult.Failure(Reason.NotAvailable)
+            return ActionResult.Success()
         }
-    }
 
-    private suspend fun showImmunityQueueScreen(context: ScreenContext) {
-        context.callbackId?.let { bot.answerCallbackQuery(it) }
-        val queueContext = ScreenContext(context.chatId, context.user)
-        ScreenRouter.openScreen(bot, queueContext, "immunity_queue")
+        return ActionResult.Failure(Reason.NotAvailable)
     }
 
 }

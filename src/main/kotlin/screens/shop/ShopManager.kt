@@ -3,16 +3,14 @@ package com.ehedgehog.screens.shop
 import com.ehedgehog.base.BaseUserManager
 import com.ehedgehog.data.ActionResult
 import com.ehedgehog.data.Reason
-import com.ehedgehog.database.repositories.UserRepository
 import com.ehedgehog.data.ScreenContext
-import com.ehedgehog.screens.ScreenRouter
-import com.ehedgehog.showPopup
+import com.ehedgehog.database.repositories.UserRepository
 import dev.inmo.tgbotapi.bot.TelegramBot
 
 internal const val PRICE_UNWARN = 2
 internal const val PRICE_IMMUNITY = 6
 
-class ShopManager(private val bot: TelegramBot) : BaseUserManager(bot) {
+class ShopManager(bot: TelegramBot) : BaseUserManager(bot) {
 
     val repository = UserRepository()
 
@@ -33,7 +31,7 @@ class ShopManager(private val bot: TelegramBot) : BaseUserManager(bot) {
         """.trimIndent()
     }
 
-    suspend fun buyUnwarn(context: ScreenContext): ActionResult {
+    fun buyUnwarn(context: ScreenContext): ActionResult {
         val userEntry = repository.getUserById(context.user.id.chatId.toString()) ?: return ActionResult.Failure(Reason.UserNotFound)
 
         if (userEntry.balance >= PRICE_UNWARN) {
@@ -45,16 +43,14 @@ class ShopManager(private val bot: TelegramBot) : BaseUserManager(bot) {
                     unwarns = userEntry.unwarns + 1
                 )
             )
-            bot.showPopup(context, "Покупка совершена ✅")
-            ScreenRouter.openScreen(bot, context, "shop")
-            return ActionResult.Success
-        } else {
-            bot.showPopup(context, "Недостаточно средств ❌")
-            return ActionResult.Failure(Reason.NotEnoughBalance)
+
+            return ActionResult.Success()
         }
+
+        return ActionResult.Failure(Reason.NotEnoughBalance)
     }
 
-    suspend fun buyImmunity(context: ScreenContext): ActionResult {
+    fun buyImmunity(context: ScreenContext): ActionResult {
         val userEntry = repository.getUserById(context.user.id.chatId.toString()) ?: return ActionResult.Failure(Reason.UserNotFound)
 
         if (userEntry.balance >= PRICE_IMMUNITY) {
@@ -66,13 +62,11 @@ class ShopManager(private val bot: TelegramBot) : BaseUserManager(bot) {
                     immunities = userEntry.immunities + 1
                 )
             )
-            bot.showPopup(context, "Покупка совершена ✅")
-            ScreenRouter.openScreen(bot, context, "shop")
-            return ActionResult.Success
-        } else {
-            bot.showPopup(context, "Недостаточно средств ❌")
-            return ActionResult.Failure(Reason.NotEnoughBalance)
+
+            return ActionResult.Success()
         }
+
+        return ActionResult.Failure(Reason.NotEnoughBalance)
     }
 
 }

@@ -44,12 +44,12 @@ fun registerScreens(bot: TelegramBot) {
 }
 
 fun registerActions(bot: TelegramBot) {
-    ActionRouter.registerAction(UseUnwarnAction(InventoryManager(bot)))
-    ActionRouter.registerAction(UseImmunityAction(InventoryManager(bot)))
-    ActionRouter.registerAction(BuyUnwarnAction(ShopManager(bot)))
-    ActionRouter.registerAction(BuyImmunityAction(ShopManager(bot)))
-    ActionRouter.registerAction(ConfirmUnwarnAction(UnwarnRequestManager(bot)))
-    ActionRouter.registerAction(DeclineUnwarnAction(UnwarnRequestManager(bot)))
-    ActionRouter.registerAction(ImmunityQueueConfirmAction(ImmunityQueueManager(bot)))
-    ActionRouter.registerAction(ImmunityQueueDeclineAction(ImmunityQueueManager(bot)))
+    ActionRouter.registerAction(UseUnwarnAction(bot, InventoryManager(bot)))
+    ActionRouter.registerAction(UseImmunityAction(bot,InventoryManager(bot)))
+    ActionRouter.registerAction(BuyUnwarnAction(bot, ShopManager(bot)))
+    ActionRouter.registerAction(BuyImmunityAction(bot, ShopManager(bot)))
+    ActionRouter.registerAction(ConfirmUnwarnAction(bot, UnwarnRequestManager(bot)))
+    ActionRouter.registerAction(DeclineUnwarnAction(bot, UnwarnRequestManager(bot)))
+    ActionRouter.registerAction(ImmunityQueueConfirmAction(bot, ImmunityQueueManager(bot)))
+    ActionRouter.registerAction(ImmunityQueueDeclineAction(bot))
 }

@@ -1,26 +1,48 @@
 package com.ehedgehog.screens.request_unwarn
 
 import com.ehedgehog.base.BaseAction
+import com.ehedgehog.data.ActionResult
+import com.ehedgehog.data.Reason
 import com.ehedgehog.data.ScreenContext
+import com.ehedgehog.showPopup
+import dev.inmo.tgbotapi.bot.TelegramBot
+import dev.inmo.tgbotapi.extensions.api.edit.text.editMessageText
+import dev.inmo.tgbotapi.types.message.MarkdownV2
 
-class ConfirmUnwarnAction(private val manager: UnwarnRequestManager) : BaseAction {
+class ConfirmUnwarnAction(bot: TelegramBot, private val manager: UnwarnRequestManager) : UnwarnAction(bot) {
 
     override val id: String = "action:confirm_unwarn"
 
-    override suspend fun execute(context: ScreenContext, data: String?) {
-        println("Action: unwarn confirmed")
-        val requestId = data?.toInt() ?: return
-        manager.confirmUnwarn(context, requestId)
+    override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
+        val result = manager.confirmUnwarn(context, data)
+        handleActionResult(result, context)
+        return result
     }
 }
 
-class DeclineUnwarnAction(private val manager: UnwarnRequestManager) : BaseAction {
+class DeclineUnwarnAction(bot: TelegramBot, private val manager: UnwarnRequestManager) : UnwarnAction(bot) {
 
     override val id: String = "action:decline_unwarn"
 
-    override suspend fun execute(context: ScreenContext, data: String?) {
-        println("Action: unwarn declined $data")
-        val requestId = data?.toInt() ?: return
-        manager.declineUnwarn(context, requestId)
+    override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
+        val result = manager.declineUnwarn(context, data)
+        handleActionResult(result, context)
+        return result
     }
+}
+
+abstract class UnwarnAction(private val bot: TelegramBot) : BaseAction {
+
+    protected suspend fun handleActionResult(result: ActionResult, context: ScreenContext) {
+        when (result) {
+            is ActionResult.Success -> if (context.messageId != null && result.data != null) {
+                bot.editMessageText(context.chatId, context.messageId, result.data, MarkdownV2)
+            }
+
+            is ActionResult.Failure -> if (result.reason is Reason.AccessDenied) {
+                bot.showPopup(context, "Недостаточно прав ❌")
+            }
+        }
+    }
+
 }

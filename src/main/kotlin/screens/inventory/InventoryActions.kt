@@ -1,24 +1,65 @@
 package com.ehedgehog.screens.inventory
 
 import com.ehedgehog.base.BaseAction
+import com.ehedgehog.data.ActionResult
+import com.ehedgehog.data.Reason
 import com.ehedgehog.data.ScreenContext
+import com.ehedgehog.screens.ScreenRouter
+import com.ehedgehog.showPopup
+import dev.inmo.tgbotapi.bot.TelegramBot
+import dev.inmo.tgbotapi.extensions.api.answers.answerCallbackQuery
+import dev.inmo.tgbotapi.types.ChatId
+import dev.inmo.tgbotapi.types.RawChatId
 
-class UseUnwarnAction(private val manager: InventoryManager): BaseAction {
+class UseUnwarnAction(private val bot: TelegramBot, private val manager: InventoryManager): BaseAction {
 
     override val id: String = "action:use_unwarn"
 
-    override suspend fun execute(context: ScreenContext, data: String?) {
-        println("Action: use unwarn")
-        manager.useUnwarn(context)
+    override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
+        val result = manager.useUnwarn(context)
+
+        when (result) {
+            is ActionResult.Success -> {
+                val chatId = ChatId(RawChatId(System.getenv("SYSTEM_CHAT_ID").toLong()))
+                val unwarnContext = ScreenContext(chatId, context.user)
+                ScreenRouter.openScreen(bot, unwarnContext, "request_unwarn", result.data)
+                bot.showPopup(context, "Запрос отправлен админам ✅")
+                ScreenRouter.openScreen(bot, context, "inventory")
+            }
+
+            is ActionResult.Failure -> if (result.reason is Reason.NotEnoughItems) {
+                bot.showPopup(context, "Недостаточно анварнов ❌")
+            }
+        }
+
+        return result
     }
 }
 
-class UseImmunityAction(private val manager: InventoryManager): BaseAction {
+class UseImmunityAction(private val bot: TelegramBot, private val manager: InventoryManager): BaseAction {
 
     override val id: String = "action:use_immunity"
 
-    override suspend fun execute(context: ScreenContext, data: String?) {
-        println("Action: use immunity")
-        manager.useImmunity(context)
+    override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
+        val result = manager.useImmunity(context)
+
+        when (result) {
+            is ActionResult.Success -> {
+                bot.showPopup(context, "Иммунитет активирован ✅")
+                ScreenRouter.openScreen(bot, context, "inventory")
+            }
+            is ActionResult.Failure -> {
+                if (result.reason is Reason.LimitExceeded) {
+                    context.callbackId?.let { bot.answerCallbackQuery(it) }
+                    val queueContext = ScreenContext(context.chatId, context.user)
+                    ScreenRouter.openScreen(bot, queueContext, "immunity_queue")
+                } else if (result.reason is Reason.NotAvailable) {
+                    bot.showPopup(context, "Иммунитет недоступен ☹\uFE0F")
+                }
+            }
+        }
+
+        return result
     }
+
 }
