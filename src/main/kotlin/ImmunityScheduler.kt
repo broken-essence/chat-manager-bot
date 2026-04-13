@@ -30,6 +30,7 @@ class ImmunityScheduler(
                 "\uD83D\uDD14 *Срок действия вашего иммунитета истек\\!*\n\nПожалуйста, уберите эмодзи «\uD83D\uDEA9» из ника\\.",
                 MarkdownV2
             )
+            Logger.notification("immunity expired", userId)
         }
     }
 
@@ -45,6 +46,7 @@ class ImmunityScheduler(
                 "\uD83D\uDC8A *Иммунитет активирован\\!*\n\nПеред игрой не забудьте добавить эмодзи «`\uD83D\uDEA9`» в ваш никнейм\\.",
                 MarkdownV2
             )
+            Logger.notification("immunity activated", userId)
         }
     }
 

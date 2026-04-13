@@ -4,7 +4,7 @@
     <logger name="KSLog" level="OFF"/>
     <logger name="com.ehedgehog" level="INFO"/>
 
-    <root level="ERROR">
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
 
