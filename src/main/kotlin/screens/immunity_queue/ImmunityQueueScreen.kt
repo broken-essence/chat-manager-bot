@@ -14,8 +14,8 @@ class ImmunityQueueScreen(private val manager: ImmunityQueueManager) : BaseScree
     override suspend fun render(context: ScreenContext, data: String?): ScreenContent {
         val keyboard = inlineKeyboard {
             row {
-                dataButton("Да", "action:immunity_queue_yes")
-                dataButton("Нет", "action:immunity_queue_no")
+                dataButton("Да", "action:$id/immunity_queue_yes")
+                dataButton("Нет", "action:$id/immunity_queue_no")
             }
         }
 

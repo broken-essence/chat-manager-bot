@@ -17,7 +17,7 @@ object ActionRouter {
     fun get(id: String): BaseAction? = actions[id]
 
     suspend fun executeAction(context: ScreenContext, actionId: String, data: String? = null) {
-        loggedAction(actionId.substringAfter(":"), context.user.id.chatId.toString()) {
+        loggedAction(actionId.substringAfter("/"), context.user.id.chatId.toString()) {
             val action = actions[actionId]
             action?.execute(context, data) ?: ActionResult.Failure(Reason.UnexpectedError)
         }

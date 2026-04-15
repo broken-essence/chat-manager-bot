@@ -11,7 +11,7 @@ import dev.inmo.tgbotapi.types.message.MarkdownV2
 
 class ConfirmUnwarnAction(bot: TelegramBot, private val manager: UnwarnRequestManager) : UnwarnAction(bot) {
 
-    override val id: String = "action:confirm_unwarn"
+    override val id: String = "action:request_unwarn/confirm_unwarn"
 
     override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
         val result = manager.confirmUnwarn(context, data)
@@ -22,7 +22,7 @@ class ConfirmUnwarnAction(bot: TelegramBot, private val manager: UnwarnRequestMa
 
 class DeclineUnwarnAction(bot: TelegramBot, private val manager: UnwarnRequestManager) : UnwarnAction(bot) {
 
-    override val id: String = "action:decline_unwarn"
+    override val id: String = "action:request_unwarn/decline_unwarn"
 
     override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
         val result = manager.declineUnwarn(context, data)

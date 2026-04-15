@@ -15,8 +15,8 @@ class UnwarnRequestScreen(private val manager: UnwarnRequestManager): BaseScreen
         val keyboard = inlineKeyboard {
             if (context.messageId == null) {
                 row {
-                    dataButton("✅ Подтвердить", "action:confirm_unwarn?$data")
-                    dataButton("❌ Отклонить", "action:decline_unwarn?$data")
+                    dataButton("✅ Подтвердить", "action:$id/confirm_unwarn?$data")
+                    dataButton("❌ Отклонить", "action:$id/decline_unwarn?$data")
                 }
             }
         }

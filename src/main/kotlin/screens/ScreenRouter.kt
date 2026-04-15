@@ -19,10 +19,18 @@ object ScreenRouter {
     fun get(id: String): BaseScreen? = screens[id]
 
     suspend fun openScreen(bot: TelegramBot, context: ScreenContext, screenId: String, data: String? = null) {
+        renderScreen(bot, context, screenId, data)
+        Logger.screen(screenId, context.user.id.chatId.toString())
+    }
+
+    suspend fun refreshScreen(bot: TelegramBot, context: ScreenContext, data: String? = null) {
+        val screenId = context.currentScreenId ?: return
+        renderScreen(bot, context, screenId, data)
+    }
+
+    private suspend fun renderScreen(bot: TelegramBot, context: ScreenContext, screenId: String, data: String? = null) {
         val screen = screens[screenId]
         val content = screen?.render(context, data) ?: return
-
-        Logger.screen(screenId, context.user.id.chatId.toString())
 
         if (context.messageId == null) {
             bot.sendMessage(context.chatId, content.text, MarkdownV2, replyMarkup = content.keyboard)

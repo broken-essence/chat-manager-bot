@@ -3,9 +3,7 @@ package com.ehedgehog
 import com.ehedgehog.config.Config
 import com.ehedgehog.database.DatabaseFactory
 import com.ehedgehog.database.repositories.UserRepository
-import com.ehedgehog.screens.ActionRouter
 import com.ehedgehog.data.ScreenContext
-import com.ehedgehog.screens.ScreenRouter
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.bot.ktor.telegramBot
 import dev.inmo.tgbotapi.extensions.api.answers.answerCallbackQuery
@@ -13,9 +11,7 @@ import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.api.chat.members.getChatMember
 import dev.inmo.tgbotapi.extensions.api.getUpdates
 import dev.inmo.tgbotapi.extensions.behaviour_builder.buildBehaviourWithLongPolling
-import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onText
-import dev.inmo.tgbotapi.extensions.utils.extensions.raw.message
 import dev.inmo.tgbotapi.types.ChatIdentifier
 import dev.inmo.tgbotapi.types.RawChatId
 import dev.inmo.tgbotapi.types.UpdateId
@@ -71,25 +67,7 @@ suspend fun main(args: Array<String>) {
         registerScreens(bot)
         registerActions(bot)
 
-        onDataCallbackQuery { callback ->
-            val message = callback.message ?: return@onDataCallbackQuery
-            val context = ScreenContext(message.chat.id, callback.from, message.messageId, callback.id)
-
-            val id = callback.data.substringBefore("?")
-            val data = callback.data.substringAfter("?", "")
-
-            if (callback.data.startsWith("action:"))
-                ActionRouter.executeAction(context, id, data)
-            else
-                ScreenRouter.openScreen(bot, context, id, data)
-
-            context.callbackId?.let {
-                if (!context.callbackAnswered) {
-                    answerCallbackQuery(it)
-                    context.callbackAnswered = true
-                }
-            }
-        }
+        registerDataCallbackHandler(bot)
 
         println(me)
     }.join()

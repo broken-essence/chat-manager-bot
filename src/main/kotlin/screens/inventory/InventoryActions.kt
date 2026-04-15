@@ -13,7 +13,7 @@ import dev.inmo.tgbotapi.types.RawChatId
 
 class UseUnwarnAction(private val bot: TelegramBot, private val manager: InventoryManager): BaseAction {
 
-    override val id: String = "action:use_unwarn"
+    override val id: String = "action:inventory/use_unwarn"
 
     override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
         val result = manager.useUnwarn(context)
@@ -24,7 +24,7 @@ class UseUnwarnAction(private val bot: TelegramBot, private val manager: Invento
                 val unwarnContext = ScreenContext(chatId, context.user)
                 ScreenRouter.openScreen(bot, unwarnContext, "request_unwarn", result.data)
                 bot.showPopup(context, "Запрос отправлен админам ✅")
-                ScreenRouter.openScreen(bot, context, "inventory")
+                ScreenRouter.refreshScreen(bot, context)
             }
 
             is ActionResult.Failure -> if (result.reason is Reason.NotEnoughItems) {
@@ -38,7 +38,7 @@ class UseUnwarnAction(private val bot: TelegramBot, private val manager: Invento
 
 class UseImmunityAction(private val bot: TelegramBot, private val manager: InventoryManager): BaseAction {
 
-    override val id: String = "action:use_immunity"
+    override val id: String = "action:inventory/use_immunity"
 
     override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
         val result = manager.useImmunity(context)
@@ -46,7 +46,7 @@ class UseImmunityAction(private val bot: TelegramBot, private val manager: Inven
         when (result) {
             is ActionResult.Success -> {
                 bot.showPopup(context, "Иммунитет активирован ✅")
-                ScreenRouter.openScreen(bot, context, "inventory")
+                ScreenRouter.refreshScreen(bot, context)
             }
             is ActionResult.Failure -> {
                 if (result.reason is Reason.LimitExceeded) {

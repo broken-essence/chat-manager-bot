@@ -10,7 +10,7 @@ import dev.inmo.tgbotapi.bot.TelegramBot
 
 class BuyUnwarnAction(bot: TelegramBot, private val manager: ShopManager): ShopAction(bot) {
 
-    override val id: String = "action:buy_unwarn"
+    override val id: String = "action:shop/buy_unwarn"
 
     override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
         val result = manager.buyUnwarn(context)
@@ -22,7 +22,7 @@ class BuyUnwarnAction(bot: TelegramBot, private val manager: ShopManager): ShopA
 
 class BuyImmunityAction(bot: TelegramBot, private val manager: ShopManager): ShopAction(bot) {
 
-    override val id: String = "action:buy_immunity"
+    override val id: String = "action:shop/buy_immunity"
 
     override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
         val result = manager.buyImmunity(context)
@@ -38,7 +38,7 @@ abstract class ShopAction(private val bot: TelegramBot): BaseAction {
         when (result) {
             is ActionResult.Success -> {
                 bot.showPopup(context, "Покупка совершена ✅")
-                ScreenRouter.openScreen(bot, context, "shop")
+                ScreenRouter.refreshScreen(bot, context)
             }
 
             is ActionResult.Failure -> if (result.reason is Reason.NotEnoughBalance) {

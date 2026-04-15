@@ -12,7 +12,7 @@ import dev.inmo.tgbotapi.types.message.MarkdownV2
 
 class ImmunityQueueConfirmAction(private val bot: TelegramBot, private val manager: ImmunityQueueManager) : BaseAction {
 
-    override val id: String = "action:immunity_queue_yes"
+    override val id: String = "action:immunity_queue/immunity_queue_yes"
 
     override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
         val result = manager.confirmQueue(context)
@@ -32,7 +32,7 @@ class ImmunityQueueConfirmAction(private val bot: TelegramBot, private val manag
 
 class ImmunityQueueDeclineAction(private val bot: TelegramBot) : BaseAction {
 
-    override val id: String = "action:immunity_queue_no"
+    override val id: String = "action:immunity_queue/immunity_queue_no"
 
     override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
         context.messageId?.let { bot.deleteMessage(context.chatId, it) }

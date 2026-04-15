@@ -10,5 +10,6 @@ data class ScreenContext(
     val user: User,
     val messageId: MessageId? = null,
     val callbackId: CallbackQueryId? = null,
+    val currentScreenId: String? = null,
     var callbackAnswered: Boolean = false
 )

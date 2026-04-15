@@ -14,10 +14,10 @@ class ShopScreen(private val manager: ShopManager) : BaseScreen {
     override suspend fun render(context: ScreenContext, data: String?): ScreenContent {
         val keyboard = inlineKeyboard {
             row {
-                dataButton("\uD83E\uDDFB Снятие предупреждения – $PRICE_UNWARN \uD83D\uDCB8", "action:buy_unwarn")
+                dataButton("\uD83E\uDDFB Снятие предупреждения – $PRICE_UNWARN \uD83D\uDCB8", "action:$id/buy_unwarn")
             }
             row {
-                dataButton("\uD83D\uDC8A Иммунитет – $PRICE_IMMUNITY \uD83D\uDCB8", "action:buy_immunity")
+                dataButton("\uD83D\uDC8A Иммунитет – $PRICE_IMMUNITY \uD83D\uDCB8", "action:$id/buy_immunity")
             }
             row {
                 dataButton("\uD83D\uDD19 Назад", "profile")

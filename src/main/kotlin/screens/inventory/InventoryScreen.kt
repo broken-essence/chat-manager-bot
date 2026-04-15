@@ -14,10 +14,10 @@ class InventoryScreen(private val manager: InventoryManager): BaseScreen {
     override suspend fun render(context: ScreenContext, data: String?): ScreenContent {
         val keyboard = inlineKeyboard {
             row {
-                dataButton("\uD83E\uDDFB Снять предупреждение", "action:use_unwarn")
+                dataButton("\uD83E\uDDFB Снять предупреждение", "action:$id/use_unwarn")
             }
             row {
-                dataButton("\uD83D\uDC8A Активировать иммунитет", "action:use_immunity")
+                dataButton("\uD83D\uDC8A Активировать иммунитет", "action:$id/use_immunity")
             }
             row {
                 dataButton("\uD83D\uDD19 Назад", "profile")
