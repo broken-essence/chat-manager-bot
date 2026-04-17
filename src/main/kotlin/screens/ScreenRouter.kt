@@ -20,7 +20,8 @@ object ScreenRouter {
 
     suspend fun openScreen(bot: TelegramBot, context: ScreenContext, screenId: String, data: String? = null) {
         renderScreen(bot, context, screenId, data)
-        Logger.screen(screenId, context.user.id.chatId.toString())
+        val name = if (!data.isNullOrEmpty()) screenId.plus("(id$data)") else screenId
+        Logger.screen(name, context.user.id.chatId.toString())
     }
 
     suspend fun refreshScreen(bot: TelegramBot, context: ScreenContext, data: String? = null) {
