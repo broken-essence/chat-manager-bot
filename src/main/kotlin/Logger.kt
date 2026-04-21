@@ -1,6 +1,7 @@
 package com.ehedgehog
 
 import com.ehedgehog.data.ActionResult
+import com.ehedgehog.data.CommandResult
 import org.slf4j.LoggerFactory
 
 object Logger {
@@ -19,8 +20,13 @@ object Logger {
         logger.info("[SCREEN] {} userId={}", name, userId)
     }
 
-    fun command(name: String, from: String, result: String) {
-        logger.info("[COMMAND] {} from={} result={}", name, from, result)
+    fun commandSuccess(name: String, from: String, args: String? = null, target: String? = null) {
+        val target = if (target != null) " target=$target" else ""
+        logger.info("[COMMAND] {}{} from={}{} SUCCESS", name, args ?: "", from, target)
+    }
+
+    fun commandFailed(name: String, from: String, reason: String, args: String? = null) {
+        logger.info("[COMMAND] {}{} from={} FAILED {}", name, args ?: "", from, reason)
     }
 
     fun notification(message: String, userId: String) {
@@ -37,6 +43,18 @@ suspend fun loggedAction(name: String, userId: String, action: suspend () -> Act
         }
     } catch (e: Exception) {
         Logger.actionFailed(name, userId, e.toString())
+        throw e
+    }
+}
+
+suspend fun loggedCommand(name: String, userId: String, args: Array<String>? = null, command: suspend () -> CommandResult) {
+    return try {
+        when (val result = command()) {
+            is CommandResult.Success -> Logger.commandSuccess(name, userId, args?.contentToString(), result.targetUserId)
+            is CommandResult.Failure -> Logger.commandFailed(name, userId, result.reason.code, args?.contentToString())
+        }
+    } catch (e: Exception) {
+        Logger.commandFailed(name, userId, e.toString(), args?.contentToString())
         throw e
     }
 }
