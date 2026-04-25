@@ -17,6 +17,7 @@ import dev.inmo.tgbotapi.utils.RiskFeature
 private const val COMMAND_PROF = "prof"
 private const val COMMAND_IMMUNITIES = "immunities"
 private const val COMMAND_RANDOM = "random"
+private const val COMMAND_GIFT = "gift"
 
 @OptIn(RiskFeature::class)
 fun BehaviourContext.registerGeneralCommands(manager: GeneralManager) {
@@ -56,6 +57,20 @@ fun BehaviourContext.registerGeneralCommands(manager: GeneralManager) {
                 }
                 is CommandResult.Failure -> {
                     bot.reply(it.chat.id, it.messageId, "Ты делаешь что-то не так \uD83D\uDE10")
+                }
+            }
+
+            result
+        }
+    }
+
+    onCommandWithArgs(COMMAND_GIFT) { it, args ->
+        loggedCommand(COMMAND_GIFT, it.from?.id?.chatId.toString(), args) {
+            val result = manager.gift(it, args)
+
+            if (result is CommandResult.Success) {
+                result.message?.let { text ->
+                    bot.sendMessage(it.chat.id, text, MarkdownV2)
                 }
             }
 
