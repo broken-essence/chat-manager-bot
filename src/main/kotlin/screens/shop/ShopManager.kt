@@ -5,12 +5,11 @@ import com.ehedgehog.data.ActionResult
 import com.ehedgehog.data.Reason
 import com.ehedgehog.data.ScreenContext
 import com.ehedgehog.database.repositories.UserRepository
-import dev.inmo.tgbotapi.bot.TelegramBot
 
 internal const val PRICE_UNWARN = 2
 internal const val PRICE_IMMUNITY = 6
 
-class ShopManager(bot: TelegramBot) : BaseUserManager(bot) {
+class ShopManager : BaseUserManager() {
 
     val repository = UserRepository()
 

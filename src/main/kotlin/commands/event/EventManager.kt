@@ -1,143 +1,118 @@
 package com.ehedgehog.commands.event
 
 import com.ehedgehog.base.BaseUserManager
-import dev.inmo.tgbotapi.bot.TelegramBot
-import dev.inmo.tgbotapi.extensions.api.send.reply
-import dev.inmo.tgbotapi.extensions.api.send.sendMessage
+import com.ehedgehog.data.CommandResult
+import com.ehedgehog.data.Reason
+import com.ehedgehog.database.ChatUser
+import com.ehedgehog.database.UserEntity
+import com.ehedgehog.database.repositories.UserRepository
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
-import dev.inmo.tgbotapi.types.message.MarkdownV2
 import dev.inmo.tgbotapi.types.message.content.TextMessage
 import dev.inmo.tgbotapi.utils.RiskFeature
 
-class EventManager(private val bot: TelegramBot): BaseUserManager(bot) {
+class EventManager : BaseUserManager() {
 
-    private val repository = EventRepository()
+    private val repository = UserRepository()
 
     @OptIn(RiskFeature::class)
-    suspend fun giveEventPoints(command: TextMessage, amount: Int = 1) {
+    fun giveEventPoints(command: TextMessage, args: Array<String>): CommandResult {
+        val count = if (args.isNotEmpty()) args[0].toInt() else 1
         val repliedUser = command.replyTo?.from
         val markdownNameString = repliedUser?.let { createMarkdownLink(it.firstName, it.id.chatId.toString()) }
 
-        if (repliedUser != null && amount >= 0) {
-            if (isAdmin(command.chat.id, command.from!!.id)) {
-                val eventPointCount = repository.getEventPointCountById(repliedUser.id.chatId.toString()) + amount
-                repository.setEventPoints(repliedUser, eventPointCount)
-                val amountString = createAmountString("начислен", "что-то", amount)
-                bot.sendMessage(
-                    command.chat.id,
-                    """Пользователю $markdownNameString $amountString\!
-                    |Всего печенюшек: $eventPointCount 🍪""".trimMargin(),
-                    MarkdownV2
+        if (repliedUser != null && count > 0) {
+            if (isAdmin(command.from?.id?.chatId.toString())) {
+                val storedUser = repository.getUserById(repliedUser.id.chatId.toString()) ?: UserEntity(
+                    repliedUser.id.chatId.toString(),
+                    repliedUser.firstName,
+                    repliedUser.username?.username ?: ""
                 )
-            } else {
-                bot.reply(command, "В админы метишь, бро?")
+                val newCount = storedUser.eventPointCount + count
+                updateEventPoints(ChatUser(command.chat.id, storedUser, repliedUser), newCount)
+                val amountString = createAmountString("начислен", "что\\-то", count)
+
+                val message = "Пользователю $markdownNameString $amountString\\!\nВсего печенюшек: $newCount 🍪"
+                return CommandResult.Success(message, storedUser.id)
             }
+
+            return CommandResult.Failure(Reason.AccessDenied)
         }
+
+        return CommandResult.Failure(Reason.WrongData)
     }
 
     @OptIn(RiskFeature::class)
-    suspend fun takeEventPoints(command: TextMessage, amount: Int = 1) {
-        val repliedUser = command.replyTo?.from
-        val markdownNameString = repliedUser?.let { createMarkdownLink(it.firstName, it.id.chatId.toString()) }
+    fun takeEventPoints(command: TextMessage, args: Array<String>): CommandResult {
+        val count = if (args.isNotEmpty()) args[0].toInt() else 1
+        val repliedUser = command.replyTo?.from ?: return CommandResult.Failure(Reason.WrongData)
+        val markdownNameString = createMarkdownLink(repliedUser.firstName, repliedUser.id.chatId.toString())
+        val storedUser = repository.getUserById(repliedUser.id.chatId.toString()) ?: UserEntity(
+            repliedUser.id.chatId.toString(),
+            repliedUser.firstName,
+            repliedUser.username?.username ?: ""
+        )
 
-        if (repliedUser != null) {
-            if (isAdmin(command.chat.id, command.from!!.id)) {
-                val eventPointCount = repository.getEventPointCountById(repliedUser.id.chatId.toString())
-                if (eventPointCount > 0) {
-                    if (amount <= eventPointCount) {
-                        val newCount = eventPointCount - amount
-                        repository.setEventPoints(repliedUser, newCount)
-                        val amountString = createAmountString("отобран", "что-то", amount)
+        if (isAdmin(command.from?.id?.chatId.toString())) {
+            if (storedUser.eventPointCount > 0 && count <= storedUser.eventPointCount) {
+                val newCount = storedUser.eventPointCount - count
+                updateEventPoints(ChatUser(command.chat.id, storedUser, repliedUser), newCount)
+                val amountString = createAmountString("отобран", "что\\-то", count)
 
-                        bot.sendMessage(
-                            command.chat.id,
-                            """У пользователя $markdownNameString $amountString\!
-                    |Всего печенюшек: $newCount 🍪""".trimMargin(),
-                            MarkdownV2
-                        )
-                    } else {
-                        bot.reply(command, "У данного пользователя нет столько печенюшек!")
-                    }
-                } else {
-                    bot.reply(command, "У этого пользователя и так ничего нет!")
-                }
-            } else {
-                bot.reply(command, "В админы метишь, бро?")
+                val message = "У пользователя $markdownNameString $amountString\\!\nВсего печенюшек: $newCount 🍪"
+                return CommandResult.Success(message, storedUser.id)
             }
+
+            return CommandResult.Failure(Reason.NotEnoughBalance)
         }
+
+        return CommandResult.Failure(Reason.AccessDenied)
     }
 
-    suspend fun getEventPointRating(command: TextMessage) {
+    fun getEventPointRating(): CommandResult {
         val eventPointList = repository.getTopByEventPoints()
+        val ratingString = formatRatingList(eventPointList)
 
-        if (!eventPointList.isEmpty()) {
-            val ratingString = eventPointList
-                .joinToString("\n", "\uD83C\uDF6A *Рейтинг печенюшек:*\n\n") { "${it.index}\\. ${createMarkdownLink(it.name, it.id)} – ${it.eventPointCount} \uD83C\uDF6A" }
-            bot.sendMessage(command.chat.id, ratingString, MarkdownV2)
-        } else {
-            bot.sendMessage(command.chat.id, "Список пуст.")
-        }
+        val message = "\uD83C\uDF6A *Рейтинг печенюшек:*\n\n".plus(ratingString)
+        return CommandResult.Success(message)
     }
 
     @OptIn(RiskFeature::class)
-    suspend fun getPersonalRating(command: TextMessage) {
-        val user = command.from
-        if (user != null) {
-            val userMarkdown = createMarkdownLink(user.firstName, user.id.chatId.toString())
-            val eventPointCount = repository.getEventPointCountById(user.id.chatId.toString())
-            bot.reply(command, "\uD83C\uDF85 Пользователь ${userMarkdown}\n\uD83C\uDF81 *Ваш баланс:* $eventPointCount \uD83C\uDF6A", MarkdownV2)
-        }
+    fun getPersonalRating(command: TextMessage): CommandResult {
+        val user = command.from ?: return CommandResult.Failure(Reason.UserNotFound)
+
+        val userMarkdown = createMarkdownLink(user.firstName, user.id.chatId.toString())
+        val eventPointCount = repository.getEventPointCountById(user.id.chatId.toString())
+
+        val message = "\uD83C\uDF85 Пользователь ${userMarkdown}\n\uD83C\uDF81 *Ваш баланс:* $eventPointCount \uD83C\uDF6A"
+        return CommandResult.Success(message)
     }
 
     @OptIn(RiskFeature::class)
-    suspend fun clearEventPoints(command: TextMessage) {
-        if (isAdmin(command.chat.id, command.from!!.id)) {
+    fun clearEventPoints(command: TextMessage): CommandResult {
+        if (isSeniorAdmin(command.from?.id?.chatId.toString())) {
             repository.clearEventPoints()
+            return CommandResult.Success("Очки пользователей обнулены.")
         }
+
+        return CommandResult.Failure(Reason.AccessDenied)
     }
 
-    suspend fun getCommands(command: TextMessage) {
-        bot.sendMessage(
-            command.chat.id,
-            """*ᅠ   Команды бота:*
+    fun showCommands(): CommandResult {
+        val message = """*ᅠ   Команды бота:*
                 |👮🏼 /cookie – подарить печенюшку \(reply\)
                 |👮🏼 /take – забрать печенюшку \(reply\)
                 |🪿 /rating – рейтинг печенюшек
                 |🪿 /balance – посмотреть баланс печенюшек
                 |🪿 /hint – список команд
-            """.trimMargin(),
-            MarkdownV2
-        )
+            """.trimMargin()
+        return CommandResult.Success(message)
     }
 
-    @OptIn(RiskFeature::class)
-    suspend fun handleRPCommands(command: TextMessage) {
-        val message = command.content.text
-        if (message.startsWith("!")) {
-            val senderUser = command.from
-            val repliedUser = command.replyTo?.from
-            val senderMarkdown = createMarkdownLink(senderUser?.firstName ?: "(null)", senderUser?.id?.chatId.toString())
-            val repliedMarkdown = createMarkdownLink(repliedUser?.firstName ?: "(null)", repliedUser?.id?.chatId.toString())
-            val splitMessage = message.split(" ")
-            val resultMessage = when (splitMessage[0].lowercase()) {
-                "!чай" -> {
-                    if (repliedUser != null && senderUser?.id?.chatId.toString() != repliedUser.id.chatId.toString())
-                        "$senderMarkdown заварил чашечку горячего чая для $repliedMarkdown \uD83C\uDF75\uD83E\uDD70"
-                    else "$senderMarkdown заварил себе чашечку горячего чая \uD83C\uDF75"
-                }
-                "!подарок" -> {
-                    if (repliedUser != null && senderUser?.id?.chatId.toString() != repliedUser.id.chatId.toString())
-                        if (splitMessage.size > 1)
-                            "\uD83C\uDF81 $senderMarkdown подарил $repliedMarkdown${message.removePrefix(splitMessage[0])} \uD83C\uDF81"
-                        else "\uD83C\uDF81 $senderMarkdown подготовил подарок для $repliedMarkdown, но это сюрприз \uD83C\uDF81"
-                    else "$senderMarkdown дарит сам себе подарки, печальное зрелище \uD83D\uDE22"
-                }
-
-                else -> return
-            }
-
-            bot.sendMessage(command.chat.id, resultMessage, MarkdownV2)
-        }
-    }
+    private fun formatRatingList(list: List<UserEntity>): String =
+        if (list.isNotEmpty()) {
+            list.mapIndexed { index, user ->
+                "${index + 1}\\. ${createMarkdownLink(user.name, user.id)} — ${user.eventPointCount} \uD83C\uDF6A"
+            }.joinToString("\n")
+        } else "Список пуст\\."
 
 }

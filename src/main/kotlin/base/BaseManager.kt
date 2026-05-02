@@ -1,21 +1,12 @@
 package com.ehedgehog.base
 
-import dev.inmo.tgbotapi.bot.TelegramBot
-import dev.inmo.tgbotapi.extensions.api.chat.get.getChatAdministrators
-import dev.inmo.tgbotapi.types.IdChatIdentifier
-import dev.inmo.tgbotapi.types.UserId
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 private const val DATE_FORMAT = "dd MMMM yyyy HH:mm"
 
-abstract class BaseManager(private val bot: TelegramBot) {
-
-    // TODO: must be extension fun
-    suspend fun isAdmin(chatId: IdChatIdentifier, userId: UserId): Boolean {
-        return bot.getChatAdministrators(chatId).any { it.user.id == userId }
-    }
+abstract class BaseManager {
 
     fun createMarkdownLink(name: String, userId: String): String = "[${handleReservedSymbols(name)}](tg://user?id=${userId})"
 

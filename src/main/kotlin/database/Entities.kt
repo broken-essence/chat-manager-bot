@@ -26,13 +26,6 @@ data class UserEntity(
     val immunityExpiresAt: Long = 0
 )
 
-data class UserIndexed(
-    val index: Int,
-    val id: String,
-    val name: String,
-    val eventPointCount: Int
-)
-
 data class ChatUser(
     val chatId: IdChatIdentifier,
     val storedUser: UserEntity,

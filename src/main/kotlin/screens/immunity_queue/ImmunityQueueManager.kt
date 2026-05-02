@@ -10,7 +10,7 @@ import dev.inmo.tgbotapi.bot.TelegramBot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
-class ImmunityQueueManager(bot: TelegramBot) : BaseUserManager(bot) {
+class ImmunityQueueManager(bot: TelegramBot) : BaseUserManager() {
 
     private val userRepository = UserRepository()
     private val immunityScheduler = ImmunityScheduler(bot, userRepository, CoroutineScope(Dispatchers.Default))

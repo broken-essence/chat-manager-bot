@@ -4,7 +4,6 @@ import com.ehedgehog.database.ChatUser
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus
 import com.ehedgehog.database.repositories.UserRepository
-import dev.inmo.tgbotapi.bot.TelegramBot
 
 private const val TEST_IMMUNITY_DURATION = 60 * 1000
 const val IMMUNITY_DURATION = /*24 * 60 * 60 * 1000*/ TEST_IMMUNITY_DURATION
@@ -13,7 +12,7 @@ const val IMMUNITIES_COUNT_LIMIT = /*5*/ TEST_IMMUNITIES_COUNT_LIMIT
 private const val TEST_IMMUNITY_COOLDOWN = 2 * 60 * 1000
 const val IMMUNITY_COOLDOWN = /*24 * 60 * 60 * 1000*/ TEST_IMMUNITY_COOLDOWN
 
-abstract class BaseUserManager(bot: TelegramBot) : BaseManager(bot) {
+abstract class BaseUserManager : BaseManager() {
 
     private val repository = UserRepository()
 
@@ -25,7 +24,12 @@ abstract class BaseUserManager(bot: TelegramBot) : BaseManager(bot) {
         }
     }
 
-    fun isSeniorAdminOrOwner(userId: String): Boolean {
+    fun isAdmin(userId: String): Boolean {
+        val status = repository.getUserStatusById(userId)
+        return status >= UserStatus.ADMIN || userId == System.getenv("BOT_OWNER_ID")
+    }
+
+    fun isSeniorAdmin(userId: String): Boolean {
         val status = repository.getUserStatusById(userId)
         return status == UserStatus.SENIOR_ADMIN || userId == System.getenv("BOT_OWNER_ID")
     }
@@ -64,6 +68,16 @@ abstract class BaseUserManager(bot: TelegramBot) : BaseManager(bot) {
                 name = user.chatMember.firstName,
                 username = user.chatMember.username?.username ?: "",
                 balance = amount
+            )
+        )
+    }
+
+    protected fun updateEventPoints(user: ChatUser, count: Int) {
+        updateUserEntry(
+            user.storedUser.copy(
+                name = user.chatMember.firstName,
+                username = user.chatMember.username?.username ?: "",
+                eventPointCount = count
             )
         )
     }

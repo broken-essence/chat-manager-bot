@@ -4,10 +4,9 @@ import com.ehedgehog.base.BaseUserManager
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus
 import com.ehedgehog.database.repositories.UserRepository
-import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.types.chat.User
 
-class ProfileManager(bot: TelegramBot) : BaseUserManager(bot) {
+class ProfileManager : BaseUserManager() {
 
     private val repository = UserRepository()
 

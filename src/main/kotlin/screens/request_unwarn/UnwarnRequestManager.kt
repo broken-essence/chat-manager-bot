@@ -7,9 +7,8 @@ import com.ehedgehog.data.ScreenContext
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.repositories.UnwarnRequestRepository
 import com.ehedgehog.database.repositories.UserRepository
-import dev.inmo.tgbotapi.bot.TelegramBot
 
-class UnwarnRequestManager(bot: TelegramBot): BaseUserManager(bot) {
+class UnwarnRequestManager : BaseUserManager() {
 
     val unwarnRequestRepository = UnwarnRequestRepository()
     val userRepository = UserRepository()
@@ -20,7 +19,7 @@ class UnwarnRequestManager(bot: TelegramBot): BaseUserManager(bot) {
     }
 
     fun confirmUnwarn(context: ScreenContext, data: String?): ActionResult {
-        if (isSeniorAdminOrOwner(context.user.id.chatId.toString())) {
+        if (isSeniorAdmin(context.user.id.chatId.toString())) {
             val user = getUserFromRequest(data) ?: return ActionResult.Failure(Reason.UserNotFound)
 
             val adminMarkdownLink = createMarkdownLink(context.user.firstName, context.user.id.chatId.toString())
@@ -33,7 +32,7 @@ class UnwarnRequestManager(bot: TelegramBot): BaseUserManager(bot) {
     }
 
     fun declineUnwarn(context: ScreenContext, data: String?): ActionResult {
-        if (isSeniorAdminOrOwner(context.user.id.chatId.toString())) {
+        if (isSeniorAdmin(context.user.id.chatId.toString())) {
             val user = getUserFromRequest(data) ?: return ActionResult.Failure(Reason.UserNotFound)
 
             val adminMarkdownLink = createMarkdownLink(context.user.firstName, context.user.id.chatId.toString())

@@ -12,7 +12,7 @@ import dev.inmo.tgbotapi.bot.TelegramBot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
-class InventoryManager(bot: TelegramBot) : BaseUserManager(bot) {
+class InventoryManager(bot: TelegramBot) : BaseUserManager() {
 
     private val userRepository = UserRepository()
     private val unwarnRequestRepository = UnwarnRequestRepository()

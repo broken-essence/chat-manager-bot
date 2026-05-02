@@ -6,12 +6,11 @@ import com.ehedgehog.data.Reason
 import com.ehedgehog.database.ChatUser
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.repositories.UserRepository
-import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.types.message.content.TextMessage
 import dev.inmo.tgbotapi.utils.RiskFeature
 
-class GeneralManager(bot: TelegramBot): BaseUserManager(bot) {
+class GeneralManager : BaseUserManager() {
 
     private sealed class Gift{
         object Unwarn: Gift()

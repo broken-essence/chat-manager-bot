@@ -30,26 +30,26 @@ import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 
 fun registerCommands(bot: TelegramBot, context: BehaviourContext) {
-    context.registerEventCommands(EventManager(bot))
-    context.registerGeneralCommands(GeneralManager(bot))
+    context.registerEventCommands(EventManager())
+    context.registerGeneralCommands(GeneralManager())
     context.registerAdminCommands(AdminManager(bot))
 }
 
 fun registerScreens(bot: TelegramBot) {
-    ScreenRouter.registerScreen(ProfileScreen(ProfileManager(bot)))
+    ScreenRouter.registerScreen(ProfileScreen(ProfileManager()))
     ScreenRouter.registerScreen(InventoryScreen(InventoryManager(bot)))
-    ScreenRouter.registerScreen(ShopScreen(ShopManager(bot)))
-    ScreenRouter.registerScreen(UnwarnRequestScreen(UnwarnRequestManager(bot)))
+    ScreenRouter.registerScreen(ShopScreen(ShopManager()))
+    ScreenRouter.registerScreen(UnwarnRequestScreen(UnwarnRequestManager()))
     ScreenRouter.registerScreen(ImmunityQueueScreen(ImmunityQueueManager(bot)))
 }
 
 fun registerActions(bot: TelegramBot) {
     ActionRouter.registerAction(UseUnwarnAction(bot, InventoryManager(bot)))
     ActionRouter.registerAction(UseImmunityAction(bot,InventoryManager(bot)))
-    ActionRouter.registerAction(BuyUnwarnAction(bot, ShopManager(bot)))
-    ActionRouter.registerAction(BuyImmunityAction(bot, ShopManager(bot)))
-    ActionRouter.registerAction(ConfirmUnwarnAction(bot, UnwarnRequestManager(bot)))
-    ActionRouter.registerAction(DeclineUnwarnAction(bot, UnwarnRequestManager(bot)))
+    ActionRouter.registerAction(BuyUnwarnAction(bot, ShopManager()))
+    ActionRouter.registerAction(BuyImmunityAction(bot, ShopManager()))
+    ActionRouter.registerAction(ConfirmUnwarnAction(bot, UnwarnRequestManager()))
+    ActionRouter.registerAction(DeclineUnwarnAction(bot, UnwarnRequestManager()))
     ActionRouter.registerAction(ImmunityQueueConfirmAction(bot, ImmunityQueueManager(bot)))
     ActionRouter.registerAction(ImmunityQueueDeclineAction(bot))
 }

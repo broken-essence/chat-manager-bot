@@ -13,7 +13,7 @@ import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.types.message.content.TextMessage
 import dev.inmo.tgbotapi.utils.RiskFeature
 
-class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
+class AdminManager(private val bot: TelegramBot): BaseUserManager() {
 
     private val repository = UserRepository()
 
@@ -21,7 +21,7 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
     fun changeUserStatus(command: TextMessage, statusValue: Int): CommandResult {
         val repliedUser = command.replyTo?.from
 
-        if (isSeniorAdminOrOwner(command.from?.id?.chatId.toString())) {
+        if (isSeniorAdmin(command.from?.id?.chatId.toString())) {
             if (repliedUser != null && statusValue in 0..<UserStatus.entries.size) {
                 val userId = repliedUser.id.chatId.toString()
                 val user = repository.getUserById(userId)
@@ -86,7 +86,7 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager(bot) {
     ): CommandResult {
         val repliedUser = command.replyTo?.from
 
-        if (isSeniorAdminOrOwner(command.from?.id?.chatId.toString())) {
+        if (isSeniorAdmin(command.from?.id?.chatId.toString())) {
             val firstPart = content.split(" ")[0]
             val secondPart = content.removePrefix(firstPart).trim()
             if (firstPart.all { it in '0'..'9' } && firstPart.length >= 8) {
