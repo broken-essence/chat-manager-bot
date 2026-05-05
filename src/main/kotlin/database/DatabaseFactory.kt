@@ -34,7 +34,7 @@ object DatabaseFactory {
 //
 //        Database.connect(HikariDataSource(config))
         transaction {
-            SchemaUtils.create(Users, UnwarnRequests)
+            SchemaUtils.create(Users, UnwarnRequests, Settings)
         }
     }
 
