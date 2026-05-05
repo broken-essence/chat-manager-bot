@@ -27,7 +27,7 @@ class EventManager : BaseUserManager() {
                     repliedUser.firstName,
                     repliedUser.username?.username ?: ""
                 )
-                val newCount = storedUser.eventPointCount + count
+                val newCount = storedUser.eventPoints + count
                 updateEventPoints(ChatUser(command.chat.id, storedUser, repliedUser), newCount)
                 val amountString = createAmountString("начислен", "что\\-то", count)
 
@@ -53,8 +53,8 @@ class EventManager : BaseUserManager() {
         )
 
         if (isAdmin(command.from?.id?.chatId.toString())) {
-            if (storedUser.eventPointCount > 0 && count <= storedUser.eventPointCount) {
-                val newCount = storedUser.eventPointCount - count
+            if (storedUser.eventPoints > 0 && count <= storedUser.eventPoints) {
+                val newCount = storedUser.eventPoints - count
                 updateEventPoints(ChatUser(command.chat.id, storedUser, repliedUser), newCount)
                 val amountString = createAmountString("отобран", "что\\-то", count)
 
@@ -111,7 +111,7 @@ class EventManager : BaseUserManager() {
     private fun formatRatingList(list: List<UserEntity>): String =
         if (list.isNotEmpty()) {
             list.mapIndexed { index, user ->
-                "${index + 1}\\. ${createMarkdownLink(user.name, user.id)} — ${user.eventPointCount} \uD83C\uDF6A"
+                "${index + 1}\\. ${createMarkdownLink(user.name, user.id)} — ${user.eventPoints} \uD83C\uDF6A"
             }.joinToString("\n")
         } else "Список пуст\\."
 

@@ -77,7 +77,7 @@ abstract class BaseUserManager : BaseManager() {
             user.storedUser.copy(
                 name = user.chatMember.firstName,
                 username = user.chatMember.username?.username ?: "",
-                eventPointCount = count
+                eventPoints = count
             )
         )
     }

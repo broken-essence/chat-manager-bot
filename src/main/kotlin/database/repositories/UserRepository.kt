@@ -8,7 +8,6 @@ import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.greaterEq
-import org.jetbrains.exposed.v1.jdbc.deleteAll
 import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -17,23 +16,13 @@ import org.jetbrains.exposed.v1.jdbc.upsert
 
 class UserRepository {
 
-    fun setEventPoints(user: UserEntity) {
-        transaction {
-            Users.upsert {
-                it[userId] = user.id
-                it[name] = user.name
-                it[count] = user.eventPointCount
-            }
-        }
-    }
-
     fun updateUserEntry(user: UserEntity) {
         transaction {
             Users.upsert {
                 it[userId] = user.id
                 it[name] = user.name
                 it[username] = user.username
-                it[count] = user.eventPointCount
+                it[eventPoints] = user.eventPoints
                 it[status] = user.status.ordinal
                 it[warns] = user.adminWarns
                 it[immunities] = user.immunities
@@ -84,33 +73,32 @@ class UserRepository {
 
     fun getEventPointCountById(userId: String): Int {
         return transaction {
-            Users.select(Users.count)
+            Users.select(Users.eventPoints)
                 .where(Users.userId eq userId)
-                .singleOrNull()?.get(Users.count) ?: 0
+                .singleOrNull()?.get(Users.eventPoints) ?: 0
         }
     }
 
     fun getTopByEventPoints(): List<UserEntity> {
         return transaction {
             Users.selectAll()
-                .orderBy(Users.count, SortOrder.DESC)
+                .orderBy(Users.eventPoints, SortOrder.DESC)
                 .limit(20)
                 .map {
                     UserEntity(
                         id = it[Users.userId],
                         name = it[Users.name],
-                        eventPointCount = it[Users.count]
+                        eventPoints = it[Users.eventPoints]
                     )
                 }
         }
     }
 
-    //TODO: need to clear only event points, not users
-    fun clearEventPoints() {
-        transaction {
-            Users.deleteAll()
+    fun clearEventPoints() = transaction {
+            Users.update {
+                it[Users.eventPoints] = 0
+            }
         }
-    }
 
     private fun getUserWhere(predicate: Op<Boolean>): UserEntity? {
         return Users.selectAll()
@@ -125,7 +113,7 @@ fun ResultRow.toUserEntity(): UserEntity = UserEntity(
     id = this[Users.userId],
     name = this[Users.name],
     username = this[Users.username],
-    eventPointCount = this[Users.count],
+    eventPoints = this[Users.eventPoints],
     status = UserStatus.fromInt(this[Users.status]),
     adminWarns = this[Users.warns],
     immunities = this[Users.immunities],

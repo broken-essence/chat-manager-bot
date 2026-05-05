@@ -7,7 +7,7 @@ object Users : Table("users") {
     val userId = varchar("user_id", 50).uniqueIndex()
     val name = varchar("name", 50)
     val username = varchar("username", 50).default("")
-    val count = integer("count").default(0)
+    val eventPoints = integer("event_points").default(0)
     val status = integer("status").default(UserStatus.PLAYER.ordinal)
     val warns = integer("warns").default(0)
     val immunities = integer("immunities").default(0)
