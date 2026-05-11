@@ -6,6 +6,7 @@ import com.ehedgehog.data.Reason
 import com.ehedgehog.database.ChatUser
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.repositories.UserRepository
+import com.ehedgehog.utils.PluralsUtil
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.types.message.content.TextMessage
 import dev.inmo.tgbotapi.utils.RiskFeature
@@ -29,9 +30,10 @@ class EventManager : BaseUserManager() {
                 )
                 val newCount = storedUser.eventPoints + count
                 updateEventPoints(ChatUser(command.chat.id, storedUser, repliedUser), newCount)
-                val amountString = createAmountString("начислен", "что\\-то", count)
+                val countString = PluralsUtil.pluralize(count, "морковка", "начислено")
 
-                val message = "Пользователю $markdownNameString $amountString\\!\nВсего печенюшек: $newCount 🍪"
+                val pointsName = PluralsUtil.getPlurals("морковка").many
+                val message = "Пользователю $markdownNameString $countString\\!\nВсего $pointsName: $newCount \uD83E\uDD55"
                 return CommandResult.Success(message, storedUser.id)
             }
 
@@ -56,9 +58,10 @@ class EventManager : BaseUserManager() {
             if (storedUser.eventPoints > 0 && count <= storedUser.eventPoints) {
                 val newCount = storedUser.eventPoints - count
                 updateEventPoints(ChatUser(command.chat.id, storedUser, repliedUser), newCount)
-                val amountString = createAmountString("отобран", "что\\-то", count)
+                val countString = PluralsUtil.pluralize(count, "морковка", "отобрано")
 
-                val message = "У пользователя $markdownNameString $amountString\\!\nВсего печенюшек: $newCount 🍪"
+                val pointsName = PluralsUtil.getPlurals("морковка").many
+                val message = "У пользователя $markdownNameString $countString\\!\nВсего $pointsName: $newCount \uD83E\uDD55"
                 return CommandResult.Success(message, storedUser.id)
             }
 
@@ -72,7 +75,8 @@ class EventManager : BaseUserManager() {
         val eventPointList = repository.getTopByEventPoints()
         val ratingString = formatRatingList(eventPointList)
 
-        val message = "\uD83C\uDF6A *Рейтинг печенюшек:*\n\n".plus(ratingString)
+        val pointsName = PluralsUtil.getPlurals("морковка").many
+        val message = "\uD83E\uDD55 *Рейтинг $pointsName:*\n\n".plus(ratingString)
         return CommandResult.Success(message)
     }
 
@@ -83,7 +87,7 @@ class EventManager : BaseUserManager() {
         val userMarkdown = createMarkdownLink(user.firstName, user.id.chatId.toString())
         val eventPointCount = repository.getEventPointCountById(user.id.chatId.toString())
 
-        val message = "\uD83C\uDF85 Пользователь ${userMarkdown}\n\uD83C\uDF81 *Ваш баланс:* $eventPointCount \uD83C\uDF6A"
+        val message = "\uD83C\uDF85 Пользователь ${userMarkdown}\n\uD83C\uDF81 *Ваш баланс:* $eventPointCount \uD83E\uDD55"
         return CommandResult.Success(message)
     }
 
@@ -111,7 +115,7 @@ class EventManager : BaseUserManager() {
     private fun formatRatingList(list: List<UserEntity>): String =
         if (list.isNotEmpty()) {
             list.mapIndexed { index, user ->
-                "${index + 1}\\. ${createMarkdownLink(user.name, user.id)} — ${user.eventPoints} \uD83C\uDF6A"
+                "${index + 1}\\. ${createMarkdownLink(user.name, user.id)} — ${user.eventPoints} \uD83E\uDD55"
             }.joinToString("\n")
         } else "Список пуст\\."
 

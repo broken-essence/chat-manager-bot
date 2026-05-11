@@ -8,6 +8,7 @@ import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus
 import com.ehedgehog.database.repositories.UserRepository
 import com.ehedgehog.getChatUserById
+import com.ehedgehog.utils.PluralsUtil
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.types.message.content.TextMessage
@@ -152,7 +153,7 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager() {
     private fun addImmunity(chatUser: ChatUser, count: Int = 1): CommandResult {
         val newCount = chatUser.storedUser.immunities + count
         updateImmunities(chatUser, newCount)
-        val actionString = createAmountString("подарен", "иммунитет", count)
+        val actionString = PluralsUtil.pluralize(count, "иммунитет", "подарено")
         val markdownNameString = createMarkdownLink(chatUser.chatMember.firstName, chatUser.storedUser.id)
 
         val message = "Пользователю $markdownNameString ${actionString}\\."
@@ -162,7 +163,7 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager() {
     private fun addUnwarn(chatUser: ChatUser, count: Int = 1): CommandResult {
         val newCount = chatUser.storedUser.unwarns + count
         updateUnwarns(chatUser, newCount)
-        val actionString = createAmountString("подарен", "анварн", count)
+        val actionString = PluralsUtil.pluralize(count, "анварн", "подарено")
         val markdownNameString = createMarkdownLink(chatUser.chatMember.firstName, chatUser.storedUser.id)
 
         val message = "Пользователю $markdownNameString ${actionString}\\."
