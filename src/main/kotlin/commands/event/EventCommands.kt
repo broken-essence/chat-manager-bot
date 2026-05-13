@@ -1,8 +1,10 @@
 package com.ehedgehog.commands.event
 
+import com.ehedgehog.AppContext
 import com.ehedgehog.data.CommandResult
 import com.ehedgehog.data.Reason
 import com.ehedgehog.loggedCommand
+import com.ehedgehog.utils.PluralsUtil
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
@@ -12,27 +14,50 @@ import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.types.message.MarkdownV2
 import dev.inmo.tgbotapi.utils.RiskFeature
 
-private const val COMMAND_COOKIE = "cookie"
+private const val COMMAND_START_EVENT = "start_event"
+private const val COMMAND_STOP_EVENT = "stop_event"
+private const val COMMAND_REWARD = "reward"
 private const val COMMAND_TAKE = "take"
 private const val COMMAND_RATING = "rating"
-private const val COMMAND_BALANCE = "balance"
+private const val COMMAND_POINTS = "points"
 private const val COMMAND_CLEAR_RATING = "clear_rating"
 private const val COMMAND_HINT = "hint"
 
 @OptIn(RiskFeature::class)
 fun BehaviourContext.registerEventCommands(manager: EventManager) {
 
-    onCommandWithArgs(COMMAND_COOKIE) { command, args ->
-        loggedCommand(COMMAND_COOKIE, command.from?.id?.chatId.toString(), args) {
+    onCommandWithArgs(COMMAND_START_EVENT) { command, args ->
+        loggedCommand(COMMAND_START_EVENT, command.from?.id?.chatId.toString(), args) {
+            val result = manager.startEvent(command, args)
+            if (result is CommandResult.Success)
+                result.message?.let { bot.sendMessage(command.chat.id, it, MarkdownV2) }
+            result
+        }
+    }
+
+    onCommandWithArgs(COMMAND_STOP_EVENT) { command, args ->
+        loggedCommand(COMMAND_STOP_EVENT, command.from?.id?.chatId.toString(), args) {
+            val result = manager.stopEvent(command)
+            if (result is CommandResult.Success)
+                result.message?.let { bot.sendMessage(command.chat.id, it) }
+            result
+        }
+    }
+
+    onCommandWithArgs(COMMAND_REWARD) { command, args ->
+        loggedCommand(COMMAND_REWARD, command.from?.id?.chatId.toString(), args) {
             val result = manager.giveEventPoints(command, args)
 
             when (result) {
                 is CommandResult.Success -> if (result.message != null) {
                     bot.sendMessage(command.chat.id, result.message, MarkdownV2)
                 }
-                is CommandResult.Failure -> if (result.reason is Reason.AccessDenied) {
-                    bot.reply(command, "В админы метишь, бро?")
-                }
+                is CommandResult.Failure ->
+                    if (result.reason is Reason.AccessDenied) {
+                        bot.reply(command, "В админы метишь, бро?")
+                    } else if (result.reason is Reason.EventNotEnabled) {
+                        bot.reply(command, "Событие уже завершилось!")
+                    }
             }
 
             result
@@ -49,9 +74,13 @@ fun BehaviourContext.registerEventCommands(manager: EventManager) {
                 }
                 is CommandResult.Failure ->
                     if (result.reason is Reason.NotEnoughBalance) {
-                        bot.reply(command, "У данного пользователя нет столько печенюшек!")
+                        val pointsName = AppContext.settings.getEventConfig().noun
+                        val pointsMany = PluralsUtil.getPlurals(pointsName).many
+                        bot.reply(command, "У данного пользователя нет столько $pointsMany!")
                     } else if (result.reason is Reason.AccessDenied) {
                         bot.reply(command, "В админы метишь, бро?")
+                    } else if (result.reason is Reason.EventNotEnabled) {
+                        bot.reply(command, "Событие уже завершилось!")
                     }
             }
 
@@ -68,8 +97,8 @@ fun BehaviourContext.registerEventCommands(manager: EventManager) {
         }
     }
 
-    onCommand(COMMAND_BALANCE) {
-        loggedCommand(COMMAND_BALANCE, it.from?.id?.chatId.toString()) {
+    onCommand(COMMAND_POINTS) {
+        loggedCommand(COMMAND_POINTS, it.from?.id?.chatId.toString()) {
             val result = manager.getPersonalRating(it)
             if (result is CommandResult.Success)
                 result.message?.let { text -> bot.reply(it, text, MarkdownV2) }

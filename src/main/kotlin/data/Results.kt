@@ -21,5 +21,6 @@ sealed class Reason(val code: String) {
     object LimitExceeded: Reason("LIMIT_EXCEEDED")
     object WrongData: Reason("WRONG_DATA")
     object WrongCount: Reason("WRONG_COUNT")
+    object EventNotEnabled: Reason("EVENT_NOT_ENABLED")
     object UnexpectedError: Reason("UNEXPECTED_ERROR")
 }

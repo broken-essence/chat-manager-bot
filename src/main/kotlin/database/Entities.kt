@@ -37,3 +37,9 @@ data class UnwarnRequest(
     val userId: String,
     val createdAt: Long
 )
+
+data class EventConfig(
+    val enabled: Boolean,
+    val emoji: String,
+    val noun: String
+)
