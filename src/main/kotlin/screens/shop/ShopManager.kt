@@ -1,7 +1,9 @@
 package com.ehedgehog.screens.shop
 
+import com.ehedgehog.AppContext
 import com.ehedgehog.base.BaseUserManager
 import com.ehedgehog.data.ActionResult
+import com.ehedgehog.data.JournalEvent
 import com.ehedgehog.data.Reason
 import com.ehedgehog.data.ScreenContext
 import com.ehedgehog.database.repositories.UserRepository
@@ -30,7 +32,7 @@ class ShopManager : BaseUserManager() {
         """.trimIndent()
     }
 
-    fun buyUnwarn(context: ScreenContext): ActionResult {
+    suspend fun buyUnwarn(context: ScreenContext): ActionResult {
         val userEntry = repository.getUserById(context.user.id.chatId.toString()) ?: return ActionResult.Failure(Reason.UserNotFound)
 
         if (userEntry.balance >= PRICE_UNWARN) {
@@ -42,6 +44,7 @@ class ShopManager : BaseUserManager() {
                     unwarns = userEntry.unwarns + 1
                 )
             )
+            AppContext.journal.write(JournalEvent.Purchase(userEntry.id, userEntry.name, "анварн"))
 
             return ActionResult.Success()
         }
@@ -49,7 +52,7 @@ class ShopManager : BaseUserManager() {
         return ActionResult.Failure(Reason.NotEnoughBalance)
     }
 
-    fun buyImmunity(context: ScreenContext): ActionResult {
+    suspend fun buyImmunity(context: ScreenContext): ActionResult {
         val userEntry = repository.getUserById(context.user.id.chatId.toString()) ?: return ActionResult.Failure(Reason.UserNotFound)
 
         if (userEntry.balance >= PRICE_IMMUNITY) {
@@ -61,6 +64,7 @@ class ShopManager : BaseUserManager() {
                     immunities = userEntry.immunities + 1
                 )
             )
+            AppContext.journal.write(JournalEvent.Purchase(userEntry.id, userEntry.name, "иммунитет"))
 
             return ActionResult.Success()
         }

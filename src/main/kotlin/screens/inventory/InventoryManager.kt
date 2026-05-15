@@ -1,8 +1,10 @@
 package com.ehedgehog.screens.inventory
 
+import com.ehedgehog.AppContext
 import com.ehedgehog.ImmunityScheduler
 import com.ehedgehog.base.*
 import com.ehedgehog.data.ActionResult
+import com.ehedgehog.data.JournalEvent
 import com.ehedgehog.data.Reason
 import com.ehedgehog.data.ScreenContext
 import com.ehedgehog.database.ChatUser
@@ -34,7 +36,7 @@ class InventoryManager(bot: TelegramBot) : BaseUserManager() {
         """.trimIndent()
     }
 
-    fun useUnwarn(context: ScreenContext): ActionResult {
+    suspend fun useUnwarn(context: ScreenContext): ActionResult {
         val userEntry = userRepository.getUserById(context.user.id.chatId.toString()) ?: return ActionResult.Failure(Reason.UserNotFound)
 
         if (userEntry.unwarns > 0) {
@@ -42,6 +44,8 @@ class InventoryManager(bot: TelegramBot) : BaseUserManager() {
                 ChatUser(context.chatId, userEntry, context.user),
                 userEntry.unwarns - 1
             )
+
+            AppContext.journal.write(JournalEvent.Activation(userEntry.id, userEntry.name, "анварн"))
             val requestId = unwarnRequestRepository.createRequest(userEntry.id)
             return ActionResult.Success(requestId.toString())
         } else {
@@ -49,7 +53,7 @@ class InventoryManager(bot: TelegramBot) : BaseUserManager() {
         }
     }
 
-    fun useImmunity(context: ScreenContext): ActionResult {
+    suspend fun useImmunity(context: ScreenContext): ActionResult {
         val userEntry = userRepository.getUserById(context.user.id.chatId.toString()) ?: return ActionResult.Failure(Reason.UserNotFound)
         val activeImmunities = userRepository.getUsersWithActiveImmunity()
 
@@ -68,6 +72,7 @@ class InventoryManager(bot: TelegramBot) : BaseUserManager() {
                 )
             )
 
+            AppContext.journal.write(JournalEvent.Activation(userEntry.id, userEntry.name, "иммунитет"))
             immunityScheduler.scheduleExpirationNotification(userEntry.id, expiresAt)
             return ActionResult.Success()
         }
