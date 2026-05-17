@@ -1,6 +1,7 @@
 package com.ehedgehog.screens.profile
 
 import com.ehedgehog.base.BaseUserManager
+import com.ehedgehog.base.getDescription
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus
 import com.ehedgehog.database.repositories.UserRepository
@@ -15,7 +16,7 @@ class ProfileManager : BaseUserManager() {
         val warnsVisible = userEntry.status > UserStatus.PLAYER
 
         return """|🪿 Пользователь *${handleReservedSymbols(user.firstName)}*
-                |👤 Статус: ${getStatusDescription(userEntry.status)}
+                |👤 Статус: ${userEntry.status.getDescription()}
                 |💰 Ваш баланс: ${userEntry.balance} 💸
                 |
                 |🧻 Снятие варна: ${userEntry.unwarns}

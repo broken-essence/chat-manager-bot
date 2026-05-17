@@ -1,7 +1,10 @@
 package com.ehedgehog.commands.admin
 
+import com.ehedgehog.AppContext
 import com.ehedgehog.base.BaseUserManager
+import com.ehedgehog.base.getDescription
 import com.ehedgehog.data.CommandResult
+import com.ehedgehog.data.JournalEvent
 import com.ehedgehog.data.Reason
 import com.ehedgehog.database.ChatUser
 import com.ehedgehog.database.UserEntity
@@ -11,18 +14,20 @@ import com.ehedgehog.getChatUserById
 import com.ehedgehog.utils.PluralsUtil
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
+import dev.inmo.tgbotapi.types.chat.User
 import dev.inmo.tgbotapi.types.message.content.TextMessage
 import dev.inmo.tgbotapi.utils.RiskFeature
 
+@OptIn(RiskFeature::class)
 class AdminManager(private val bot: TelegramBot): BaseUserManager() {
 
     private val repository = UserRepository()
 
-    @OptIn(RiskFeature::class)
-    fun changeUserStatus(command: TextMessage, statusValue: Int): CommandResult {
+    suspend fun changeUserStatus(command: TextMessage, statusValue: Int): CommandResult {
         val repliedUser = command.replyTo?.from
+        val fromUser = command.from ?: return CommandResult.Failure(Reason.UnexpectedError)
 
-        if (isSeniorAdmin(command.from?.id?.chatId.toString())) {
+        if (isSeniorAdmin(fromUser.id.chatId.toString())) {
             if (repliedUser != null && statusValue in 0..<UserStatus.entries.size) {
                 val userId = repliedUser.id.chatId.toString()
                 val user = repository.getUserById(userId)
@@ -34,7 +39,14 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager() {
                     status
                 )
 
-                val message = "$markdownNameString теперь *${getStatusDescription(status)}*"
+                AppContext.journal.write(JournalEvent.StatusChanged(
+                    repliedUser.id.chatId.toString(),
+                    repliedUser.firstName,
+                    fromUser.id.chatId.toString(),
+                    fromUser.firstName,
+                    status
+                ))
+                val message = "$markdownNameString теперь *${status.getDescription()}*"
                 return CommandResult.Success(message, userId)
             }
 
@@ -44,42 +56,40 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager() {
         return CommandResult.Failure(Reason.AccessDenied)
     }
 
-    @OptIn(RiskFeature::class)
     suspend fun giveWarn(command: TextMessage, content: String): CommandResult {
         return onGiveCommand(command, content) { user, reason ->
-            addWarn(user, reason)
+            addWarn(user, command.from!!, reason)
         }
     }
 
     suspend fun takeWarn(command: TextMessage, content: String): CommandResult {
         return onGiveCommand(command, content) { user, count ->
             val newCount = if (count.isNotBlank()) count.trim().toInt() else 1
-            removeWarn(user, newCount)
+            removeWarn(user, command.from!!, newCount)
         }
     }
 
     suspend fun giveImmunity(command: TextMessage, content: String): CommandResult {
         return onGiveCommand(command, content) { user, count ->
             val newCount = if (count.isNotBlank()) count.trim().toInt() else 1
-            addImmunity(user, newCount)
+            addImmunity(user, command.from!!, newCount)
         }
     }
 
     suspend fun giveUnwarn(command: TextMessage, content: String): CommandResult {
         return onGiveCommand(command, content) { user, count ->
             val newCount = if (count.isNotBlank()) count.trim().toInt() else 1
-            addUnwarn(user, newCount)
+            addUnwarn(user, command.from!!, newCount)
         }
     }
 
     suspend fun giveBalance(command: TextMessage, content: String): CommandResult {
         return onGiveCommand(command, content) { user, amount ->
             val newAmount = if (amount.isNotBlank()) amount.trim().toInt() else 1
-            addBalance(user, newAmount)
+            addBalance(user, command.from!!, newAmount)
         }
     }
 
-    @OptIn(RiskFeature::class)
     private suspend fun onGiveCommand(
         command: TextMessage,
         content: String,
@@ -117,7 +127,7 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager() {
         return CommandResult.Failure(Reason.AccessDenied)
     }
 
-    private fun addWarn(chatUser: ChatUser, reason: String): CommandResult {
+    private suspend fun addWarn(chatUser: ChatUser, from: User, reason: String): CommandResult {
         if (chatUser.storedUser.status >= UserStatus.ADMIN) {
             val newCount = chatUser.storedUser.adminWarns + 1
             updateWarns(chatUser, newCount)
@@ -127,13 +137,22 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager() {
                 |Администратору $markdownNameString выдано $newCount\/6 предупреждений\.
                 |${if (reason.isNotBlank()) "*Причина:* $reason" else ""}
                 """.trimMargin()
+            AppContext.journal.write(JournalEvent.WarnsUpdate(
+                chatUser.storedUser.id,
+                chatUser.storedUser.name,
+                from.id.chatId.toString(),
+                from.firstName,
+                newCount,
+                reason
+            ))
+
             return CommandResult.Success(message, chatUser.storedUser.id)
         }
 
         return CommandResult.Failure(Reason.WrongData)
     }
 
-    private fun removeWarn(chatUser: ChatUser, count: Int = 1): CommandResult {
+    private suspend fun removeWarn(chatUser: ChatUser, from: User, count: Int = 1): CommandResult {
         if (chatUser.storedUser.status >= UserStatus.ADMIN) {
             if (count <= 0 || count > chatUser.storedUser.adminWarns) {
                 return CommandResult.Failure(Reason.WrongCount)
@@ -143,6 +162,13 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager() {
             val countText = if (newCount == 0) "больше не имеет предупреждений\\." else "имеет $newCount\\/6 предупреждений\\."
             val message = "Администратор ${createMarkdownLink(chatUser.chatMember.firstName, chatUser.storedUser.id)} $countText"
             updateWarns(chatUser, newCount)
+            AppContext.journal.write(JournalEvent.WarnsUpdate(
+                chatUser.storedUser.id,
+                chatUser.storedUser.name,
+                from.id.chatId.toString(),
+                from.firstName,
+                newCount
+            ))
 
             return CommandResult.Success(message, chatUser.storedUser.id)
         }
@@ -150,32 +176,56 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager() {
         return CommandResult.Failure(Reason.WrongData)
     }
 
-    private fun addImmunity(chatUser: ChatUser, count: Int = 1): CommandResult {
+    private suspend fun addImmunity(chatUser: ChatUser, from: User, count: Int = 1): CommandResult {
         val newCount = chatUser.storedUser.immunities + count
         updateImmunities(chatUser, newCount)
         val actionString = PluralsUtil.pluralize(count, "иммунитет", "подарено")
         val markdownNameString = createMarkdownLink(chatUser.chatMember.firstName, chatUser.storedUser.id)
 
         val message = "Пользователю $markdownNameString ${actionString}\\."
+        AppContext.journal.write(JournalEvent.ItemGiving(
+                chatUser.storedUser.id,
+                chatUser.storedUser.name,
+                from.id.chatId.toString(),
+                from.firstName,
+                "иммунитет",
+                count
+        ))
         return CommandResult.Success(message, chatUser.storedUser.id)
     }
 
-    private fun addUnwarn(chatUser: ChatUser, count: Int = 1): CommandResult {
+    private suspend fun addUnwarn(chatUser: ChatUser, from: User, count: Int = 1): CommandResult {
         val newCount = chatUser.storedUser.unwarns + count
         updateUnwarns(chatUser, newCount)
         val actionString = PluralsUtil.pluralize(count, "анварн", "подарено")
         val markdownNameString = createMarkdownLink(chatUser.chatMember.firstName, chatUser.storedUser.id)
 
         val message = "Пользователю $markdownNameString ${actionString}\\."
+        AppContext.journal.write(JournalEvent.ItemGiving(
+            chatUser.storedUser.id,
+            chatUser.storedUser.name,
+            from.id.chatId.toString(),
+            from.firstName,
+            "анварн",
+            count
+        ))
         return CommandResult.Success(message, chatUser.storedUser.id)
     }
 
-    private fun addBalance(chatUser: ChatUser, amount: Int = 0): CommandResult {
+    private suspend fun addBalance(chatUser: ChatUser, from: User, amount: Int = 0): CommandResult {
         val newAmount = chatUser.storedUser.balance + amount
         updateBalance(chatUser, newAmount)
         val markdownNameString = createMarkdownLink(chatUser.chatMember.firstName, chatUser.storedUser.id)
 
         val message = "Пользователю $markdownNameString выдано $amount \uD83D\uDCB8"
+        AppContext.journal.write(JournalEvent.ItemGiving(
+            chatUser.storedUser.id,
+            chatUser.storedUser.name,
+            from.id.chatId.toString(),
+            from.firstName,
+            "валюта",
+            amount
+        ))
         return CommandResult.Success(message, chatUser.storedUser.id)
     }
 

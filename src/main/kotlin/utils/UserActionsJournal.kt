@@ -1,6 +1,7 @@
 package com.ehedgehog.utils
 
 import com.ehedgehog.base.BaseManager
+import com.ehedgehog.base.getDescription
 import com.ehedgehog.data.JournalEvent
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
@@ -38,14 +39,14 @@ class UserActionsJournal private constructor(private val bot: TelegramBot) : Bas
         """.trimMargin()
 
         is JournalEvent.NewUser -> """
-            |🚗 \#НОВЫЙ_ПОЛЬЗОВАТЕЛЬ
+            |🚗 \#НОВЫЙ\_ПОЛЬЗОВАТЕЛЬ
             |*Кто:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
             |*Дата:* ${dateFromMillis(System.currentTimeMillis())}
             |\#id${event.userId}
         """.trimMargin()
 
         is JournalEvent.WarnsUpdate -> """
-            |⚠️ \#ОБНОВЛЕНИЕ_ПРЕДУПРЕЖДЕНИЙ
+            |⚠️ \#ОБНОВЛЕНИЕ\_ПРЕДУПРЕЖДЕНИЙ
             |*Кто:* ${createMarkdownLink(event.fromName, event.fromId)} \[`${event.fromId}`\]
             |*Кому:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
             |*Новое количество:* ${event.newCount}\/6
@@ -58,7 +59,16 @@ class UserActionsJournal private constructor(private val bot: TelegramBot) : Bas
             |📦 \#ВЫДАНО \#${event.item.uppercase()}
             |*Кто:* ${createMarkdownLink(event.fromName, event.fromId)} \[`${event.fromId}`\]
             |*Кому:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
-            |*Выдано: * ${event.item} ${event.count} шт\.
+            |*Выдано:* ${event.item} ${event.count} шт\.
+            |*Дата:* ${dateFromMillis(System.currentTimeMillis())}
+            |\#id${event.userId}
+        """.trimMargin()
+
+        is JournalEvent.StatusChanged -> """
+            |👤 \#ИЗМЕНЕНИЕ\_СТАТУСА \#${event.status.name.replace("_", "\\_")}
+            |*Кто:* ${createMarkdownLink(event.fromName, event.fromId)} \[`${event.fromId}`\]
+            |*Кому:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
+            |*Новая роль:* ${event.status.getDescription()}
             |*Дата:* ${dateFromMillis(System.currentTimeMillis())}
             |\#id${event.userId}
         """.trimMargin()

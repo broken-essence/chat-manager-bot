@@ -1,5 +1,7 @@
 package com.ehedgehog.data
 
+import com.ehedgehog.database.UserStatus
+
 sealed class JournalEvent {
 
     data class Purchase(val userId: String, val name: String, val item: String): JournalEvent()
@@ -24,6 +26,14 @@ sealed class JournalEvent {
         val fromName: String,
         val item: String,
         val count: Int
+    ): JournalEvent()
+
+    data class StatusChanged(
+        val userId: String,
+        val name: String,
+        val fromId: String,
+        val fromName: String,
+        val status: UserStatus
     ): JournalEvent()
 
 }

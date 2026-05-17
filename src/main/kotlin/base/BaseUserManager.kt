@@ -16,14 +16,6 @@ abstract class BaseUserManager : BaseManager() {
 
     private val repository = UserRepository()
 
-    fun getStatusDescription(status: UserStatus): String {
-        return when (status) {
-            UserStatus.PLAYER -> "Игрок"
-            UserStatus.ADMIN -> "Администратор"
-            UserStatus.SENIOR_ADMIN -> "Старший администратор"
-        }
-    }
-
     fun isAdmin(userId: String): Boolean {
         val status = repository.getUserStatusById(userId)
         return status >= UserStatus.ADMIN || userId == System.getenv("BOT_OWNER_ID")
@@ -100,3 +92,9 @@ fun UserEntity.hasActiveImmunity(): Boolean = immunityExpiresAt > System.current
 fun UserEntity.isInImmunityQueue(): Boolean = immunityStartsAt > System.currentTimeMillis()
 
 fun UserEntity.hasImmunityCooldown(): Boolean = System.currentTimeMillis() - immunityExpiresAt < IMMUNITY_COOLDOWN
+
+fun UserStatus.getDescription(): String = when (this) {
+    UserStatus.PLAYER -> "Игрок"
+    UserStatus.ADMIN -> "Администратор"
+    UserStatus.SENIOR_ADMIN -> "Старший администратор"
+}
