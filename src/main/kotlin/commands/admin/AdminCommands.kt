@@ -2,7 +2,7 @@ package com.ehedgehog.commands.admin
 
 import com.ehedgehog.data.CommandResult
 import com.ehedgehog.data.Reason
-import com.ehedgehog.loggedCommand
+import com.ehedgehog.utils.loggedCommand
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext

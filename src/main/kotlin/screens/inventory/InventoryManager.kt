@@ -1,7 +1,7 @@
 package com.ehedgehog.screens.inventory
 
 import com.ehedgehog.AppContext
-import com.ehedgehog.ImmunityScheduler
+import com.ehedgehog.utils.ImmunityScheduler
 import com.ehedgehog.base.*
 import com.ehedgehog.data.ActionResult
 import com.ehedgehog.data.JournalEvent

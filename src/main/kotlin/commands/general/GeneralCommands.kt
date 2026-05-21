@@ -3,7 +3,7 @@ package com.ehedgehog.commands.general
 import com.ehedgehog.data.CommandResult
 import com.ehedgehog.data.Reason
 import com.ehedgehog.data.ScreenContext
-import com.ehedgehog.loggedCommand
+import com.ehedgehog.utils.loggedCommand
 import com.ehedgehog.screens.ScreenRouter
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage

@@ -1,4 +1,4 @@
-package com.ehedgehog
+package com.ehedgehog.utils
 
 import com.ehedgehog.data.ActionResult
 import com.ehedgehog.data.CommandResult

@@ -4,7 +4,7 @@ import com.ehedgehog.base.BaseAction
 import com.ehedgehog.data.ActionResult
 import com.ehedgehog.data.Reason
 import com.ehedgehog.data.ScreenContext
-import com.ehedgehog.loggedAction
+import com.ehedgehog.utils.loggedAction
 
 object ActionRouter {
 

@@ -1,6 +1,6 @@
 package com.ehedgehog.screens
 
-import com.ehedgehog.Logger
+import com.ehedgehog.utils.Logger
 import com.ehedgehog.base.BaseScreen
 import com.ehedgehog.data.ScreenContext
 import dev.inmo.tgbotapi.bot.TelegramBot

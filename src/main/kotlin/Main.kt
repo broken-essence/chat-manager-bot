@@ -4,6 +4,7 @@ import com.ehedgehog.config.Config
 import com.ehedgehog.database.DatabaseFactory
 import com.ehedgehog.database.repositories.UserRepository
 import com.ehedgehog.data.ScreenContext
+import com.ehedgehog.utils.ImmunityScheduler
 import com.ehedgehog.utils.UserActionsJournal
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.bot.ktor.telegramBot

@@ -1,7 +1,7 @@
-package com.ehedgehog
+package com.ehedgehog.utils
 
-import com.ehedgehog.base.isInImmunityQueue
 import com.ehedgehog.base.immunityStartsAt
+import com.ehedgehog.base.isInImmunityQueue
 import com.ehedgehog.database.repositories.UserRepository
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
