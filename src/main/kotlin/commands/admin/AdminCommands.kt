@@ -2,10 +2,13 @@ package com.ehedgehog.commands.admin
 
 import com.ehedgehog.data.CommandResult
 import com.ehedgehog.data.Reason
+import com.ehedgehog.data.ScreenContext
+import com.ehedgehog.screens.ScreenRouter
 import com.ehedgehog.utils.loggedCommand
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
+import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommandWithArgs
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.types.message.MarkdownV2
@@ -14,6 +17,7 @@ import dev.inmo.tgbotapi.utils.RiskFeature
 
 typealias FailureHandler = suspend (Reason) -> Boolean
 
+private const val COMMAND_HELP_ADMIN = "help_admin"
 private const val COMMAND_STATUS = "status"
 private const val COMMAND_ADMWARN = "admwarn"
 private const val COMMAND_ADMUNWARN = "admunwarn"
@@ -21,7 +25,25 @@ private const val COMMAND_GIVE_IMMUN = "give_immun"
 private const val COMMAND_GIVE_UNWARN = "give_unwarn"
 private const val COMMAND_GIVE_BALANCE = "give_balance"
 
+@OptIn(RiskFeature::class)
 fun BehaviourContext.registerAdminCommands(manager: AdminManager) {
+
+    onCommand(COMMAND_HELP_ADMIN) { command ->
+        loggedCommand(COMMAND_HELP_ADMIN, command.from?.id?.chatId.toString()) {
+            command.from?.let {
+                if (manager.isAdmin(it.id.chatId.toString())) {
+                    ScreenRouter.openScreen(
+                        bot, ScreenContext(command.chat.id, it), "help", "admin"
+                    )
+                    return@loggedCommand CommandResult.Success()
+                }
+
+                return@loggedCommand CommandResult.Failure(Reason.AccessDenied)
+            }
+
+            CommandResult.Failure(Reason.UnexpectedError)
+        }
+    }
 
     onCommandWithArgs(COMMAND_STATUS) { it, args ->
         executeAdminCommand(COMMAND_STATUS, bot, it, args) {

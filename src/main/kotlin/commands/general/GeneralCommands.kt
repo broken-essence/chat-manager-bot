@@ -14,16 +14,33 @@ import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.types.message.MarkdownV2
 import dev.inmo.tgbotapi.utils.RiskFeature
 
-private const val COMMAND_PROF = "prof"
+private const val COMMAND_START = "start"
+private const val COMMAND_PROFILE = "gmprofile"
 private const val COMMAND_IMMUNITIES = "immunities"
 private const val COMMAND_RANDOM = "random"
 private const val COMMAND_GIFT = "gift"
+private const val COMMAND_HELP = "gmhelp"
 
 @OptIn(RiskFeature::class)
 fun BehaviourContext.registerGeneralCommands(manager: GeneralManager) {
 
-    onCommand(COMMAND_PROF) { command ->
-        loggedCommand(COMMAND_PROF, command.from?.id?.chatId.toString()) {
+    onCommand(COMMAND_START) { command ->
+        loggedCommand(COMMAND_START, command.from?.id?.chatId.toString()) {
+            command.from?.let {
+                if (command.chat.id.chatId.toString() == it.id.chatId.toString()) {
+                    ScreenRouter.openScreen(bot, ScreenContext(it.id, it), "start")
+                    return@loggedCommand CommandResult.Success()
+                }
+
+                return@loggedCommand CommandResult.Failure(Reason.AccessDenied)
+            }
+
+            CommandResult.Failure(Reason.UnexpectedError)
+        }
+    }
+
+    onCommand(COMMAND_PROFILE) { command ->
+        loggedCommand(COMMAND_PROFILE, command.from?.id?.chatId.toString()) {
             command.from?.let {
                 if (command.chat.id.chatId.toString() != it.id.chatId.toString()) {
                     bot.reply(command, "Отправлено в личные сообщения.")
@@ -33,7 +50,7 @@ fun BehaviourContext.registerGeneralCommands(manager: GeneralManager) {
                 return@loggedCommand CommandResult.Success()
             }
 
-            CommandResult.Failure(Reason.UserNotFound)
+            CommandResult.Failure(Reason.UnexpectedError)
         }
     }
 
@@ -75,6 +92,17 @@ fun BehaviourContext.registerGeneralCommands(manager: GeneralManager) {
             }
 
             result
+        }
+    }
+
+    onCommand(COMMAND_HELP) { command ->
+        loggedCommand(COMMAND_HELP, command.from?.id?.chatId.toString()) {
+            command.from?.let {
+                ScreenRouter.openScreen(bot, ScreenContext(command.chat.id, it), "help")
+                return@loggedCommand CommandResult.Success()
+            }
+
+            CommandResult.Failure(Reason.UnexpectedError)
         }
     }
 

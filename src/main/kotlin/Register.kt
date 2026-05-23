@@ -8,6 +8,8 @@ import com.ehedgehog.commands.general.GeneralManager
 import com.ehedgehog.commands.general.registerGeneralCommands
 import com.ehedgehog.screens.ActionRouter
 import com.ehedgehog.screens.ScreenRouter
+import com.ehedgehog.screens.help.HelpManager
+import com.ehedgehog.screens.help.HelpScreen
 import com.ehedgehog.screens.immunity_queue.ImmunityQueueConfirmAction
 import com.ehedgehog.screens.immunity_queue.ImmunityQueueDeclineAction
 import com.ehedgehog.screens.immunity_queue.ImmunityQueueManager
@@ -26,6 +28,8 @@ import com.ehedgehog.screens.shop.BuyImmunityAction
 import com.ehedgehog.screens.shop.BuyUnwarnAction
 import com.ehedgehog.screens.shop.ShopManager
 import com.ehedgehog.screens.shop.ShopScreen
+import com.ehedgehog.screens.start.StartManager
+import com.ehedgehog.screens.start.StartScreen
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 
@@ -36,6 +40,8 @@ fun registerCommands(bot: TelegramBot, context: BehaviourContext) {
 }
 
 fun registerScreens(bot: TelegramBot) {
+    ScreenRouter.registerScreen(StartScreen(StartManager()))
+    ScreenRouter.registerScreen(HelpScreen(HelpManager()))
     ScreenRouter.registerScreen(ProfileScreen(ProfileManager()))
     ScreenRouter.registerScreen(InventoryScreen(InventoryManager(bot)))
     ScreenRouter.registerScreen(ShopScreen(ShopManager()))

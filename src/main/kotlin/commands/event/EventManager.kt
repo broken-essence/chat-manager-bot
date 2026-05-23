@@ -144,17 +144,6 @@ class EventManager : BaseUserManager() {
         return CommandResult.Failure(Reason.AccessDenied)
     }
 
-    fun showCommands(): CommandResult {
-        val message = """*ᅠ   Команды бота:*
-                |👮🏼 /reward – начислить очки \(reply\)
-                |👮🏼 /take – забрать очки \(reply\)
-                |🪿 /rating – рейтинг события
-                |🪿 /points – посмотреть количество очков
-                |🪿 /hint – список команд
-            """.trimMargin()
-        return CommandResult.Success(message)
-    }
-
     private fun formatRatingList(list: List<UserEntity>, emoji: String): String =
         if (list.isNotEmpty()) {
             list.mapIndexed { index, user ->

@@ -21,7 +21,6 @@ private const val COMMAND_TAKE = "take"
 private const val COMMAND_RATING = "rating"
 private const val COMMAND_POINTS = "points"
 private const val COMMAND_CLEAR_RATING = "clear_rating"
-private const val COMMAND_HINT = "hint"
 
 @OptIn(RiskFeature::class)
 fun BehaviourContext.registerEventCommands(manager: EventManager) {
@@ -111,15 +110,6 @@ fun BehaviourContext.registerEventCommands(manager: EventManager) {
             val result = manager.clearEventPoints(it)
             if (result is CommandResult.Success)
                 result.message?.let { text -> bot.sendMessage(it.chat.id, text) }
-            result
-        }
-    }
-
-    onCommand(COMMAND_HINT) {
-        loggedCommand(COMMAND_HINT, it.from?.id?.chatId.toString()) {
-            val result = manager.showCommands()
-            if (result is CommandResult.Success)
-                result.message?.let { text -> bot.sendMessage(it.chat.id, text, MarkdownV2) }
             result
         }
     }
