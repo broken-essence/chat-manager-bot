@@ -10,6 +10,8 @@ sealed class JournalEvent {
 
     data class NewUser(val userId: String, val name: String): JournalEvent()
 
+    data class UserBlocked(val userId: String, val name: String): JournalEvent()
+
     data class WarnsUpdate(
         val userId: String,
         val name: String,

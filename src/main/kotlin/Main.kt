@@ -1,9 +1,9 @@
 package com.ehedgehog
 
 import com.ehedgehog.config.Config
+import com.ehedgehog.data.ScreenContext
 import com.ehedgehog.database.DatabaseFactory
 import com.ehedgehog.database.repositories.UserRepository
-import com.ehedgehog.data.ScreenContext
 import com.ehedgehog.utils.ImmunityScheduler
 import com.ehedgehog.utils.UserActionsJournal
 import dev.inmo.tgbotapi.bot.TelegramBot
@@ -72,6 +72,7 @@ suspend fun main(args: Array<String>) {
         registerActions(bot)
 
         registerDataCallbackHandler(bot)
+        registerChatMemberStatusHandler()
 
         println(me)
     }.join()

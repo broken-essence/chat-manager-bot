@@ -45,6 +45,13 @@ class UserActionsJournal private constructor(private val bot: TelegramBot) : Bas
             |\#id${event.userId}
         """.trimMargin()
 
+        is JournalEvent.UserBlocked -> """
+            |👎 \#ПОЛЬЗОВАТЕЛЬ\_ОТКЛЮЧИЛСЯ
+            |*Кто:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
+            |*Дата:* ${dateFromMillis(System.currentTimeMillis())}
+            |\#id${event.userId}
+        """.trimMargin()
+
         is JournalEvent.WarnsUpdate -> """
             |⚠️ \#ОБНОВЛЕНИЕ\_ПРЕДУПРЕЖДЕНИЙ
             |*Кто:* ${createMarkdownLink(event.fromName, event.fromId)} \[`${event.fromId}`\]
