@@ -24,59 +24,59 @@ class UserActionsJournal private constructor(private val bot: TelegramBot) : Bas
     private fun format(event: JournalEvent): String = when (event) {
         is JournalEvent.Purchase -> """
             🛒 \#ПОКУПКА \#${event.item.uppercase()}
-            |*Кто:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
-            |*Покупка:* ${event.item}
-            |*Дата:* ${dateFromMillis(System.currentTimeMillis())}
+            |*• Кто:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
+            |*• Покупка:* ${event.item}
+            |*• Дата:* ${dateFromMillis(System.currentTimeMillis())}
             |\#id${event.userId}
         """.trimMargin()
 
         is JournalEvent.Activation -> """
             |✅ \#АКТИВАЦИЯ \#${event.item.uppercase()}
-            |*Кто:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
-            |*Активировано:* ${event.item}
-            |*Дата:* ${dateFromMillis(System.currentTimeMillis())}
+            |*• Кто:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
+            |*• Активировано:* ${event.item}
+            |*• Дата:* ${dateFromMillis(System.currentTimeMillis())}
             |\#id${event.userId}
         """.trimMargin()
 
         is JournalEvent.NewUser -> """
             |🚗 \#НОВЫЙ\_ПОЛЬЗОВАТЕЛЬ
-            |*Кто:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
-            |*Дата:* ${dateFromMillis(System.currentTimeMillis())}
+            |*• Кто:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
+            |*• Дата:* ${dateFromMillis(System.currentTimeMillis())}
             |\#id${event.userId}
         """.trimMargin()
 
         is JournalEvent.UserBlocked -> """
             |👎 \#ПОЛЬЗОВАТЕЛЬ\_ОТКЛЮЧИЛСЯ
-            |*Кто:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
-            |*Дата:* ${dateFromMillis(System.currentTimeMillis())}
+            |*• Кто:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
+            |*• Дата:* ${dateFromMillis(System.currentTimeMillis())}
             |\#id${event.userId}
         """.trimMargin()
 
         is JournalEvent.WarnsUpdate -> """
             |⚠️ \#ОБНОВЛЕНИЕ\_ПРЕДУПРЕЖДЕНИЙ
-            |*Кто:* ${createMarkdownLink(event.fromName, event.fromId)} \[`${event.fromId}`\]
-            |*Кому:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
-            |*Новое количество:* ${event.newCount}\/6
-            |*Причина:* ${event.reason ?: "снятие"}
-            |*Дата:* ${dateFromMillis(System.currentTimeMillis())}
+            |*• Кто:* ${createMarkdownLink(event.fromName, event.fromId)} \[`${event.fromId}`\]
+            |*• Кому:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
+            |*• Новое количество:* ${event.newCount}\/6
+            |*• Причина:* ${event.reason ?: "снятие"}
+            |*• Дата:* ${dateFromMillis(System.currentTimeMillis())}
             |\#id${event.userId}
         """.trimMargin()
 
         is JournalEvent.ItemGiving -> """
             |📦 \#ВЫДАНО \#${event.item.uppercase()}
-            |*Кто:* ${createMarkdownLink(event.fromName, event.fromId)} \[`${event.fromId}`\]
-            |*Кому:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
-            |*Выдано:* ${event.item} ${event.count} шт\.
-            |*Дата:* ${dateFromMillis(System.currentTimeMillis())}
+            |*• Кто:* ${createMarkdownLink(event.fromName, event.fromId)} \[`${event.fromId}`\]
+            |*• Кому:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
+            |*• Выдано:* ${event.item} ${event.count} шт\.
+            |*• Дата:* ${dateFromMillis(System.currentTimeMillis())}
             |\#id${event.userId}
         """.trimMargin()
 
         is JournalEvent.StatusChanged -> """
             |👤 \#ИЗМЕНЕНИЕ\_СТАТУСА \#${event.status.name.replace("_", "\\_")}
-            |*Кто:* ${createMarkdownLink(event.fromName, event.fromId)} \[`${event.fromId}`\]
-            |*Кому:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
-            |*Новая роль:* ${event.status.getDescription()}
-            |*Дата:* ${dateFromMillis(System.currentTimeMillis())}
+            |*• Кто:* ${createMarkdownLink(event.fromName, event.fromId)} \[`${event.fromId}`\]
+            |*• Кому:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
+            |*• Новая роль:* ${event.status.getDescription()}
+            |*• Дата:* ${dateFromMillis(System.currentTimeMillis())}
             |\#id${event.userId}
         """.trimMargin()
     }

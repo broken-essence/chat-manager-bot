@@ -129,8 +129,10 @@ class EventManager : BaseUserManager() {
         val userMarkdown = createMarkdownLink(user.firstName, user.id.chatId.toString())
         val eventPointCount = repository.getEventPointCountById(user.id.chatId.toString())
         val eventConfig = AppContext.settings.getEventConfig()
+        val pointsName = PluralsUtil.getPlurals(eventConfig.noun).many
 
-        val message = "\uD83E\uDEBF Пользователь ${userMarkdown}\n\uD83C\uDF81 *Полученные очки:* $eventPointCount ${eventConfig.emoji}"
+        val message = "\uD83E\uDEBF Пользователь ${userMarkdown}\n" +
+                "\uD83C\uDF81 *Получено $pointsName:* $eventPointCount ${eventConfig.emoji}"
         return CommandResult.Success(message)
     }
 
