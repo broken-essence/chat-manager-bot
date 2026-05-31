@@ -45,7 +45,7 @@ class UserActionsJournal private constructor(private val bot: TelegramBot) : Bas
             |\#id${event.userId}
         """.trimMargin()
 
-        is JournalEvent.UserBlocked -> """
+        is JournalEvent.UserLeft -> """
             |👎 \#ПОЛЬЗОВАТЕЛЬ\_ОТКЛЮЧИЛСЯ
             |*• Кто:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
             |*• Дата:* ${dateFromMillis(System.currentTimeMillis())}
@@ -57,7 +57,7 @@ class UserActionsJournal private constructor(private val bot: TelegramBot) : Bas
             |*• Кто:* ${createMarkdownLink(event.fromName, event.fromId)} \[`${event.fromId}`\]
             |*• Кому:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
             |*• Новое количество:* ${event.newCount}\/6
-            |*• Причина:* ${event.reason ?: "снятие"}
+            |*• Причина:* ${event.reason?.ifBlank { "—" } ?: "снятие"}
             |*• Дата:* ${dateFromMillis(System.currentTimeMillis())}
             |\#id${event.userId}
         """.trimMargin()
@@ -76,6 +76,23 @@ class UserActionsJournal private constructor(private val bot: TelegramBot) : Bas
             |*• Кто:* ${createMarkdownLink(event.fromName, event.fromId)} \[`${event.fromId}`\]
             |*• Кому:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
             |*• Новая роль:* ${event.status.getDescription()}
+            |*• Дата:* ${dateFromMillis(System.currentTimeMillis())}
+            |\#id${event.userId}
+        """.trimMargin()
+
+        is JournalEvent.UserBlocked -> """
+            |🚷 \#ПОЛЬЗОВАТЕЛЬ\_ЗАБЛОКИРОВАН
+            |*• Кем:* ${createMarkdownLink(event.fromName, event.fromId)} \[`${event.fromId}`\]
+            |*• Кто:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
+            |*• Причина:* ${if (event.reason.isNullOrBlank()) "—" else event.reason}
+            |*• Дата:* ${dateFromMillis(System.currentTimeMillis())}
+            |\#id${event.userId}
+        """.trimMargin()
+
+        is JournalEvent.UserUnblocked -> """
+            |⭕️ \#ПОЛЬЗОВАТЕЛЬ\_РАЗБЛОКИРОВАН
+            |*• Кем:* ${createMarkdownLink(event.fromName, event.fromId)} \[`${event.fromId}`\]
+            |*• Кто:* ${createMarkdownLink(event.name, event.userId)} \[`${event.userId}`\]
             |*• Дата:* ${dateFromMillis(System.currentTimeMillis())}
             |\#id${event.userId}
         """.trimMargin()

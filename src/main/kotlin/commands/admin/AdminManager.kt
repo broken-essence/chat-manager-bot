@@ -11,6 +11,7 @@ import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus
 import com.ehedgehog.database.repositories.UserRepository
 import com.ehedgehog.getChatUserById
+import com.ehedgehog.utils.AccessManager
 import com.ehedgehog.utils.PluralsUtil
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
@@ -87,6 +88,15 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager() {
         return onGiveCommand(command, content) { user, amount ->
             val newAmount = if (amount.isNotBlank()) amount.trim().toInt() else 1
             addBalance(user, command.from!!, newAmount)
+        }
+    }
+
+    suspend fun setBlocked(command: TextMessage, content: String, blocked: Boolean): CommandResult {
+        return onGiveCommand(command, content) { user, reason ->
+            when (blocked) {
+                true -> blockUser(user, command.from!!, reason)
+                false -> unblockUser(user, command.from!!)
+            }
         }
     }
 
@@ -241,6 +251,43 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager() {
                 adminWarns = warns
             )
         )
+    }
+
+    private suspend fun blockUser(user: ChatUser, from: User, reason: String): CommandResult {
+        if (!user.storedUser.isBlocked) {
+            updateUserEntry(user.storedUser.copy(isBlocked = true))
+            AccessManager.blockUser(user.storedUser.id)
+            AppContext.journal.write(
+                JournalEvent.UserBlocked(
+                    user.storedUser.id,
+                    user.storedUser.name,
+                    from.id.chatId.toString(),
+                    from.firstName,
+                    reason
+                )
+            )
+            return CommandResult.Success(targetUserId = user.storedUser.id)
+        }
+
+        return CommandResult.Failure(Reason.WrongData)
+    }
+
+    private suspend fun unblockUser(user: ChatUser, from: User): CommandResult {
+        if (user.storedUser.isBlocked) {
+            updateUserEntry(user.storedUser.copy(isBlocked = false))
+            AccessManager.unblockUser(user.storedUser.id)
+            AppContext.journal.write(
+                JournalEvent.UserUnblocked(
+                    user.storedUser.id,
+                    user.storedUser.name,
+                    from.id.chatId.toString(),
+                    from.firstName
+                )
+            )
+            return CommandResult.Success(targetUserId = user.storedUser.id)
+        }
+
+        return CommandResult.Failure(Reason.WrongData)
     }
 
 }

@@ -24,6 +24,8 @@ private const val COMMAND_ADMUNWARN = "admunwarn"
 private const val COMMAND_GIVE_IMMUN = "give_immun"
 private const val COMMAND_GIVE_UNWARN = "give_unwarn"
 private const val COMMAND_GIVE_BALANCE = "give_balance"
+private const val COMMAND_BAN = "ban"
+private const val COMMAND_UNBAN = "unban"
 
 @OptIn(RiskFeature::class)
 fun BehaviourContext.registerAdminCommands(manager: AdminManager) {
@@ -85,6 +87,18 @@ fun BehaviourContext.registerAdminCommands(manager: AdminManager) {
     onCommandWithArgs(COMMAND_GIVE_BALANCE) { it, args ->
         executeAdminCommand(COMMAND_GIVE_BALANCE, bot, it, args) {
             manager.giveBalance(it, args.joinToString(" "))
+        }
+    }
+
+    onCommandWithArgs(COMMAND_BAN) { it, args ->
+        executeAdminCommand(COMMAND_BAN, bot, it, args) {
+            manager.setBlocked(it, args.joinToString(" "), true)
+        }
+    }
+
+    onCommandWithArgs(COMMAND_UNBAN) { it, args ->
+        executeAdminCommand(COMMAND_UNBAN, bot, it, args) {
+            manager.setBlocked(it, args.joinToString(" "), false)
         }
     }
 

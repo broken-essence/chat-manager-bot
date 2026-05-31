@@ -14,6 +14,7 @@ object Users : Table("users") {
     val unwarns = integer("unwarns").default(0)
     val balance = integer("balance").default(0)
     val immunityExpiresAt = long("immunity_expires_at").default(0)
+    val isBlocked = bool("is_blocked").default(false)
 }
 
 object UnwarnRequests : IntIdTable("unwarn_requests") {

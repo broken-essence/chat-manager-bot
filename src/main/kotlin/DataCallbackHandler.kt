@@ -3,6 +3,7 @@ package com.ehedgehog
 import com.ehedgehog.data.ScreenContext
 import com.ehedgehog.screens.ActionRouter
 import com.ehedgehog.screens.ScreenRouter
+import com.ehedgehog.utils.AccessManager
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.answers.answerCallbackQuery
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
@@ -13,6 +14,11 @@ import dev.inmo.tgbotapi.utils.RiskFeature
 @OptIn(RiskFeature::class)
 fun BehaviourContext.registerDataCallbackHandler(bot: TelegramBot) {
     onDataCallbackQuery { callback ->
+        if (AccessManager.isBlocked(callback.from.id.chatId.toString())) {
+            answerCallbackQuery(callback)
+            return@onDataCallbackQuery
+        }
+
         val message = callback.message ?: return@onDataCallbackQuery
 
         val id = callback.data.substringBefore("?")

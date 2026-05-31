@@ -29,6 +29,7 @@ class UserRepository {
                 it[unwarns] = user.unwarns
                 it[balance] = user.balance
                 it[immunityExpiresAt] = user.immunityExpiresAt
+                it[isBlocked] = user.isBlocked
             }
         }
     }
@@ -100,6 +101,12 @@ class UserRepository {
             }
         }
 
+    fun loadBlockedUsers(): List<String> = transaction {
+        Users.selectAll()
+            .where { Users.isBlocked eq true }
+            .map { it[Users.userId] }
+    }
+
     private fun getUserWhere(predicate: Op<Boolean>): UserEntity? {
         return Users.selectAll()
             .where(predicate)
@@ -119,5 +126,6 @@ fun ResultRow.toUserEntity(): UserEntity = UserEntity(
     immunities = this[Users.immunities],
     unwarns = this[Users.unwarns],
     balance = this[Users.balance],
-    immunityExpiresAt = this[Users.immunityExpiresAt]
+    immunityExpiresAt = this[Users.immunityExpiresAt],
+    isBlocked = this[Users.isBlocked]
 )

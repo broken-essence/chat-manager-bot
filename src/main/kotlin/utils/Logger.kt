@@ -49,6 +49,7 @@ suspend fun loggedAction(name: String, userId: String, action: suspend () -> Act
 
 suspend fun loggedCommand(name: String, userId: String, args: Array<String>? = null, command: suspend () -> CommandResult) {
     return try {
+        if (AccessManager.isBlocked(userId)) return
         when (val result = command()) {
             is CommandResult.Success -> Logger.commandSuccess(name, userId, args?.contentToString(), result.targetUserId)
             is CommandResult.Failure -> Logger.commandFailed(name, userId, result.reason.code, args?.contentToString())

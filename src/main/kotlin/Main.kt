@@ -4,6 +4,7 @@ import com.ehedgehog.config.Config
 import com.ehedgehog.data.ScreenContext
 import com.ehedgehog.database.DatabaseFactory
 import com.ehedgehog.database.repositories.UserRepository
+import com.ehedgehog.utils.AccessManager
 import com.ehedgehog.utils.ImmunityScheduler
 import com.ehedgehog.utils.UserActionsJournal
 import dev.inmo.tgbotapi.bot.TelegramBot
@@ -44,7 +45,8 @@ suspend fun main(args: Array<String>) {
 //    val bot = telegramBot(System.getenv("BOT_TOKEN"))
 
     val scope = CoroutineScope(Dispatchers.Default)
-    val immunityScheduler = ImmunityScheduler(bot, UserRepository(), scope)
+    val userRepository = UserRepository()
+    val immunityScheduler = ImmunityScheduler(bot, userRepository, scope)
 
     AppContext.journal = UserActionsJournal.create(bot)
 
@@ -53,6 +55,7 @@ suspend fun main(args: Array<String>) {
 
     DatabaseFactory.init()
     immunityScheduler.restoreNotifications()
+    AccessManager.init(userRepository.loadBlockedUsers())
 
     bot.skipOldUpdates()
     bot.buildBehaviourWithLongPolling(scope,
