@@ -5,7 +5,6 @@ import com.ehedgehog.data.ScreenContent
 import com.ehedgehog.data.ScreenContext
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
-import dev.inmo.tgbotapi.extensions.utils.types.buttons.urlButton
 import dev.inmo.tgbotapi.utils.row
 
 class ProfileScreen(private val manager: ProfileManager): BaseScreen {
@@ -19,9 +18,6 @@ class ProfileScreen(private val manager: ProfileManager): BaseScreen {
             }
             row {
                 dataButton("\uD83D\uDED2 Магазин", "shop")
-            }
-            row {
-                urlButton("\uD83D\uDCAC Поддержка", System.getenv("SUPPORT_URL"))
             }
         }
 
