@@ -3,16 +3,22 @@ package com.ehedgehog.commands.general
 import com.ehedgehog.data.CommandResult
 import com.ehedgehog.data.Reason
 import com.ehedgehog.data.ScreenContext
-import com.ehedgehog.utils.loggedCommand
 import com.ehedgehog.screens.ScreenRouter
+import com.ehedgehog.utils.loggedCommand
+import dev.inmo.tgbotapi.bot.TelegramBot
+import dev.inmo.tgbotapi.bot.exceptions.CommonRequestException
+import dev.inmo.tgbotapi.extensions.api.bot.getMe
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommandWithArgs
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
+import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
+import dev.inmo.tgbotapi.extensions.utils.types.buttons.urlButton
 import dev.inmo.tgbotapi.types.message.MarkdownV2
 import dev.inmo.tgbotapi.utils.RiskFeature
+import dev.inmo.tgbotapi.utils.row
 
 private const val COMMAND_START = "start"
 private const val COMMAND_PROFILE = "gmprofile"
@@ -42,11 +48,22 @@ fun BehaviourContext.registerGeneralCommands(manager: GeneralManager) {
     onCommand(COMMAND_PROFILE) { command ->
         loggedCommand(COMMAND_PROFILE, command.from?.id?.chatId.toString()) {
             command.from?.let {
-                if (command.chat.id.chatId.toString() != it.id.chatId.toString()) {
-                    bot.reply(command, "Отправлено в личные сообщения.")
+                try {
+                    ScreenRouter.openScreen(bot, ScreenContext(it.id, it), "profile")
+                    if (command.chat.id.chatId.toString() != it.id.chatId.toString()) {
+                        bot.reply(command, "Отправлено в личные сообщения.")
+                    }
+                } catch (e: CommonRequestException) {
+                    if (e.message?.contains("bot was blocked by the user") == true ||
+                        e.message?.contains("can't initiate conversation") == true
+                    ) {
+                        bot.reply(
+                            command,
+                            "Для выполнения этой команды активируйте бота в личных сообщениях.",
+                            replyMarkup = activationKeyboard(bot))
+                    } else throw e
                 }
 
-                ScreenRouter.openScreen(bot, ScreenContext(it.id, it), "profile")
                 return@loggedCommand CommandResult.Success()
             }
 
@@ -106,4 +123,11 @@ fun BehaviourContext.registerGeneralCommands(manager: GeneralManager) {
         }
     }
 
+}
+
+private suspend fun activationKeyboard(bot: TelegramBot) = inlineKeyboard {
+    val username = bot.getMe().username?.username?.removePrefix("@")
+    row {
+        urlButton("\uD83E\uDD16 Активировать", "https://t.me/$username?start")
+    }
 }
