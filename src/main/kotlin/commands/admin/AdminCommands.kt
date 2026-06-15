@@ -19,9 +19,9 @@ typealias FailureHandler = suspend (Reason) -> Boolean
 
 private const val COMMAND_HELP_ADMIN = "help_admin"
 private const val COMMAND_STATUS = "status"
-private const val COMMAND_ADMWARN = "admwarn"
-private const val COMMAND_ADMUNWARN = "admunwarn"
-private const val COMMAND_GIVE_IMMUN = "give_immun"
+private const val COMMAND_WARN = "gmwarn"
+private const val COMMAND_UNWARN = "gmunwarn"
+private const val COMMAND_GIVE_IMMUNITY = "give_immunity"
 private const val COMMAND_GIVE_UNWARN = "give_unwarn"
 private const val COMMAND_GIVE_BALANCE = "give_balance"
 private const val COMMAND_BAN = "ban"
@@ -53,13 +53,13 @@ fun BehaviourContext.registerAdminCommands(manager: AdminManager) {
         }
     }
 
-    onCommandWithArgs(COMMAND_ADMWARN) { it, args ->
-        executeAdminCommand(COMMAND_ADMWARN, bot, it, args) {
+    onCommandWithArgs(COMMAND_WARN) { it, args ->
+        executeAdminCommand(COMMAND_WARN, bot, it, args) {
             manager.giveWarn(it, args.joinToString(" "))
         }
     }
 
-    onCommandWithArgs(COMMAND_ADMUNWARN) { it, args ->
+    onCommandWithArgs(COMMAND_UNWARN) { it, args ->
         val failureHandler: FailureHandler = { reason ->
             if (reason is Reason.WrongCount) {
                 bot.sendMessage(it.chat.id, "Неправильное количество предупреждений.")
@@ -67,13 +67,13 @@ fun BehaviourContext.registerAdminCommands(manager: AdminManager) {
             } else false
         }
 
-        executeAdminCommand(COMMAND_ADMUNWARN, bot, it, args, failureHandler) {
+        executeAdminCommand(COMMAND_UNWARN, bot, it, args, failureHandler) {
             manager.takeWarn(it, args.joinToString(" "))
         }
     }
 
-    onCommandWithArgs(COMMAND_GIVE_IMMUN) { it, args ->
-        executeAdminCommand(COMMAND_GIVE_IMMUN, bot, it, args) {
+    onCommandWithArgs(COMMAND_GIVE_IMMUNITY) { it, args ->
+        executeAdminCommand(COMMAND_GIVE_IMMUNITY, bot, it, args) {
             manager.giveImmunity(it, args.joinToString(" "))
         }
     }

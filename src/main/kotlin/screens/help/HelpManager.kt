@@ -25,11 +25,11 @@ class HelpManager: BaseManager() {
             *😎 Админские команды:*
             
             *• /status* _<0\-2\>_ – изменить статус пользователя \(игрок/админ/старший админ\)
-            *• /admwarn* _<id/username/reply\> <причина\>_ – варн админу \(название скорее всего временное\)
-            *• /admunwarn* _<id/username/reply\> <кол\-во\>_ – снять варн админу \(тоже временное\)
-            *• /give\_immun* _<id/username/reply\> <кол\-во\>_ – выдать иммунитет
+            *• /gmwarn* _<id/username/reply\> <причина\>_ – варн админу
+            *• /gmunwarn* _<id/username/reply\> <кол\-во\>_ – снять варн админу
+            *• /give\_immunity* _<id/username/reply\> <кол\-во\>_ – выдать иммунитет
             *• /give\_unwarn* _<id/username/reply\> <кол\-во\>_ – выдать анварн
-            *• /give\_balance* _<id/username/reply\> <кол\-во\>_ – выдать валюту \(вероятно временное\)
+            *• /give\_balance* _<id/username/reply\> <кол\-во\>_ – выдать валюту
             *• /help\_admin* – список команд для админов
 
             *• /start\_event* _<emoji\> <что выдаем\>_ – запуск ивента

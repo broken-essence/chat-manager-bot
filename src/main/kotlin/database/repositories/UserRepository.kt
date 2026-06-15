@@ -7,6 +7,7 @@ import org.jetbrains.exposed.v1.core.Op
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.greater
 import org.jetbrains.exposed.v1.core.greaterEq
 import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
@@ -83,6 +84,7 @@ class UserRepository {
     fun getTopByEventPoints(): List<UserEntity> {
         return transaction {
             Users.selectAll()
+                .where { Users.eventPoints greater 0 }
                 .orderBy(Users.eventPoints, SortOrder.DESC)
                 .limit(20)
                 .map {

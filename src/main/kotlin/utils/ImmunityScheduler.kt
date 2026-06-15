@@ -27,7 +27,7 @@ class ImmunityScheduler(
 
             bot.sendMessage(
                 ChatId(RawChatId(userId.toLong())),
-                "\uD83D\uDD14 *Срок действия вашего иммунитета истек\\!*\n\nПожалуйста, уберите эмодзи «\uD83D\uDEA9» из ника\\.",
+                "\uD83D\uDD14 *Срок действия вашего иммунитета истек\\!*\n\nПожалуйста, уберите эмодзи «\uD83E\uDD66» из ника\\.",
                 MarkdownV2
             )
             Logger.notification("immunity expired", userId)
@@ -43,7 +43,7 @@ class ImmunityScheduler(
 
             bot.sendMessage(
                 ChatId(RawChatId(userId.toLong())),
-                "\uD83D\uDC8A *Иммунитет активирован\\!*\n\nПеред игрой не забудьте добавить эмодзи «`\uD83D\uDEA9`» в ваш никнейм\\.",
+                "\uD83D\uDC8A *Иммунитет активирован\\!*\n\nПеред игрой не забудьте добавить эмодзи «`\uD83E\uDD66`» в ваш никнейм\\.",
                 MarkdownV2
             )
             Logger.notification("immunity activated", userId)
