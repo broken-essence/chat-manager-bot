@@ -24,13 +24,9 @@ class GeneralManager : BaseUserManager() {
         val immunities = repository.getUsersWithActiveImmunity()
         val immunitiesListString = formatImmunitiesList(immunities)
 
-        val message = """
-            *Игроки с активным иммунитетом:
-            |
-            |*$immunitiesListString
-            |
-            |❗ Иммунитет обозначается эмодзи 🥦 в нике\. Игроков с иммунитетом *запрещено в первые 2 игровые ночи* убивать и посещать активным ролям\.
-            """.trimMargin()
+        val message = "*Игроки с активным иммунитетом:\n\n*$immunitiesListString\n\n" +
+                "❗ Иммунитет обозначается эмодзи 🥦 в нике\\. Игроков с иммунитетом *запрещено в первые 2 игровые ночи* " +
+                "убивать и посещать активным ролям\\. Действует в играх *от 10 человек*\\."
 
         return CommandResult.Success(message)
     }

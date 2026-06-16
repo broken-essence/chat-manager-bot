@@ -1,8 +1,10 @@
 package com.ehedgehog.screens.immunity_queue
 
+import com.ehedgehog.AppContext
 import com.ehedgehog.utils.ImmunityScheduler
 import com.ehedgehog.base.*
 import com.ehedgehog.data.ActionResult
+import com.ehedgehog.data.JournalEvent
 import com.ehedgehog.data.Reason
 import com.ehedgehog.data.ScreenContext
 import com.ehedgehog.database.repositories.UserRepository
@@ -19,7 +21,7 @@ class ImmunityQueueManager(bot: TelegramBot) : BaseUserManager() {
         return "\uD83D\uDDD3 *Достигнуто максимальное количество пользователей с активным иммунитетом\\.*\n\nЖелаете встать в очередь?"
     }
 
-    fun confirmQueue(context: ScreenContext): ActionResult {
+    suspend fun confirmQueue(context: ScreenContext): ActionResult {
         val user = userRepository.getUserById(context.user.id.chatId.toString()) ?: return ActionResult.Failure(Reason.UserNotFound)
         val immunities = userRepository.getUsersWithActiveImmunity()
 
@@ -38,6 +40,7 @@ class ImmunityQueueManager(bot: TelegramBot) : BaseUserManager() {
                 )
             )
 
+            AppContext.journal.write(JournalEvent.Activation(user.id, user.name, "иммунитет"))
             immunityScheduler.scheduleImmunityActivatedNotification(user.id, startsAt)
             immunityScheduler.scheduleExpirationNotification(user.id, expiresAt)
             val newMessage = "*Вы заняли место в очереди\\.*\n\n✅ Ваш иммунитет активируется ${dateFromMillis(startsAt)} по МСК"
