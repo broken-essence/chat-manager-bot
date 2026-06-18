@@ -100,6 +100,38 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager() {
         }
     }
 
+    fun getUserInfo(command: TextMessage, content: String?): CommandResult {
+        if (isAdmin(command.from?.id?.chatId.toString())) {
+            val repliedUser = command.replyTo?.from
+
+            val user = when {
+                content == null -> repository.getUserById(repliedUser?.id?.chatId.toString())
+                content.all { it.isDigit() } && content.length >= 8 -> repository.getUserById(content)
+                content.startsWith("@") && content.length > 1 -> repository.getUserByUsername(content)
+                else -> return CommandResult.Failure(Reason.WrongData)
+            }
+
+            if (user != null) {
+                val markdownNameString = createMarkdownLink(user.name, user.id)
+
+                if (user.status >= UserStatus.ADMIN) {
+                    val message = """
+                        🪿 *$markdownNameString* \[`${user.id}`\]
+                        👤 Статус: ${user.status.getDescription()}
+                        ⚠️ Количество предупреждений: ${user.adminWarns}\/6
+                    """.trimIndent()
+                    return CommandResult.Success(message, user.id)
+                }
+
+                return CommandResult.Failure(Reason.WrongData)
+            }
+
+            return CommandResult.Failure(Reason.UserNotFound)
+        }
+
+        return CommandResult.Failure(Reason.AccessDenied)
+    }
+
     private suspend fun onGiveCommand(
         command: TextMessage,
         content: String,

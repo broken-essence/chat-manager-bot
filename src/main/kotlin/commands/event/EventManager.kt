@@ -117,8 +117,8 @@ class EventManager : BaseUserManager() {
         val ratingString = formatRatingList(eventPointList, eventConfig.emoji)
 
         val pointsName = PluralsUtil.getPlurals(eventConfig.noun).many
-        val isEventFinishedString = if (!eventConfig.enabled) "\n\nСобытие завершено\\!" else ""
-        val message = "${eventConfig.emoji} *Рейтинг $pointsName:*\n\n$ratingString$isEventFinishedString"
+        val bottomString = if (!eventConfig.enabled) "Событие завершено" else "Будьте активными и заработаете много $pointsName"
+        val message = "${eventConfig.emoji} *Рейтинг $pointsName:*\n\n$ratingString\n\n$bottomString\\!"
         return CommandResult.Success(message)
     }
 

@@ -6,6 +6,7 @@ import com.ehedgehog.data.ScreenContext
 import com.ehedgehog.screens.ScreenRouter
 import com.ehedgehog.utils.loggedCommand
 import dev.inmo.tgbotapi.bot.TelegramBot
+import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
@@ -26,6 +27,7 @@ private const val COMMAND_GIVE_UNWARN = "give_unwarn"
 private const val COMMAND_GIVE_BALANCE = "give_balance"
 private const val COMMAND_BAN = "ban"
 private const val COMMAND_UNBAN = "unban"
+private const val COMMAND_INFO = "gminfo"
 
 @OptIn(RiskFeature::class)
 fun BehaviourContext.registerAdminCommands(manager: AdminManager) {
@@ -99,6 +101,18 @@ fun BehaviourContext.registerAdminCommands(manager: AdminManager) {
     onCommandWithArgs(COMMAND_UNBAN) { it, args ->
         executeAdminCommand(COMMAND_UNBAN, bot, it, args) {
             manager.setBlocked(it, args.joinToString(" "), false)
+        }
+    }
+
+    onCommandWithArgs(COMMAND_INFO) { it, args ->
+        val failureHandler: FailureHandler = { reason ->
+            if (reason is Reason.UserNotFound) {
+                bot.reply(it, "Не удалось найти информацию о заданном пользователе.")
+                true
+            } else false
+        }
+        executeAdminCommand(COMMAND_INFO, bot, it, args, failureHandler) {
+            manager.getUserInfo(it, args.getOrNull(0))
         }
     }
 

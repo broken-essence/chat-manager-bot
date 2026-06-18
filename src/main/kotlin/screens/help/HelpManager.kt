@@ -27,6 +27,7 @@ class HelpManager: BaseManager() {
             *• /status* _<0\-2\>_ – изменить статус пользователя \(игрок/админ/старший админ\)
             *• /gmwarn* _<id/username/reply\> <причина\>_ – варн админу
             *• /gmunwarn* _<id/username/reply\> <кол\-во\>_ – снять варн админу
+            *• /gminfo* _<id/username/reply\>_ – посмотреть кол-во варнов у админа
             *• /give\_immunity* _<id/username/reply\> <кол\-во\>_ – выдать иммунитет
             *• /give\_unwarn* _<id/username/reply\> <кол\-во\>_ – выдать анварн
             *• /give\_balance* _<id/username/reply\> <кол\-во\>_ – выдать валюту
