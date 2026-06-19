@@ -4,6 +4,8 @@ import com.ehedgehog.base.BaseAction
 import com.ehedgehog.data.ActionResult
 import com.ehedgehog.data.Reason
 import com.ehedgehog.data.ScreenContext
+import com.ehedgehog.screens.ActionIds
+import com.ehedgehog.screens.ScreenIds
 import com.ehedgehog.screens.ScreenRouter
 import com.ehedgehog.showPopup
 import dev.inmo.tgbotapi.bot.TelegramBot
@@ -13,7 +15,7 @@ import dev.inmo.tgbotapi.types.RawChatId
 
 class UseUnwarnAction(private val bot: TelegramBot, private val manager: InventoryManager): BaseAction {
 
-    override val id: String = "action:inventory/use_unwarn"
+    override val id: String = ActionIds.USE_UNWARN
 
     override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
         val result = manager.useUnwarn(context)
@@ -22,7 +24,7 @@ class UseUnwarnAction(private val bot: TelegramBot, private val manager: Invento
             is ActionResult.Success -> {
                 val chatId = ChatId(RawChatId(System.getenv("SYSTEM_CHAT_ID").toLong()))
                 val unwarnContext = ScreenContext(chatId, context.user)
-                ScreenRouter.openScreen(bot, unwarnContext, "request_unwarn", result.data)
+                ScreenRouter.openScreen(bot, unwarnContext, ScreenIds.REQUEST_UNWARN, result.data)
                 bot.showPopup(context, "Запрос отправлен админам ✅")
                 ScreenRouter.refreshScreen(bot, context)
             }
@@ -38,7 +40,7 @@ class UseUnwarnAction(private val bot: TelegramBot, private val manager: Invento
 
 class UseImmunityAction(private val bot: TelegramBot, private val manager: InventoryManager): BaseAction {
 
-    override val id: String = "action:inventory/use_immunity"
+    override val id: String = ActionIds.USE_IMMUNITY
 
     override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
         val result = manager.useImmunity(context)
@@ -52,7 +54,7 @@ class UseImmunityAction(private val bot: TelegramBot, private val manager: Inven
                 if (result.reason is Reason.LimitExceeded) {
                     context.callbackId?.let { bot.answerCallbackQuery(it) }
                     val queueContext = ScreenContext(context.chatId, context.user)
-                    ScreenRouter.openScreen(bot, queueContext, "immunity_queue")
+                    ScreenRouter.openScreen(bot, queueContext, ScreenIds.IMMUNITY_QUEUE)
                 } else if (result.reason is Reason.NotAvailable) {
                     bot.showPopup(context, "Иммунитет недоступен ☹\uFE0F")
                 }

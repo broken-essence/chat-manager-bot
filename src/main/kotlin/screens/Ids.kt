@@ -1,0 +1,22 @@
+package com.ehedgehog.screens
+
+object ScreenIds {
+    const val START = "start"
+    const val PROFILE = "profile"
+    const val INVENTORY = "inventory"
+    const val SHOP = "shop"
+    const val IMMUNITY_QUEUE = "immunity_queue"
+    const val REQUEST_UNWARN = "request_unwarn"
+    const val HELP = "help"
+}
+
+object ActionIds {
+    const val USE_UNWARN = "action:${ScreenIds.INVENTORY}/use_unwarn"
+    const val USE_IMMUNITY = "action:${ScreenIds.INVENTORY}/use_immunity"
+    const val BUY_UNWARN = "action:${ScreenIds.SHOP}/buy_unwarn"
+    const val BUY_IMMUNITY = "action:${ScreenIds.SHOP}/buy_immunity"
+    const val IMMUNITY_QUEUE_CONFIRM = "action:${ScreenIds.IMMUNITY_QUEUE}/confirm"
+    const val IMMUNITY_QUEUE_DECLINE = "action:${ScreenIds.IMMUNITY_QUEUE}/decline"
+    const val UNWARN_CONFIRM = "action:${ScreenIds.REQUEST_UNWARN}/confirm_unwarn"
+    const val UNWARN_DECLINE = "action:${ScreenIds.REQUEST_UNWARN}/decline_unwarn"
+}

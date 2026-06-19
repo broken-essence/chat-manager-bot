@@ -3,6 +3,7 @@ package com.ehedgehog.commands.general
 import com.ehedgehog.data.CommandResult
 import com.ehedgehog.data.Reason
 import com.ehedgehog.data.ScreenContext
+import com.ehedgehog.screens.ScreenIds
 import com.ehedgehog.screens.ScreenRouter
 import com.ehedgehog.utils.loggedCommand
 import dev.inmo.tgbotapi.bot.TelegramBot
@@ -34,7 +35,7 @@ fun BehaviourContext.registerGeneralCommands(manager: GeneralManager) {
         loggedCommand(COMMAND_START, command.from?.id?.chatId.toString()) {
             command.from?.let {
                 if (command.chat.id.chatId.toString() == it.id.chatId.toString()) {
-                    ScreenRouter.openScreen(bot, ScreenContext(it.id, it), "start")
+                    ScreenRouter.openScreen(bot, ScreenContext(it.id, it), ScreenIds.START)
                     return@loggedCommand CommandResult.Success()
                 }
 
@@ -49,7 +50,7 @@ fun BehaviourContext.registerGeneralCommands(manager: GeneralManager) {
         loggedCommand(COMMAND_PROFILE, command.from?.id?.chatId.toString()) {
             command.from?.let {
                 try {
-                    ScreenRouter.openScreen(bot, ScreenContext(it.id, it), "profile")
+                    ScreenRouter.openScreen(bot, ScreenContext(it.id, it), ScreenIds.PROFILE)
                     if (command.chat.id.chatId.toString() != it.id.chatId.toString()) {
                         bot.reply(command, "Отправлено в личные сообщения.")
                     }
@@ -115,7 +116,7 @@ fun BehaviourContext.registerGeneralCommands(manager: GeneralManager) {
     onCommand(COMMAND_HELP) { command ->
         loggedCommand(COMMAND_HELP, command.from?.id?.chatId.toString()) {
             command.from?.let {
-                ScreenRouter.openScreen(bot, ScreenContext(command.chat.id, it), "help")
+                ScreenRouter.openScreen(bot, ScreenContext(command.chat.id, it), ScreenIds.HELP)
                 return@loggedCommand CommandResult.Success()
             }
 

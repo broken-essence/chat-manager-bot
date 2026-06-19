@@ -4,6 +4,7 @@ import com.ehedgehog.base.BaseAction
 import com.ehedgehog.data.ActionResult
 import com.ehedgehog.data.Reason
 import com.ehedgehog.data.ScreenContext
+import com.ehedgehog.screens.ActionIds
 import com.ehedgehog.showPopup
 import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.api.edit.text.editMessageText
@@ -11,7 +12,7 @@ import dev.inmo.tgbotapi.types.message.MarkdownV2
 
 class ConfirmUnwarnAction(bot: TelegramBot, private val manager: UnwarnRequestManager) : UnwarnAction(bot) {
 
-    override val id: String = "action:request_unwarn/confirm_unwarn"
+    override val id: String = ActionIds.UNWARN_CONFIRM
 
     override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
         val result = manager.confirmUnwarn(context, data)
@@ -22,7 +23,7 @@ class ConfirmUnwarnAction(bot: TelegramBot, private val manager: UnwarnRequestMa
 
 class DeclineUnwarnAction(bot: TelegramBot, private val manager: UnwarnRequestManager) : UnwarnAction(bot) {
 
-    override val id: String = "action:request_unwarn/decline_unwarn"
+    override val id: String = ActionIds.UNWARN_DECLINE
 
     override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
         val result = manager.declineUnwarn(context, data)

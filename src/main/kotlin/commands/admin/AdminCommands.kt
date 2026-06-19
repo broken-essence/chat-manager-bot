@@ -3,6 +3,7 @@ package com.ehedgehog.commands.admin
 import com.ehedgehog.data.CommandResult
 import com.ehedgehog.data.Reason
 import com.ehedgehog.data.ScreenContext
+import com.ehedgehog.screens.ScreenIds
 import com.ehedgehog.screens.ScreenRouter
 import com.ehedgehog.utils.loggedCommand
 import dev.inmo.tgbotapi.bot.TelegramBot
@@ -37,7 +38,7 @@ fun BehaviourContext.registerAdminCommands(manager: AdminManager) {
             command.from?.let {
                 if (manager.isAdmin(it.id.chatId.toString())) {
                     ScreenRouter.openScreen(
-                        bot, ScreenContext(command.chat.id, it), "help", "admin"
+                        bot, ScreenContext(command.chat.id, it), ScreenIds.HELP, "admin"
                     )
                     return@loggedCommand CommandResult.Success()
                 }

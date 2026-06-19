@@ -4,13 +4,14 @@ import com.ehedgehog.base.BaseAction
 import com.ehedgehog.data.ActionResult
 import com.ehedgehog.data.Reason
 import com.ehedgehog.data.ScreenContext
+import com.ehedgehog.screens.ActionIds
 import com.ehedgehog.screens.ScreenRouter
 import com.ehedgehog.showPopup
 import dev.inmo.tgbotapi.bot.TelegramBot
 
 class BuyUnwarnAction(bot: TelegramBot, private val manager: ShopManager): ShopAction(bot) {
 
-    override val id: String = "action:shop/buy_unwarn"
+    override val id: String = ActionIds.BUY_UNWARN
 
     override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
         val result = manager.buyUnwarn(context)
@@ -22,7 +23,7 @@ class BuyUnwarnAction(bot: TelegramBot, private val manager: ShopManager): ShopA
 
 class BuyImmunityAction(bot: TelegramBot, private val manager: ShopManager): ShopAction(bot) {
 
-    override val id: String = "action:shop/buy_immunity"
+    override val id: String = ActionIds.BUY_IMMUNITY
 
     override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
         val result = manager.buyImmunity(context)
