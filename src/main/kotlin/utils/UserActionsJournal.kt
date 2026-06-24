@@ -1,5 +1,6 @@
 package com.ehedgehog.utils
 
+import com.ehedgehog.AppContext
 import com.ehedgehog.base.BaseManager
 import com.ehedgehog.base.getDescription
 import com.ehedgehog.data.JournalEvent
@@ -17,7 +18,7 @@ class UserActionsJournal private constructor(private val bot: TelegramBot) : Bas
 
     suspend fun write(event: JournalEvent) {
         val eventString = format(event)
-        val channelId = ChatId(RawChatId(System.getenv("JOURNAL_CHANNEL_ID").toLong()))
+        val channelId = ChatId(RawChatId(AppContext.config.journalChannelId.toLong()))
         bot.sendMessage(channelId, eventString, MarkdownV2)
     }
 

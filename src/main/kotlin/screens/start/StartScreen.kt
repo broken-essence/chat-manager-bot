@@ -1,5 +1,6 @@
 package com.ehedgehog.screens.start
 
+import com.ehedgehog.AppContext
 import com.ehedgehog.base.BaseScreen
 import com.ehedgehog.data.ScreenContent
 import com.ehedgehog.data.ScreenContext
@@ -19,11 +20,11 @@ class StartScreen(private val manager: StartManager) : BaseScreen {
                 dataButton("\uD83E\uDEBF Профиль", ScreenIds.PROFILE)
             }
             row {
-                urlButton("\uD83D\uDCD6 Полное руководство", System.getenv("GUIDE_URL"))
+                urlButton("\uD83D\uDCD6 Полное руководство", AppContext.config.guideUrl)
                 dataButton("\uD83E\uDDD1\u200D\uD83D\uDCBB Команды бота", ScreenIds.HELP)
             }
             row {
-                urlButton("\uD83D\uDCAC Поддержка", System.getenv("SUPPORT_URL"))
+                urlButton("\uD83D\uDCAC Поддержка", AppContext.config.supportUrl)
             }
         }
 

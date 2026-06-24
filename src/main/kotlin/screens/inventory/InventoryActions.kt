@@ -1,5 +1,6 @@
 package com.ehedgehog.screens.inventory
 
+import com.ehedgehog.AppContext
 import com.ehedgehog.base.BaseAction
 import com.ehedgehog.data.ActionResult
 import com.ehedgehog.data.Reason
@@ -22,7 +23,7 @@ class UseUnwarnAction(private val bot: TelegramBot, private val manager: Invento
 
         when (result) {
             is ActionResult.Success -> {
-                val chatId = ChatId(RawChatId(System.getenv("SYSTEM_CHAT_ID").toLong()))
+                val chatId = ChatId(RawChatId(AppContext.config.systemChatId.toLong()))
                 val unwarnContext = ScreenContext(chatId, context.user)
                 ScreenRouter.openScreen(bot, unwarnContext, ScreenIds.REQUEST_UNWARN, result.data)
                 bot.showPopup(context, "Запрос отправлен админам ✅")

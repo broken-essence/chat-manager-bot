@@ -26,10 +26,10 @@ class ImmunityQueueManager(bot: TelegramBot) : BaseUserManager() {
         val immunities = userRepository.getUsersWithActiveImmunity()
 
         if (user.immunities > 0 && !user.hasActiveImmunity() && !user.hasImmunityCooldown()) {
-            val startsAt = if (immunities.size >= IMMUNITIES_COUNT_LIMIT)
-                immunities[immunities.size - IMMUNITIES_COUNT_LIMIT].immunityExpiresAt
+            val startsAt = if (immunities.size >= AppContext.config.immunitiesCountLimit)
+                immunities[immunities.size - AppContext.config.immunitiesCountLimit].immunityExpiresAt
             else System.currentTimeMillis()
-            val expiresAt = startsAt + IMMUNITY_DURATION
+            val expiresAt = startsAt + AppContext.config.immunityDuration
 
             updateUserEntry(
                 user.copy(

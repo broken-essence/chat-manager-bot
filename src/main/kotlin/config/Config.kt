@@ -1,10 +1,16 @@
 package com.ehedgehog.config
 
-import kotlinx.serialization.Serializable
+interface Config {
+    val token: String
+    val systemChatId: String
+    val journalChannelId: String
+    val botOwnerId: String
+    val supportUrl: String
+    val guideUrl: String
 
-@Serializable
-data class Config(
-    val token: String,
-    val testToken: String,
-    val client: HttpClientConfig? = null
-)
+    val immunityDuration: Long
+    val immunitiesCountLimit: Int
+    val immunityCooldown: Long
+
+    fun connectDatabase()
+}

@@ -60,11 +60,11 @@ class InventoryManager(bot: TelegramBot) : BaseUserManager() {
         val activeImmunities = userRepository.getUsersWithActiveImmunity()
 
         if (userEntry.immunities > 0 && !userEntry.hasActiveImmunity() && !userEntry.hasImmunityCooldown()) {
-            if (activeImmunities.size >= IMMUNITIES_COUNT_LIMIT) {
+            if (activeImmunities.size >= AppContext.config.immunitiesCountLimit) {
                 return ActionResult.Failure(Reason.LimitExceeded)
             }
 
-            val expiresAt = System.currentTimeMillis() + IMMUNITY_DURATION
+            val expiresAt = System.currentTimeMillis() + AppContext.config.immunityDuration
             updateUserEntry(
                 userEntry.copy(
                     name = context.user.firstName,

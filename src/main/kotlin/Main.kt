@@ -1,6 +1,7 @@
 package com.ehedgehog
 
-import com.ehedgehog.config.Config
+import com.ehedgehog.config.LocalConfig
+import com.ehedgehog.config.ProductionConfig
 import com.ehedgehog.data.ScreenContext
 import com.ehedgehog.database.DatabaseFactory
 import com.ehedgehog.database.repositories.UserRepository
@@ -35,14 +36,16 @@ suspend fun main(args: Array<String>) {
 
     println("=== BOT PROCESS STARTED ===")
 
-    /* for local running */
-    val json = Json { ignoreUnknownKeys = true }
-    val configFile = File(args.first())
-    val config: Config = json.decodeFromString(Config.serializer(), configFile.readText())
-    val bot = telegramBot(config.testToken)
+    val isProduction = System.getenv("APP_CONFIG") == "prod"
+    AppContext.config = if (isProduction) {
+        ProductionConfig()
+    } else {
+        val json = Json { ignoreUnknownKeys = true }
+        val configFile = File(args.first())
+        json.decodeFromString(LocalConfig.serializer(), configFile.readText())
+    }
 
-    /* running with railway */
-//    val bot = telegramBot(System.getenv("BOT_TOKEN"))
+    val bot = telegramBot(AppContext.config.token)
 
     val scope = CoroutineScope(Dispatchers.Default)
     val userRepository = UserRepository()
@@ -66,8 +69,10 @@ suspend fun main(args: Array<String>) {
         println(">>> LONG POLLING BEHAVIOUR STARTED")
         val me = getMe()
 
-        onText { message ->
-            println("TEXT RECEIVED: ${message.content.text}")
+        if (!isProduction) {
+            onText { message ->
+                println("TEXT RECEIVED: ${message.content.text}")
+            }
         }
 
         registerCommands(bot, this)

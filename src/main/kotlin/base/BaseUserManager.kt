@@ -1,16 +1,10 @@
 package com.ehedgehog.base
 
+import com.ehedgehog.AppContext
 import com.ehedgehog.database.ChatUser
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus
 import com.ehedgehog.database.repositories.UserRepository
-
-private const val TEST_IMMUNITY_DURATION = 60 * 1000
-const val IMMUNITY_DURATION = /*24 * 60 * 60 * 1000*/ TEST_IMMUNITY_DURATION
-private const val TEST_IMMUNITIES_COUNT_LIMIT = 1
-const val IMMUNITIES_COUNT_LIMIT = /*5*/ TEST_IMMUNITIES_COUNT_LIMIT
-private const val TEST_IMMUNITY_COOLDOWN = 2 * 60 * 1000
-const val IMMUNITY_COOLDOWN = /*24 * 60 * 60 * 1000*/ TEST_IMMUNITY_COOLDOWN
 
 abstract class BaseUserManager : BaseManager() {
 
@@ -18,12 +12,12 @@ abstract class BaseUserManager : BaseManager() {
 
     fun isAdmin(userId: String): Boolean {
         val status = repository.getUserStatusById(userId)
-        return status >= UserStatus.ADMIN || userId == System.getenv("BOT_OWNER_ID")
+        return status >= UserStatus.ADMIN || userId == AppContext.config.botOwnerId
     }
 
     fun isSeniorAdmin(userId: String): Boolean {
         val status = repository.getUserStatusById(userId)
-        return status == UserStatus.SENIOR_ADMIN || userId == System.getenv("BOT_OWNER_ID")
+        return status == UserStatus.SENIOR_ADMIN || userId == AppContext.config.botOwnerId
     }
 
     fun getImmunityStatus(user: UserEntity?): String = when {
@@ -85,13 +79,13 @@ abstract class BaseUserManager : BaseManager() {
 }
 
 val UserEntity.immunityStartsAt
-    get() = immunityExpiresAt - IMMUNITY_DURATION
+    get() = immunityExpiresAt - AppContext.config.immunityDuration
 
 fun UserEntity.hasActiveImmunity(): Boolean = immunityExpiresAt > System.currentTimeMillis()
 
 fun UserEntity.isInImmunityQueue(): Boolean = immunityStartsAt > System.currentTimeMillis()
 
-fun UserEntity.hasImmunityCooldown(): Boolean = System.currentTimeMillis() - immunityExpiresAt < IMMUNITY_COOLDOWN
+fun UserEntity.hasImmunityCooldown(): Boolean = System.currentTimeMillis() - immunityExpiresAt < AppContext.config.immunityCooldown
 
 fun UserStatus.getDescription(): String = when (this) {
     UserStatus.PLAYER -> "Игрок"

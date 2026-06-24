@@ -1,5 +1,6 @@
 package com.ehedgehog.screens.help
 
+import com.ehedgehog.AppContext
 import com.ehedgehog.base.BaseScreen
 import com.ehedgehog.data.ScreenContent
 import com.ehedgehog.data.ScreenContext
@@ -16,7 +17,7 @@ class HelpScreen(private val manager: HelpManager): BaseScreen {
     override suspend fun render(context: ScreenContext, data: String?): ScreenContent {
         val keyboard = inlineKeyboard {
             row {
-                urlButton("\uD83D\uDCD6 Полное руководство", System.getenv("GUIDE_URL"))
+                urlButton("\uD83D\uDCD6 Полное руководство", AppContext.config.guideUrl)
             }
             if (context.currentScreenId != null) {
                 row {
