@@ -33,16 +33,13 @@ fun BehaviourContext.registerGeneralCommands(manager: GeneralManager) {
 
     onCommand(COMMAND_START) { command ->
         loggedCommand(COMMAND_START, command.from?.id?.chatId.toString()) {
-            command.from?.let {
-                if (command.chat.id.chatId.toString() == it.id.chatId.toString()) {
+            val result = manager.showStartScreen(command)
+            if (result is CommandResult.Success) {
+                command.from?.let {
                     ScreenRouter.openScreen(bot, ScreenContext(it.id, it), ScreenIds.START)
-                    return@loggedCommand CommandResult.Success()
                 }
-
-                return@loggedCommand CommandResult.Failure(Reason.AccessDenied)
             }
-
-            CommandResult.Failure(Reason.UnexpectedError)
+            result
         }
     }
 

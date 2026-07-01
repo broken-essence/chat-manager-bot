@@ -31,6 +31,7 @@ class UserRepository {
                 it[balance] = user.balance
                 it[immunityExpiresAt] = user.immunityExpiresAt
                 it[isBlocked] = user.isBlocked
+                it[isActive] = user.isActive
             }
         }
     }
@@ -70,6 +71,23 @@ class UserRepository {
                 .where { Users.immunityExpiresAt greaterEq System.currentTimeMillis() }
                 .orderBy(Users.immunityExpiresAt)
                 .map { it.toUserEntity() }
+        }
+    }
+
+    fun hasActivatedBot(id: String): Boolean {
+        return transaction {
+            Users.select(Users.isActive)
+                .where(Users.userId eq id)
+                .map { it.getOrNull(Users.isActive) }
+                .singleOrNull() ?: false
+        }
+    }
+
+    fun setActivated(id: String, isActivated: Boolean) {
+        transaction {
+            Users.update({ Users.userId eq id }) {
+                it[Users.isActive] = isActivated
+            }
         }
     }
 
@@ -129,5 +147,6 @@ fun ResultRow.toUserEntity(): UserEntity = UserEntity(
     unwarns = this[Users.unwarns],
     balance = this[Users.balance],
     immunityExpiresAt = this[Users.immunityExpiresAt],
-    isBlocked = this[Users.isBlocked]
+    isBlocked = this[Users.isBlocked],
+    isActive = this[Users.isActive]
 )

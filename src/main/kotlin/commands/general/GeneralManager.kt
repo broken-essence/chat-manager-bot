@@ -1,7 +1,9 @@
 package com.ehedgehog.commands.general
 
+import com.ehedgehog.AppContext
 import com.ehedgehog.base.BaseUserManager
 import com.ehedgehog.data.CommandResult
+import com.ehedgehog.data.JournalEvent
 import com.ehedgehog.data.Reason
 import com.ehedgehog.database.ChatUser
 import com.ehedgehog.database.UserEntity
@@ -19,6 +21,30 @@ class GeneralManager : BaseUserManager() {
     }
 
     val repository = UserRepository()
+
+    @OptIn(RiskFeature::class)
+    suspend fun showStartScreen(command: TextMessage): CommandResult {
+        val from = command.from ?: return CommandResult.Failure(Reason.UnexpectedError)
+
+        if (command.chat.id.chatId.toString() == from.id.chatId.toString()) {
+            if (!repository.hasActivatedBot(from.id.chatId.toString())) {
+                val user = repository.getUserById(from.id.chatId.toString()) ?: UserEntity(
+                    from.id.chatId.toString(), from.firstName, from.username?.username ?: ""
+                )
+                updateUserEntry(user.copy(
+                    name = from.firstName,
+                    username = from.username?.username ?: "",
+                    isActive = true
+                ))
+                AppContext.journal.write(
+                    JournalEvent.NewUser(from.id.chatId.toString(), from.firstName)
+                )
+            }
+            return CommandResult.Success()
+        }
+
+        return CommandResult.Failure(Reason.AccessDenied)
+    }
 
     fun showImmunitiesList(): CommandResult {
         val immunities = repository.getUsersWithActiveImmunity()
