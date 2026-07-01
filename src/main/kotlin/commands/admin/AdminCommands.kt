@@ -29,6 +29,7 @@ private const val COMMAND_GIVE_BALANCE = "give_balance"
 private const val COMMAND_BAN = "ban"
 private const val COMMAND_UNBAN = "unban"
 private const val COMMAND_INFO = "gminfo"
+private const val COMMAND_BOT_STATS = "bot_stats"
 
 @OptIn(RiskFeature::class)
 fun BehaviourContext.registerAdminCommands(manager: AdminManager) {
@@ -114,6 +115,16 @@ fun BehaviourContext.registerAdminCommands(manager: AdminManager) {
         }
         executeAdminCommand(COMMAND_INFO, bot, it, args, failureHandler) {
             manager.getUserInfo(it, args.getOrNull(0))
+        }
+    }
+
+    onCommand(COMMAND_BOT_STATS) { command ->
+        loggedCommand(COMMAND_BOT_STATS, command.from?.id?.chatId.toString()) {
+            val result = manager.getBotUsersStats(command)
+            if (result is CommandResult.Success) {
+                result.message?.let { bot.sendMessage(command.chat.id, it, MarkdownV2) }
+            }
+            result
         }
     }
 

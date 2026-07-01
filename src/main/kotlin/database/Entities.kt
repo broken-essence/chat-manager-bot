@@ -34,6 +34,11 @@ data class ChatUser(
     val chatMember: User
 )
 
+data class BotUsersStats(
+    val totalUsers: Long,
+    val activeUsers: Long
+)
+
 data class UnwarnRequest(
     val id: Int,
     val userId: String,

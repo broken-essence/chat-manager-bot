@@ -132,6 +132,16 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager() {
         return CommandResult.Failure(Reason.AccessDenied)
     }
 
+    fun getBotUsersStats(command: TextMessage): CommandResult {
+        if (isSeniorAdmin(command.from?.id?.chatId.toString())) {
+            val stats = repository.getBotUsersStats()
+            val message = "*Active users:* ${stats.activeUsers}\n*Total:* ${stats.totalUsers}"
+            return CommandResult.Success(message)
+        }
+
+        return CommandResult.Failure(Reason.AccessDenied)
+    }
+
     private suspend fun onGiveCommand(
         command: TextMessage,
         content: String,

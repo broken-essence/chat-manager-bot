@@ -1,5 +1,6 @@
 package com.ehedgehog.database.repositories
 
+import com.ehedgehog.database.BotUsersStats
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus
 import com.ehedgehog.database.Users
@@ -125,6 +126,15 @@ class UserRepository {
         Users.selectAll()
             .where { Users.isBlocked eq true }
             .map { it[Users.userId] }
+    }
+    
+    fun getBotUsersStats(): BotUsersStats = transaction {
+        BotUsersStats(
+            totalUsers = Users.selectAll().count(),
+            activeUsers = Users.selectAll()
+                .where { Users.isActive eq true }
+                .count(),
+        )
     }
 
     private fun getUserWhere(predicate: Op<Boolean>): UserEntity? {
