@@ -25,6 +25,7 @@ class UnwarnRequestManager : BaseUserManager() {
             val adminMarkdownLink = createMarkdownLink(context.user.firstName, context.user.id.chatId.toString())
             val newMessage = getUnwarnRequestMessage(user.id, user.name)
                 .plus("\n\n✅ *Снятие подтверждено*\n — \uD83D\uDC6E\uD83C\uDFFC $adminMarkdownLink \\[`${context.user.id.chatId}`\\]")
+            data?.let { unwarnRequestRepository.deleteRequest(it.toInt()) }
             return ActionResult.Success(newMessage)
         }
 
@@ -40,6 +41,7 @@ class UnwarnRequestManager : BaseUserManager() {
                 .plus("\n\n❌ *Снятие отклонено*\n — \uD83D\uDC6E\uD83C\uDFFC $adminMarkdownLink \\[`${context.user.id.chatId}`\\]")
 
             userRepository.updateUnwarnCount(user.id, user.unwarns + 1)
+            data?.let { unwarnRequestRepository.deleteRequest(it.toInt()) }
             return ActionResult.Success(newMessage)
         }
 
