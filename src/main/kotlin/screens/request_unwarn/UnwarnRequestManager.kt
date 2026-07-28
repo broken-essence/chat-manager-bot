@@ -19,7 +19,7 @@ class UnwarnRequestManager : BaseUserManager() {
     }
 
     fun confirmUnwarn(context: ScreenContext, data: String?): ActionResult {
-        if (isSeniorAdmin(context.user.id.chatId.toString())) {
+        if (isAdmin(context.user.id.chatId.toString())) {
             val user = getUserFromRequest(data) ?: return ActionResult.Failure(Reason.UserNotFound)
 
             val adminMarkdownLink = createMarkdownLink(context.user.firstName, context.user.id.chatId.toString())
@@ -33,7 +33,7 @@ class UnwarnRequestManager : BaseUserManager() {
     }
 
     fun declineUnwarn(context: ScreenContext, data: String?): ActionResult {
-        if (isSeniorAdmin(context.user.id.chatId.toString())) {
+        if (isAdmin(context.user.id.chatId.toString())) {
             val user = getUserFromRequest(data) ?: return ActionResult.Failure(Reason.UserNotFound)
 
             val adminMarkdownLink = createMarkdownLink(context.user.firstName, context.user.id.chatId.toString())
