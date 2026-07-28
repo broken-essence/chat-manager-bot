@@ -308,7 +308,8 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager() {
                     reason
                 )
             )
-            return CommandResult.Success(targetUserId = user.storedUser.id)
+            val userMarkdownLink = createMarkdownLink(user.storedUser.name, user.storedUser.id)
+            return CommandResult.Success("Пользователь $userMarkdownLink заблокирован\\.", user.storedUser.id)
         }
 
         return CommandResult.Failure(Reason.WrongData)
@@ -326,7 +327,8 @@ class AdminManager(private val bot: TelegramBot): BaseUserManager() {
                     from.firstName
                 )
             )
-            return CommandResult.Success(targetUserId = user.storedUser.id)
+            val userMarkdownLink = createMarkdownLink(user.storedUser.name, user.storedUser.id)
+            return CommandResult.Success("Пользователь $userMarkdownLink разблокирован\\.", user.storedUser.id)
         }
 
         return CommandResult.Failure(Reason.WrongData)
