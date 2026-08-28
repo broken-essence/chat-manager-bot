@@ -10,7 +10,7 @@ object DatabaseFactory {
         AppContext.config.connectDatabase()
 
         transaction {
-            SchemaUtils.create(Users, UnwarnRequests, Settings)
+            SchemaUtils.create(Users, UnwarnRequests, Settings, Marriages)
         }
     }
 

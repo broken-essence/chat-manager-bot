@@ -23,6 +23,14 @@ object UnwarnRequests : IntIdTable("unwarn_requests") {
     val createdAt = long("created_at").default(0)
 }
 
+object Marriages : Table("marriages") {
+    val firstPartnerId = varchar("first_partner_id", 50)
+    val secondPartnerId = varchar("second_partner_id", 50)
+    val marriedAt = long("married_at").default(0)
+
+    override val primaryKey = PrimaryKey(firstPartnerId, secondPartnerId)
+}
+
 object Settings : Table("settings") {
     val key = varchar("key", 50).uniqueIndex()
     val value = varchar("value", 255)
