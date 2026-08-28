@@ -50,3 +50,9 @@ data class EventConfig(
     val emoji: String,
     val noun: String
 )
+
+data class Marriage(
+    val firstPartnerId: String,
+    val secondPartnerId: String,
+    val marriedAt: Long
+)
