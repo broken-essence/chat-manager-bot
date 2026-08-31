@@ -2,6 +2,7 @@ package com.ehedgehog.screens.profile
 
 import com.ehedgehog.base.BaseUserManager
 import com.ehedgehog.base.getDescription
+import com.ehedgehog.base.getRingStatus
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus
 import com.ehedgehog.database.repositories.UserRepository
@@ -22,6 +23,8 @@ class ProfileManager : BaseUserManager() {
                 |🧻 Снятие варна: ${userEntry.unwarns}
                 |💊 Активация иммунитета: ${userEntry.immunities}
                 |Иммунитет: ${getImmunityStatus(userEntry)}
+                |
+                |💍 Кольцо: ${userEntry.getRingStatus()}
                 |
                 |${if (warnsVisible) "⚠️ Предупреждения: ${userEntry.adminWarns}\\/6" else ""}
                 """.trimMargin()
