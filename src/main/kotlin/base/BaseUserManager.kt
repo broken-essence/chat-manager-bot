@@ -87,6 +87,8 @@ fun UserEntity.isInImmunityQueue(): Boolean = immunityStartsAt > System.currentT
 
 fun UserEntity.hasImmunityCooldown(): Boolean = System.currentTimeMillis() - immunityExpiresAt < AppContext.config.immunityCooldown
 
+fun UserEntity.getRingStatus(): String = if (hasRing) "приобретено" else "отсутствует"
+
 fun UserStatus.getDescription(): String = when (this) {
     UserStatus.PLAYER -> "Игрок"
     UserStatus.ADMIN -> "Администратор"

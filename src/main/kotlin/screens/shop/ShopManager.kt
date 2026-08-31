@@ -10,6 +10,7 @@ import com.ehedgehog.database.repositories.UserRepository
 
 internal const val PRICE_UNWARN = 3
 internal const val PRICE_IMMUNITY = 8
+internal const val PRICE_RING = 5
 
 class ShopManager : BaseUserManager() {
 
@@ -25,6 +26,9 @@ class ShopManager : BaseUserManager() {
             
             *💊 Иммунитет*
             Позволяет на 24 часа получить иммунитет от убийства и посещения активными ролями в *первые 2 игровые ночи*\.
+            
+            *💍 Кольцо*
+            Позволяет сделать предложение о вступлении в брак выбранному пользователю с помощью команды `/propose`\.
             
             _📌 Приобретенные товары можно активировать в инвентаре в любое время\._
             
@@ -68,6 +72,26 @@ class ShopManager : BaseUserManager() {
 
             return ActionResult.Success()
         }
+
+        return ActionResult.Failure(Reason.NotEnoughBalance)
+    }
+
+    suspend fun buyRing(context: ScreenContext): ActionResult {
+        val userEntry = repository.getUserById(context.user.id.chatId.toString()) ?: return ActionResult.Failure(Reason.UserNotFound)
+
+        if (userEntry.balance >= PRICE_RING) {
+            if (userEntry.hasRing) ActionResult.Failure(Reason.LimitExceeded)
+
+            updateUserEntry(
+                userEntry.copy(
+                    name = context.user.firstName,
+                    username = context.user.username?.username ?: "",
+                    balance = userEntry.balance - PRICE_RING,
+                    hasRing = true
+                )
+            )
+        }
+        AppContext.journal.write(JournalEvent.Purchase(userEntry.id, userEntry.name, "кольцо"))
 
         return ActionResult.Failure(Reason.NotEnoughBalance)
     }

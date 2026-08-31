@@ -25,7 +25,8 @@ data class UserEntity(
     val immunities: Int = 0,
     val immunityExpiresAt: Long = 0,
     val isBlocked: Boolean = false,
-    val isActive: Boolean = false
+    val isActive: Boolean = false,
+    val hasRing: Boolean = false
 )
 
 data class ChatUser(

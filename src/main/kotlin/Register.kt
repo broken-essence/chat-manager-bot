@@ -25,6 +25,7 @@ import com.ehedgehog.screens.request_unwarn.DeclineUnwarnAction
 import com.ehedgehog.screens.request_unwarn.UnwarnRequestManager
 import com.ehedgehog.screens.request_unwarn.UnwarnRequestScreen
 import com.ehedgehog.screens.shop.BuyImmunityAction
+import com.ehedgehog.screens.shop.BuyRingAction
 import com.ehedgehog.screens.shop.BuyUnwarnAction
 import com.ehedgehog.screens.shop.ShopManager
 import com.ehedgehog.screens.shop.ShopScreen
@@ -54,6 +55,7 @@ fun registerActions(bot: TelegramBot) {
     ActionRouter.registerAction(UseImmunityAction(bot,InventoryManager(bot)))
     ActionRouter.registerAction(BuyUnwarnAction(bot, ShopManager()))
     ActionRouter.registerAction(BuyImmunityAction(bot, ShopManager()))
+    ActionRouter.registerAction(BuyRingAction(bot, ShopManager()))
     ActionRouter.registerAction(ConfirmUnwarnAction(bot, UnwarnRequestManager()))
     ActionRouter.registerAction(DeclineUnwarnAction(bot, UnwarnRequestManager()))
     ActionRouter.registerAction(ImmunityQueueConfirmAction(bot, ImmunityQueueManager(bot)))

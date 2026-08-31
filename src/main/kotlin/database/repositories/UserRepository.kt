@@ -33,6 +33,7 @@ class UserRepository {
                 it[immunityExpiresAt] = user.immunityExpiresAt
                 it[isBlocked] = user.isBlocked
                 it[isActive] = user.isActive
+                it[hasRing] = user.hasRing
             }
         }
     }
@@ -158,5 +159,6 @@ fun ResultRow.toUserEntity(): UserEntity = UserEntity(
     balance = this[Users.balance],
     immunityExpiresAt = this[Users.immunityExpiresAt],
     isBlocked = this[Users.isBlocked],
-    isActive = this[Users.isActive]
+    isActive = this[Users.isActive],
+    hasRing = this[Users.hasRing]
 )
