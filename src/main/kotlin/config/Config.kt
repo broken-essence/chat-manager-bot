@@ -12,5 +12,9 @@ interface Config {
     val immunitiesCountLimit: Int
     val immunityCooldown: Long
 
+    val databaseUrl: String
+    val user: String
+    val password: String
+
     fun connectDatabase()
 }
