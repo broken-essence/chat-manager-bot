@@ -27,6 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
+import org.flywaydb.core.Flyway
 import org.slf4j.bridge.SLF4JBridgeHandler
 import java.io.File
 import java.util.logging.LogManager
@@ -55,6 +56,13 @@ suspend fun main(args: Array<String>) {
 
     LogManager.getLogManager().reset()
     SLF4JBridgeHandler.install()
+
+    Flyway.configure()
+        .dataSource(
+            AppContext.config.databaseUrl,
+            AppContext.config.user,
+            AppContext.config.password
+        ).load().migrate()
 
     DatabaseFactory.init()
     immunityScheduler.restoreNotifications()
