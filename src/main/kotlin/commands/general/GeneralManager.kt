@@ -20,7 +20,7 @@ class GeneralManager : BaseUserManager() {
         data class Balance(val amount: Int): Gift()
     }
 
-    val repository = UserRepository()
+    private val repository = UserRepository()
 
     @OptIn(RiskFeature::class)
     suspend fun showStartScreen(command: TextMessage): CommandResult {

@@ -8,6 +8,8 @@ object ScreenIds {
     const val IMMUNITY_QUEUE = "immunity_queue"
     const val REQUEST_UNWARN = "request_unwarn"
     const val HELP = "help"
+    const val PROPOSAL = "propose"
+    const val DIVORCE = "divorce"
 }
 
 object ActionIds {
@@ -20,4 +22,8 @@ object ActionIds {
     const val IMMUNITY_QUEUE_DECLINE = "action:${ScreenIds.IMMUNITY_QUEUE}/decline"
     const val UNWARN_CONFIRM = "action:${ScreenIds.REQUEST_UNWARN}/confirm_unwarn"
     const val UNWARN_DECLINE = "action:${ScreenIds.REQUEST_UNWARN}/decline_unwarn"
+    const val PROPOSAL_ACCEPT = "action:${ScreenIds.PROPOSAL}/accept_proposal"
+    const val PROPOSAL_REJECT = "action:${ScreenIds.PROPOSAL}/reject_proposal"
+    const val DIVORCE_CONFIRM = "action:${ScreenIds.DIVORCE}/confirm_divorce"
+    const val DIVORCE_DECLINE = "action:${ScreenIds.DIVORCE}/decline_divorce"
 }
