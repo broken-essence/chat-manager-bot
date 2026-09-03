@@ -58,11 +58,11 @@ suspend fun main(args: Array<String>) {
     SLF4JBridgeHandler.install()
 
     Flyway.configure()
-        .dataSource(
-            AppContext.config.databaseUrl,
-            AppContext.config.user,
-            AppContext.config.password
-        ).load().migrate()
+        .dataSource(AppContext.config.databaseUrl, AppContext.config.user, AppContext.config.password)
+        .baselineOnMigrate(true)
+        .baselineVersion("0")
+        .load()
+        .migrate()
 
     DatabaseFactory.init()
     immunityScheduler.restoreNotifications()
