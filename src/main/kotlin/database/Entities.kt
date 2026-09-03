@@ -57,3 +57,8 @@ data class Marriage(
     val secondPartnerId: String,
     val marriedAt: Long
 )
+
+data class UsersPair(
+    val firstUser: UserEntity?,
+    val secondUser: UserEntity?
+)

@@ -4,12 +4,14 @@ import com.ehedgehog.database.BotUsersStats
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus
 import com.ehedgehog.database.Users
+import com.ehedgehog.database.UsersPair
 import org.jetbrains.exposed.v1.core.Op
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.greater
 import org.jetbrains.exposed.v1.core.greaterEq
+import org.jetbrains.exposed.v1.core.inList
 import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -73,6 +75,19 @@ class UserRepository {
                 .where { Users.immunityExpiresAt greaterEq System.currentTimeMillis() }
                 .orderBy(Users.immunityExpiresAt)
                 .map { it.toUserEntity() }
+        }
+    }
+
+    fun getUsersPair(firstId: String, secondId: String): UsersPair {
+        return transaction {
+            val userList = Users.selectAll()
+                .where { Users.userId inList listOf(firstId, secondId) }
+                .map { it.toUserEntity() }
+
+            UsersPair(
+                userList.firstOrNull { it.id == firstId },
+                userList.firstOrNull {  it.id == secondId }
+            )
         }
     }
 
