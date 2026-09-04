@@ -80,7 +80,7 @@ class ShopManager : BaseUserManager() {
         val userEntry = repository.getUserById(context.user.id.chatId.toString()) ?: return ActionResult.Failure(Reason.UserNotFound)
 
         if (userEntry.balance >= PRICE_RING) {
-            if (userEntry.hasRing) ActionResult.Failure(Reason.LimitExceeded)
+            if (userEntry.hasRing) return ActionResult.Failure(Reason.LimitExceeded)
 
             updateUserEntry(
                 userEntry.copy(
@@ -90,8 +90,10 @@ class ShopManager : BaseUserManager() {
                     hasRing = true
                 )
             )
+            AppContext.journal.write(JournalEvent.Purchase(userEntry.id, userEntry.name, "кольцо"))
+
+            return ActionResult.Success()
         }
-        AppContext.journal.write(JournalEvent.Purchase(userEntry.id, userEntry.name, "кольцо"))
 
         return ActionResult.Failure(Reason.NotEnoughBalance)
     }
