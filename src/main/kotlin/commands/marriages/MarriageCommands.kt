@@ -26,7 +26,7 @@ fun BehaviourContext.registerMarriageCommands(manager: MarriageManager) {
                         bot,
                         ScreenContext(command.chat.id, it),
                         ScreenIds.PROPOSAL,
-                        result.targetUserId
+                        "${it.id.chatId}&${result.targetUserId}"
                     )
                 }
             }
@@ -36,7 +36,10 @@ fun BehaviourContext.registerMarriageCommands(manager: MarriageManager) {
 
     onCommand(COMMAND_DIVORCE) { command ->
         loggedCommand(COMMAND_DIVORCE, command.from?.id?.chatId.toString()) {
-            CommandResult.Success()
+            val result = manager.divorce(command)
+
+
+            result
         }
     }
 
