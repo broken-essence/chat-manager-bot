@@ -20,8 +20,10 @@ import com.ehedgehog.screens.inventory.InventoryManager
 import com.ehedgehog.screens.inventory.InventoryScreen
 import com.ehedgehog.screens.inventory.UseImmunityAction
 import com.ehedgehog.screens.inventory.UseUnwarnAction
+import com.ehedgehog.screens.marriage.AcceptProposalAction
 import com.ehedgehog.screens.marriage.MarriageScreensManager
 import com.ehedgehog.screens.marriage.ProposalScreen
+import com.ehedgehog.screens.marriage.RejectProposalAction
 import com.ehedgehog.screens.profile.ProfileManager
 import com.ehedgehog.screens.profile.ProfileScreen
 import com.ehedgehog.screens.request_unwarn.ConfirmUnwarnAction
@@ -66,4 +68,6 @@ fun registerActions(bot: TelegramBot) {
     ActionRouter.registerAction(DeclineUnwarnAction(bot, UnwarnRequestManager()))
     ActionRouter.registerAction(ImmunityQueueConfirmAction(bot, ImmunityQueueManager(bot)))
     ActionRouter.registerAction(ImmunityQueueDeclineAction(bot))
+    ActionRouter.registerAction(AcceptProposalAction(bot, MarriageScreensManager(bot)))
+    ActionRouter.registerAction(RejectProposalAction(bot, MarriageScreensManager(bot)))
 }

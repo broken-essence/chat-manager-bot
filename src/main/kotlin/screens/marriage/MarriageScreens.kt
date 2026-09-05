@@ -16,12 +16,13 @@ class ProposalScreen(private val manager: MarriageScreensManager) : BaseScreen {
     override suspend fun render(context: ScreenContext, data: String?): ScreenContent {
         val keyboard = inlineKeyboard {
             row {
-                dataButton("\uD83D\uDC9E Да", ActionIds.PROPOSAL_ACCEPT)
-                dataButton("\uD83D\uDC94 Нет", ActionIds.PROPOSAL_REJECT)
+                dataButton("\uD83D\uDC9E Да", "${ActionIds.PROPOSAL_ACCEPT}?$data")
+                dataButton("\uD83D\uDC94 Нет", "${ActionIds.PROPOSAL_REJECT}?$data")
             }
         }
 
-        val text = manager.getProposalMessage(context.chatId, context.user.id.chatId.toString(), data ?: "")
+        val secondId = data?.substringAfter("&") ?: ""
+        val text = manager.getProposalMessage(context.chatId, context.user.id.chatId.toString(), secondId)
         return ScreenContent(text, keyboard)
     }
 }
