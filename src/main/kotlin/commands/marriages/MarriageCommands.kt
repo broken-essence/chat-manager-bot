@@ -1,10 +1,12 @@
 package com.ehedgehog.commands.marriages
 
 import com.ehedgehog.data.CommandResult
+import com.ehedgehog.data.Reason
 import com.ehedgehog.data.ScreenContext
 import com.ehedgehog.screens.ScreenIds
 import com.ehedgehog.screens.ScreenRouter
 import com.ehedgehog.utils.loggedCommand
+import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
@@ -20,14 +22,25 @@ fun BehaviourContext.registerMarriageCommands(manager: MarriageManager) {
     onCommand(COMMAND_PROPOSE) { command ->
         loggedCommand(COMMAND_PROPOSE, command.from?.id?.chatId.toString()) {
             val result = manager.propose(command)
-            if (result is CommandResult.Success) {
-                command.from?.let {
-                    ScreenRouter.openScreen(
-                        bot,
-                        ScreenContext(command.chat.id, it),
-                        ScreenIds.PROPOSAL,
-                        "${it.id.chatId}&${result.targetUserId}"
-                    )
+            when (result) {
+                is CommandResult.Success -> {
+                    command.from?.let {
+                        ScreenRouter.openScreen(
+                            bot,
+                            ScreenContext(command.chat.id, it),
+                            ScreenIds.PROPOSAL,
+                            "${it.id.chatId}&${result.targetUserId}"
+                        )
+                    }
+                }
+                is CommandResult.Failure -> when (result.reason) {
+                    is Reason.NotEnoughItems -> {
+                        bot.reply(command, "Для предложения необходимо приобрести кольцо \uD83D\uDC8D")
+                    }
+                    is Reason.NotAvailable -> {
+                        bot.reply(command, "\uD83D\uDEAB Невозможно сделать предложение, когда один из участников уже состоит в браке.")
+                    }
+                    else -> {}
                 }
             }
             result
