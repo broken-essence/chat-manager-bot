@@ -34,6 +34,30 @@ class RejectProposalAction(bot: TelegramBot, private val manager: MarriageScreen
 
 }
 
+class ConfirmDivorceAction(bot: TelegramBot, private val manager: MarriageScreensManager) : MarriageAction(bot) {
+
+    override val id: String = ActionIds.DIVORCE_CONFIRM
+
+    override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
+        val result = manager.confirmDivorce(context, data)
+        handleActionResult(result, context)
+        return result
+    }
+
+}
+
+class DeclineDivorceAction(bot: TelegramBot, private val manager: MarriageScreensManager) : MarriageAction(bot) {
+
+    override val id: String = ActionIds.DIVORCE_DECLINE
+
+    override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
+        val result = manager.declineDivorce(context, data)
+        handleActionResult(result, context)
+        return result
+    }
+
+}
+
 abstract class MarriageAction(private val bot: TelegramBot): BaseAction {
 
     protected suspend fun handleActionResult(result: ActionResult, context: ScreenContext) {

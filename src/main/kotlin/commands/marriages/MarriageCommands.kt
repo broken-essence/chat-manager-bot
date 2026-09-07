@@ -51,6 +51,19 @@ fun BehaviourContext.registerMarriageCommands(manager: MarriageManager) {
         loggedCommand(COMMAND_DIVORCE, command.from?.id?.chatId.toString()) {
             val result = manager.divorce(command)
 
+            when (result) {
+                is CommandResult.Success -> command.from?.let {
+                    ScreenRouter.openScreen(
+                        bot,
+                        ScreenContext(command.chat.id, it),
+                        ScreenIds.DIVORCE,
+                        it.id.chatId.toString()
+                    )
+                }
+                is CommandResult.Failure -> if (result.reason is Reason.WrongData) {
+                    bot.reply(command, "Вы не состоите в браке!")
+                }
+            }
 
             result
         }
