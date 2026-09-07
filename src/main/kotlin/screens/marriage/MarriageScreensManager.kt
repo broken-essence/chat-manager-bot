@@ -63,7 +63,7 @@ class MarriageScreensManager(private val bot: TelegramBot) : BaseUserManager() {
 
                         val firstUserMarkdownLink = createMarkdownLink(usersPair.firstUser.name, usersPair.firstUser.id)
                         val secondUserMarkdownLink = createMarkdownLink(secondUser.name, secondUser.id)
-                        val message = "Пользователь $secondUserMarkdownLink сказал «Да»\\!\n" +
+                        val message = "\uD83D\uDC8D Пользователь $secondUserMarkdownLink сказал «Да»\\!\n\n" +
                                 "Поздравляем $firstUserMarkdownLink и $secondUserMarkdownLink со свадьбой \uD83D\uDC9E"
                         return ActionResult.Success(message)
                     }
