@@ -29,6 +29,16 @@ class MarriageScreensManager(private val bot: TelegramBot) : BaseUserManager() {
                 "Согласны ли вы вступить с ним в брак?"
     }
 
+    fun getDivorceMessage(userId: String): String {
+        val marriage = marriageRepository.getMarriage(userId) ?: return ""
+        val partnerMarkdownLink = if (marriage.firstUserId == userId)
+            createMarkdownLink(marriage.secondUserName, marriage.secondUserId)
+        else
+            createMarkdownLink(marriage.firstUserName, marriage.firstUserId)
+
+        return "\uD83D\uDC94 Вы действительно хотите развестись с $partnerMarkdownLink?"
+    }
+
     fun acceptProposal(context: ScreenContext, data: String?): ActionResult {
         data?.let {
             val ids = data.split("&")
@@ -78,6 +88,53 @@ class MarriageScreensManager(private val bot: TelegramBot) : BaseUserManager() {
             if (context.user.id.chatId.toString() == ids[1]) {
                 val secondUserMarkdownLink = createMarkdownLink(context.user.firstName, context.user.id.chatId.toString())
                 val message = "Пользователь $secondUserMarkdownLink отказался вступать в брак \uD83D\uDC94"
+                return ActionResult.Success(message)
+            }
+
+            return ActionResult.Failure(Reason.AccessDenied)
+        }
+
+        return ActionResult.Failure(Reason.UnexpectedError)
+    }
+
+    fun confirmDivorce(context: ScreenContext, data: String?): ActionResult {
+        data?.let {
+            if (context.user.id.chatId.toString() == it) {
+                val marriage = marriageRepository.getMarriage(it)
+                    ?: return ActionResult.Failure(Reason.WrongData)
+
+                marriageRepository.divorce(it)
+
+                val firstUserMarkdownLink = createMarkdownLink(marriage.firstUserName, marriage.firstUserId)
+                val secondUserMarkdownLink = createMarkdownLink(marriage.secondUserName, marriage.secondUserId)
+                val message = "Брак пользователей $firstUserMarkdownLink и $secondUserMarkdownLink расторгнут \uD83D\uDC94"
+                return ActionResult.Success(message)
+            }
+
+            return ActionResult.Failure(Reason.AccessDenied)
+        }
+
+        return ActionResult.Failure(Reason.UnexpectedError)
+    }
+
+    fun declineDivorce(context: ScreenContext, data: String?): ActionResult {
+        data?.let {
+            if (context.user.id.chatId.toString() == it) {
+                val marriage = marriageRepository.getMarriage(it)
+                    ?: return ActionResult.Failure(Reason.WrongData)
+
+                val initiatorMarkdownLink = if (marriage.firstUserId == it)
+                    createMarkdownLink(marriage.firstUserName, marriage.firstUserId)
+                else
+                    createMarkdownLink(marriage.secondUserName, marriage.secondUserId)
+
+                val partnerMarkdownLink = if (marriage.firstUserId != it)
+                    createMarkdownLink(marriage.firstUserName, marriage.firstUserId)
+                else
+                    createMarkdownLink(marriage.secondUserName, marriage.secondUserId)
+
+                val message =
+                    "❤\uFE0F\u200D\uD83E\uDE79 $initiatorMarkdownLink решил сохранить брак с пользователем $partnerMarkdownLink"
                 return ActionResult.Success(message)
             }
 

@@ -21,6 +21,9 @@ import com.ehedgehog.screens.inventory.InventoryScreen
 import com.ehedgehog.screens.inventory.UseImmunityAction
 import com.ehedgehog.screens.inventory.UseUnwarnAction
 import com.ehedgehog.screens.marriage.AcceptProposalAction
+import com.ehedgehog.screens.marriage.ConfirmDivorceAction
+import com.ehedgehog.screens.marriage.DeclineDivorceAction
+import com.ehedgehog.screens.marriage.DivorceScreen
 import com.ehedgehog.screens.marriage.MarriageScreensManager
 import com.ehedgehog.screens.marriage.ProposalScreen
 import com.ehedgehog.screens.marriage.RejectProposalAction
@@ -56,6 +59,7 @@ fun registerScreens(bot: TelegramBot) {
     ScreenRouter.registerScreen(UnwarnRequestScreen(UnwarnRequestManager()))
     ScreenRouter.registerScreen(ImmunityQueueScreen(ImmunityQueueManager(bot)))
     ScreenRouter.registerScreen(ProposalScreen(MarriageScreensManager(bot)))
+    ScreenRouter.registerScreen(DivorceScreen(MarriageScreensManager(bot)))
 }
 
 fun registerActions(bot: TelegramBot) {
@@ -70,4 +74,6 @@ fun registerActions(bot: TelegramBot) {
     ActionRouter.registerAction(ImmunityQueueDeclineAction(bot))
     ActionRouter.registerAction(AcceptProposalAction(bot, MarriageScreensManager(bot)))
     ActionRouter.registerAction(RejectProposalAction(bot, MarriageScreensManager(bot)))
+    ActionRouter.registerAction(ConfirmDivorceAction(bot, MarriageScreensManager(bot)))
+    ActionRouter.registerAction(DeclineDivorceAction(bot, MarriageScreensManager(bot)))
 }

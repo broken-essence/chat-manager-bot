@@ -34,12 +34,13 @@ class MarriageManager : BaseUserManager() {
     @OptIn(RiskFeature::class)
     fun divorce(command: TextMessage): CommandResult {
         val fromUser = command.from ?: return CommandResult.Failure(Reason.UnexpectedError)
-        marriageRepository.divorce(fromUser.id.chatId.toString())
+        marriageRepository.getMarriage(fromUser.id.chatId.toString())
+            ?: return CommandResult.Failure(Reason.WrongData)
         return CommandResult.Success()
     }
 
     fun showMarriageList() {
-
+        val marriageList = marriageRepository.getMarriageList()
     }
 
 }

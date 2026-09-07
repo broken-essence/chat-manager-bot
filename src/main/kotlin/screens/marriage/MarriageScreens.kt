@@ -26,3 +26,20 @@ class ProposalScreen(private val manager: MarriageScreensManager) : BaseScreen {
         return ScreenContent(text, keyboard)
     }
 }
+
+class DivorceScreen(private val manager: MarriageScreensManager) : BaseScreen {
+
+    override val id: String = ScreenIds.DIVORCE
+
+    override suspend fun render(context: ScreenContext, data: String?): ScreenContent {
+        val keyboard = inlineKeyboard {
+            row {
+                dataButton("Да", "${ActionIds.DIVORCE_CONFIRM}?$data")
+                dataButton("Нет", "${ActionIds.DIVORCE_DECLINE}?$data")
+            }
+        }
+
+        val text = manager.getDivorceMessage(context.user.id.chatId.toString())
+        return ScreenContent(text, keyboard)
+    }
+}
