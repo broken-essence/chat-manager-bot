@@ -1,6 +1,7 @@
 package com.ehedgehog.commands.marriages
 
 import com.ehedgehog.base.BaseUserManager
+import com.ehedgehog.base.getMarriageDuration
 import com.ehedgehog.data.CommandResult
 import com.ehedgehog.data.Reason
 import com.ehedgehog.database.MarriageWithUsers
@@ -57,7 +58,7 @@ class MarriageManager : BaseUserManager() {
         return marriages.mapIndexed { index, users ->
             val firstUserMarkdownLink = createMarkdownLink(users.firstUserName, users.firstUserId)
             val secondUserMarkdownLink = createMarkdownLink(users.secondUserName, users.secondUserId)
-            "${index + 1}\\. $firstUserMarkdownLink \uD83D\uDC96 $secondUserMarkdownLink"
+            "${index + 1}\\. $firstUserMarkdownLink \uD83D\uDC96 $secondUserMarkdownLink \\(${users.getMarriageDuration()} дн\\.\\)"
          }.joinToString("\n")
     }
 

@@ -1,6 +1,7 @@
 package com.ehedgehog.screens.marriage
 
 import com.ehedgehog.base.BaseUserManager
+import com.ehedgehog.base.getMarriageDuration
 import com.ehedgehog.data.ActionResult
 import com.ehedgehog.data.Reason
 import com.ehedgehog.data.ScreenContext
@@ -107,7 +108,8 @@ class MarriageScreensManager(private val bot: TelegramBot) : BaseUserManager() {
 
                 val firstUserMarkdownLink = createMarkdownLink(marriage.firstUserName, marriage.firstUserId)
                 val secondUserMarkdownLink = createMarkdownLink(marriage.secondUserName, marriage.secondUserId)
-                val message = "Брак пользователей $firstUserMarkdownLink и $secondUserMarkdownLink расторгнут \uD83D\uDC94"
+                val message = "Брак пользователей $firstUserMarkdownLink и $secondUserMarkdownLink расторгнут \uD83D\uDC94\n\n" +
+                        "Их союз продлился ${marriage.getMarriageDuration()} дн\\."
                 return ActionResult.Success(message)
             }
 
