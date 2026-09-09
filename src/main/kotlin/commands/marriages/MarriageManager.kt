@@ -3,6 +3,7 @@ package com.ehedgehog.commands.marriages
 import com.ehedgehog.base.BaseUserManager
 import com.ehedgehog.data.CommandResult
 import com.ehedgehog.data.Reason
+import com.ehedgehog.database.MarriageWithUsers
 import com.ehedgehog.database.repositories.MarriageRepository
 import com.ehedgehog.database.repositories.UserRepository
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
@@ -39,8 +40,25 @@ class MarriageManager : BaseUserManager() {
         return CommandResult.Success()
     }
 
-    fun showMarriageList() {
+    fun showMarriageList(): CommandResult {
         val marriageList = marriageRepository.getMarriageList()
+        val formattedMarriages = formatMarriageList(marriageList)
+
+        val message = "\uD83D\uDC8D Список браков:\n\n$formattedMarriages\n\n" +
+                "_\uD83D\uDCCC Для заключения брака необходимо приобрести кольцо в нашем магазине и сделать избраннику " +
+                "предложение с помощью команды `/propose`, в ответ на его сообщение\\._"
+        return CommandResult.Success(message)
+    }
+
+    private fun formatMarriageList(marriages: List<MarriageWithUsers>): String {
+        if (marriages.isEmpty())
+            return "Список пуст\\."
+
+        return marriages.mapIndexed { index, users ->
+            val firstUserMarkdownLink = createMarkdownLink(users.firstUserName, users.firstUserId)
+            val secondUserMarkdownLink = createMarkdownLink(users.secondUserName, users.secondUserId)
+            "${index + 1}\\. $firstUserMarkdownLink \uD83D\uDC96 $secondUserMarkdownLink"
+         }.joinToString("\n")
     }
 
 }
