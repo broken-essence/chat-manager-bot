@@ -4,6 +4,7 @@ import com.ehedgehog.database.MarriageWithUsers
 import com.ehedgehog.database.Marriages
 import com.ehedgehog.database.Users
 import org.jetbrains.exposed.v1.core.JoinType
+import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.alias
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.or
@@ -74,6 +75,7 @@ class MarriageRepository {
                 secondUser[Users.name],
                 Marriages.marriedAt
             )
+            .orderBy(Marriages.marriedAt, SortOrder.ASC)
             .map {
                 MarriageWithUsers(
                     firstUserId = it[Marriages.firstPartnerId],

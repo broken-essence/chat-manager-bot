@@ -7,9 +7,11 @@ import com.ehedgehog.screens.ScreenIds
 import com.ehedgehog.screens.ScreenRouter
 import com.ehedgehog.utils.loggedCommand
 import dev.inmo.tgbotapi.extensions.api.send.reply
+import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
+import dev.inmo.tgbotapi.types.message.MarkdownV2
 import dev.inmo.tgbotapi.utils.RiskFeature
 
 private const val COMMAND_PROPOSE = "propose"
@@ -71,7 +73,11 @@ fun BehaviourContext.registerMarriageCommands(manager: MarriageManager) {
 
     onCommand(COMMAND_MARRIAGES) { command ->
         loggedCommand(COMMAND_MARRIAGES, command.from?.id?.chatId.toString()) {
-            CommandResult.Success()
+            val result = manager.showMarriageList()
+            if (result is CommandResult.Success) {
+                result.message?.let { text -> bot.sendMessage(command.chat.id, text, MarkdownV2) }
+            }
+            result
         }
     }
 
