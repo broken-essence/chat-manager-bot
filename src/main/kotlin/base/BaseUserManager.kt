@@ -2,6 +2,7 @@ package com.ehedgehog.base
 
 import com.ehedgehog.AppContext
 import com.ehedgehog.database.ChatUser
+import com.ehedgehog.database.IdWithName
 import com.ehedgehog.database.MarriageWithUsers
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus
@@ -97,3 +98,8 @@ fun UserStatus.getDescription(): String = when (this) {
 }
 
 fun MarriageWithUsers.getMarriageDuration() = (System.currentTimeMillis() - marriedAt) / (1000 * 60 * 60 * 24)
+
+fun MarriageWithUsers.getPartner(userId: String) = when (userId) {
+    firstUserId -> IdWithName(secondUserId, secondUserName)
+    else -> IdWithName(firstUserId, firstUserName)
+}

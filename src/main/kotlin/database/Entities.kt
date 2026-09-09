@@ -70,3 +70,8 @@ data class MarriageWithUsers(
     val secondUserName: String,
     val marriedAt: Long
 )
+
+data class IdWithName(
+    val userId: String,
+    val name: String
+)

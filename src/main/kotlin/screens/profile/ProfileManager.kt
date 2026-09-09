@@ -2,19 +2,28 @@ package com.ehedgehog.screens.profile
 
 import com.ehedgehog.base.BaseUserManager
 import com.ehedgehog.base.getDescription
+import com.ehedgehog.base.getPartner
 import com.ehedgehog.base.getRingStatus
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus
+import com.ehedgehog.database.repositories.MarriageRepository
 import com.ehedgehog.database.repositories.UserRepository
 import dev.inmo.tgbotapi.types.chat.User
 
 class ProfileManager : BaseUserManager() {
 
     private val repository = UserRepository()
+    private val marriageRepository = MarriageRepository()
 
     fun getProfileMessage(user: User): String {
         val userEntry = getStoredUserOrNew(user)
         val warnsVisible = userEntry.status > UserStatus.PLAYER
+        val marriage = marriageRepository.getMarriage(userEntry.id)
+        val partner = marriage?.getPartner(userEntry.id)
+
+        val marriageString = if (partner != null)
+            "\uD83D\uDC9E В браке с: ${createMarkdownLink(partner.name, partner.userId)}"
+        else "\uD83D\uDC94 Брак: отсутствует"
 
         return """|🪿 Пользователь *${handleReservedSymbols(user.firstName)}*
                 |👤 Статус: ${userEntry.status.getDescription()}
@@ -24,6 +33,7 @@ class ProfileManager : BaseUserManager() {
                 |💊 Активация иммунитета: ${userEntry.immunities}
                 |Иммунитет: ${getImmunityStatus(userEntry)}
                 |
+                |$marriageString
                 |💍 Кольцо: ${userEntry.getRingStatus()}
                 |
                 |${if (warnsVisible) "⚠️ Предупреждения: ${userEntry.adminWarns}\\/6" else ""}
