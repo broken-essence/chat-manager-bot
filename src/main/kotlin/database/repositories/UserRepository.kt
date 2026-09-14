@@ -8,6 +8,7 @@ import com.ehedgehog.database.UsersPair
 import org.jetbrains.exposed.v1.core.Op
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.greater
 import org.jetbrains.exposed.v1.core.greaterEq
@@ -75,6 +76,15 @@ class UserRepository {
                 .where { Users.immunityExpiresAt greaterEq System.currentTimeMillis() }
                 .orderBy(Users.immunityExpiresAt)
                 .map { it.toUserEntity() }
+        }
+    }
+
+    fun getRandomUser(): UserEntity? {
+        return transaction {
+            Users.selectAll()
+                .where ((Users.isActive eq true) and (Users.isBlocked eq false))
+                .map { it.toUserEntity() }
+                .randomOrNull()
         }
     }
 

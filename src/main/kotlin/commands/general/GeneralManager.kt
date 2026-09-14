@@ -6,13 +6,17 @@ import com.ehedgehog.data.CommandResult
 import com.ehedgehog.data.JournalEvent
 import com.ehedgehog.data.Reason
 import com.ehedgehog.database.ChatUser
+import com.ehedgehog.database.GooseResult
 import com.ehedgehog.database.UserEntity
+import com.ehedgehog.database.repositories.DailyGooseRepository
 import com.ehedgehog.database.repositories.UserRepository
+import com.ehedgehog.getChatUserById
+import dev.inmo.tgbotapi.bot.TelegramBot
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.types.message.content.TextMessage
 import dev.inmo.tgbotapi.utils.RiskFeature
 
-class GeneralManager : BaseUserManager() {
+class GeneralManager(private val bot: TelegramBot) : BaseUserManager() {
 
     private sealed class Gift{
         object Unwarn: Gift()
@@ -21,6 +25,7 @@ class GeneralManager : BaseUserManager() {
     }
 
     private val repository = UserRepository()
+    private val gooseRepository = DailyGooseRepository()
 
     @OptIn(RiskFeature::class)
     suspend fun showStartScreen(command: TextMessage): CommandResult {
@@ -92,6 +97,31 @@ class GeneralManager : BaseUserManager() {
 
         val message = "\uD83C\uDF81 $fromMarkdownNameString подарил $targetMarkdownNameString $giftedItem\\."
         return CommandResult.Success(message, targetUserEntry.id)
+    }
+
+    @OptIn(RiskFeature::class)
+    suspend fun showGooseOfTheDay(command: TextMessage): CommandResult {
+        if (command.chat.id.chatId.toString() == command.from?.id?.chatId.toString())
+            return CommandResult.Failure(Reason.AccessDenied)
+        val result = gooseRepository.chooseDailyGoose() ?: return CommandResult.Failure(Reason.UnexpectedError)
+        val chatUser = bot.getChatUserById(command.chat.id, result.user.id.toLong())
+        val userMarkdownLink = createMarkdownLink(chatUser.firstName, result.user.id)
+        val message = when (result) {
+            is GooseResult.New -> {
+                updateBalance(
+                    ChatUser(command.chat.id, result.user, chatUser),
+                    result.user.balance + 1)
+                listOf(
+                    "Определяем гуся дня\\!",
+                    "3",
+                    "2",
+                    "1",
+                    "\uD83E\uDEBF Гусь дня – $userMarkdownLink\n\nВ качестве награды он получает 1 гакс \uD83D\uDCB8"
+                ).joinToString("|")
+            }
+            is GooseResult.Existing -> "\uD83E\uDEBF Гусь дня – $userMarkdownLink"
+        }
+        return CommandResult.Success(message)
     }
 
     private fun formatImmunitiesList(list: List<UserEntity>): String =

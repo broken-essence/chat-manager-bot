@@ -36,3 +36,10 @@ object Settings : Table("settings") {
     val key = varchar("key", 50).uniqueIndex()
     val value = varchar("value", 255)
 }
+
+object DailyGoose : Table("daily_goose") {
+    val dateMillis = long("date_millis")
+    val userId = varchar("user_id", length = 50)
+
+    override val primaryKey = PrimaryKey(dateMillis)
+}
