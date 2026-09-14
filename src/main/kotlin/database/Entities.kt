@@ -75,3 +75,8 @@ data class IdWithName(
     val userId: String,
     val name: String
 )
+
+sealed class GooseResult(val user: UserEntity) {
+    data class New(val resultUser: UserEntity): GooseResult(resultUser)
+    data class Existing(val resultUser: UserEntity): GooseResult(resultUser)
+}

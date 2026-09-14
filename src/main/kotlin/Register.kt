@@ -45,7 +45,7 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 
 fun registerCommands(bot: TelegramBot, context: BehaviourContext) {
     context.registerEventCommands(EventManager())
-    context.registerGeneralCommands(GeneralManager())
+    context.registerGeneralCommands(GeneralManager(bot))
     context.registerAdminCommands(AdminManager(bot))
     context.registerMarriageCommands(MarriageManager())
 }
