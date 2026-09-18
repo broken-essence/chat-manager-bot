@@ -112,11 +112,12 @@ class GeneralManager(private val bot: TelegramBot) : BaseUserManager() {
                     ChatUser(command.chat.id, result.user, chatUser),
                     result.user.balance + 1)
                 listOf(
-                    "Определяем гуся дня\\!",
+                    "\uD83D\uDD0E Отправляемся на поиски гуся дня\\!",
                     "3",
                     "2",
                     "1",
-                    "\uD83E\uDEBF Гусь дня – $userMarkdownLink\n\nВ качестве награды он получает 1 гакс \uD83D\uDCB8"
+                    "\uD83E\uDEBF *Гусь дня найден\\!*\nСегодня им становится $userMarkdownLink, поздравляем\\!\n\n" +
+                            "В качестве небольшого бонуса он получает *1 гакс* \uD83D\uDCB8"
                 ).joinToString("|")
             }
             is GooseResult.Existing -> "\uD83E\uDEBF Гусь дня – $userMarkdownLink"
