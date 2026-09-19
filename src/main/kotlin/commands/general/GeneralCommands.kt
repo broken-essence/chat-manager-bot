@@ -29,6 +29,7 @@ private const val COMMAND_RANDOM = "random"
 private const val COMMAND_GIFT = "gift"
 private const val COMMAND_HELP = "gmhelp"
 private const val COMMAND_GOOSE = "goose"
+private const val COMMAND_LAST_GEESE = "last_geese"
 
 @OptIn(RiskFeature::class)
 fun BehaviourContext.registerGeneralCommands(manager: GeneralManager) {
@@ -131,6 +132,16 @@ fun BehaviourContext.registerGeneralCommands(manager: GeneralManager) {
                     bot.sendMessage(command.chat.id, it, MarkdownV2)
                     delay(500)
                 }
+            }
+            result
+        }
+    }
+
+    onCommand(COMMAND_LAST_GEESE) { command ->
+        loggedCommand(COMMAND_LAST_GEESE, command.from?.id?.chatId.toString()) {
+            val result = manager.showLastGeese()
+            if (result is CommandResult.Success) {
+                result.message?.let { text -> bot.sendMessage(command.chat.id, text, MarkdownV2) }
             }
             result
         }

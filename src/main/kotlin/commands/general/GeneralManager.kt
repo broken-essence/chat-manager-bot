@@ -7,6 +7,7 @@ import com.ehedgehog.data.JournalEvent
 import com.ehedgehog.data.Reason
 import com.ehedgehog.database.ChatUser
 import com.ehedgehog.database.GooseResult
+import com.ehedgehog.database.IdWithName
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.repositories.DailyGooseRepository
 import com.ehedgehog.database.repositories.UserRepository
@@ -125,11 +126,26 @@ class GeneralManager(private val bot: TelegramBot) : BaseUserManager() {
         return CommandResult.Success(message)
     }
 
+    fun showLastGeese(): CommandResult {
+        val geese = gooseRepository.getLastGeese()
+        val formattedList = formatGooseList(geese)
+
+        val message = "\uD83E\uDEBF Последние 10 гусей дня:\n\n$formattedList\n\n" +
+                "\uD83D\uDCCC _Гусь дня выбирается среди пользователей, активировавших бота в личных сообщениях\\._"
+        return CommandResult.Success(message)
+    }
+
     private fun formatImmunitiesList(list: List<UserEntity>): String =
         if (list.isNotEmpty()) {
             list.mapIndexed { index, user ->
                 "${index + 1}\\. ${createMarkdownLink(user.name, user.id)} — ${getImmunityStatus(user)}"
             }.joinToString("\n")
+        } else "Список пуст\\."
+
+    private fun formatGooseList(list: List<IdWithName>): String =
+        if (list.isNotEmpty()) {
+            list.mapIndexed { index, item -> "${index + 1}\\. ${createMarkdownLink(item.name, item.userId)}" }
+                .joinToString("\n")
         } else "Список пуст\\."
 
     private fun applyGift(gift: Gift, fromUser: ChatUser, targetUser: ChatUser): String? {

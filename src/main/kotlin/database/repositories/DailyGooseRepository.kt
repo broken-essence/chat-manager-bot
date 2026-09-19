@@ -2,9 +2,13 @@ package com.ehedgehog.database.repositories
 
 import com.ehedgehog.database.DailyGoose
 import com.ehedgehog.database.GooseResult
+import com.ehedgehog.database.IdWithName
+import com.ehedgehog.database.Users
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.todayIn
+import org.jetbrains.exposed.v1.core.JoinType
+import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
@@ -39,6 +43,14 @@ class DailyGooseRepository {
         }
 
         GooseResult.New(randomUser)
+    }
+
+    fun getLastGeese() = transaction {
+        DailyGoose.join(Users, JoinType.INNER, DailyGoose.userId, Users.userId)
+            .selectAll()
+            .orderBy(DailyGoose.dateMillis, SortOrder.DESC)
+            .limit(10)
+            .map { IdWithName(it[DailyGoose.userId], it[Users.name]) }
     }
 
 }
