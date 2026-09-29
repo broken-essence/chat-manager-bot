@@ -26,7 +26,8 @@ data class UserEntity(
     val immunityExpiresAt: Long = 0,
     val isBlocked: Boolean = false,
     val isActive: Boolean = false,
-    val hasRing: Boolean = false
+    val hasRing: Boolean = false,
+    val familyId: String? = null
 )
 
 data class ChatUser(
@@ -55,7 +56,8 @@ data class EventConfig(
 data class Marriage(
     val firstPartnerId: String,
     val secondPartnerId: String,
-    val marriedAt: Long
+    val marriedAt: Long,
+    val familyId: String
 )
 
 data class UsersPair(
@@ -68,7 +70,8 @@ data class MarriageWithUsers(
     val firstUserName: String,
     val secondUserId: String,
     val secondUserName: String,
-    val marriedAt: Long
+    val marriedAt: Long,
+    val familyId: String
 )
 
 data class IdWithName(

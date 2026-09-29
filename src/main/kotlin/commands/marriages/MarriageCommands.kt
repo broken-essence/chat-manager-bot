@@ -17,6 +17,9 @@ import dev.inmo.tgbotapi.utils.RiskFeature
 private const val COMMAND_PROPOSE = "propose"
 private const val COMMAND_DIVORCE = "divorce"
 private const val COMMAND_MARRIAGES = "marriages"
+private const val COMMAND_FAMILY = "family"
+private const val COMMAND_FAMILY_ADD = "family_add"
+private const val COMMAND_FAMILY_KICK = "family_kick"
 
 @OptIn(RiskFeature::class)
 fun BehaviourContext.registerMarriageCommands(manager: MarriageManager) {
@@ -78,6 +81,85 @@ fun BehaviourContext.registerMarriageCommands(manager: MarriageManager) {
                 result.message?.let { text -> bot.sendMessage(command.chat.id, text, MarkdownV2) }
             }
             result
+        }
+    }
+
+    onCommand(COMMAND_FAMILY_ADD) { command ->
+        loggedCommand(COMMAND_FAMILY_ADD, command.from?.id?.chatId.toString()) {
+            val result = manager.inviteToFamily(command)
+            when (result) {
+                is CommandResult.Success -> command.from?.let {
+                    ScreenRouter.openScreen(
+                        bot,
+                        ScreenContext(command.chat.id, it),
+                        ScreenIds.FAMILY_INVITE,
+                        result.targetUserId
+                    )
+                }
+                is CommandResult.Failure -> when (result.reason) {
+                    is Reason.WrongData -> {
+                        bot.reply(command, "Выбранный пользователь уже состоит в семье!")
+                    }
+                    is Reason.NotAvailable -> {
+                        bot.reply(
+                            command,
+                            "Приглашать в семью могут только пользователи, состоящие в браке\\.\n\n" +
+                                    "_\uD83D\uDCCC Для заключения брака необходимо приобрести кольцо в нашем магазине и " +
+                                    "сделать избраннику предложение с помощью команды `/propose`, в ответ на его сообщение\\._",
+                            MarkdownV2
+                        )
+                    }
+                    else -> {}
+                }
+            }
+            result
+        }
+    }
+
+    onCommand(COMMAND_FAMILY_KICK) { command ->
+        loggedCommand(COMMAND_FAMILY_KICK, command.from?.id?.chatId.toString()) {
+            val result = manager.kickFromFamily(command)
+            when (result) {
+                is CommandResult.Success -> command.from?.let {
+                    ScreenRouter.openScreen(
+                        bot,
+                        ScreenContext(command.chat.id, it),
+                        ScreenIds.FAMILY_KICK,
+                        result.targetUserId
+                    )
+                }
+                is CommandResult.Failure -> when (result.reason) {
+                    is Reason.AccessDenied -> {
+                        bot.reply(command, "Изгонять из семьи могут только ее создатели.")
+                    }
+                    is Reason.WrongData -> {
+                        bot.reply(
+                            command,
+                            "Пользователь не состоит в вашей семье\\!\n\n" +
+                                    "_\uD83D\uDCCC Для приглашения в семью необходимо отправить команду `/family_add` " +
+                                    "в ответ на сообщение выбранного пользователя\\. Доступно только для участников, " +
+                                    "состоящих в браке\\._",
+                            MarkdownV2
+                        )
+                    }
+                    is Reason.NotAvailable -> {
+                        bot.reply(
+                            command,
+                            "Невозможно изгнать из семьи пользователя, с которым вы состоите в браке\\.\n\n" +
+                                    "_\uD83D\uDCCC Чтобы развестить, воспользуйтесь командой `/divorce`\\._",
+                            MarkdownV2
+                        )
+                    }
+                    else -> {}
+                }
+            }
+            result
+        }
+    }
+
+    onCommand(COMMAND_FAMILY) { command ->
+        loggedCommand(COMMAND_FAMILY, command.from?.id?.chatId.toString()) {
+            CommandResult.Success()
         }
     }
 

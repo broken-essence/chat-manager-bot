@@ -17,6 +17,7 @@ object Users : Table("users") {
     val isBlocked = bool("is_blocked").default(false)
     val isActive = bool("is_active").default(false)
     val hasRing = bool("has_ring").default(false)
+    val familyId = varchar("family_id", 36).nullable().default(null)
 }
 
 object UnwarnRequests : IntIdTable("unwarn_requests") {
@@ -28,6 +29,7 @@ object Marriages : Table("marriages") {
     val firstPartnerId = varchar("first_partner_id", 50)
     val secondPartnerId = varchar("second_partner_id", 50)
     val marriedAt = long("married_at").default(0)
+    val familyId = varchar("family_id", 36)
 
     override val primaryKey = PrimaryKey(firstPartnerId, secondPartnerId)
 }
