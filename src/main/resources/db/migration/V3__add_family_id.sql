@@ -1,0 +1,5 @@
+ALTER TABLE users
+    ADD COLUMN family_id VARCHAR(36) DEFAULT NULL;
+
+ALTER TABLE marriages
+    ADD COLUMN family_id VARCHAR(36);

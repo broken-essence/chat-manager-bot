@@ -10,6 +10,9 @@ import com.ehedgehog.commands.marriages.MarriageManager
 import com.ehedgehog.commands.marriages.registerMarriageCommands
 import com.ehedgehog.screens.ActionRouter
 import com.ehedgehog.screens.ScreenRouter
+import com.ehedgehog.screens.family.FamilyInviteScreen
+import com.ehedgehog.screens.family.FamilyScreensManager
+import com.ehedgehog.screens.family.KickFamilyMemberScreen
 import com.ehedgehog.screens.help.HelpManager
 import com.ehedgehog.screens.help.HelpScreen
 import com.ehedgehog.screens.immunity_queue.ImmunityQueueConfirmAction
@@ -60,6 +63,8 @@ fun registerScreens(bot: TelegramBot) {
     ScreenRouter.registerScreen(ImmunityQueueScreen(ImmunityQueueManager(bot)))
     ScreenRouter.registerScreen(ProposalScreen(MarriageScreensManager(bot)))
     ScreenRouter.registerScreen(DivorceScreen(MarriageScreensManager(bot)))
+    ScreenRouter.registerScreen(FamilyInviteScreen(FamilyScreensManager(bot)))
+    ScreenRouter.registerScreen(KickFamilyMemberScreen(FamilyScreensManager(bot)))
 }
 
 fun registerActions(bot: TelegramBot) {
