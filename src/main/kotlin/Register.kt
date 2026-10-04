@@ -13,6 +13,7 @@ import com.ehedgehog.screens.ScreenRouter
 import com.ehedgehog.screens.family.FamilyInviteScreen
 import com.ehedgehog.screens.family.FamilyScreensManager
 import com.ehedgehog.screens.family.KickFamilyMemberScreen
+import com.ehedgehog.screens.family.registerFamilyActions
 import com.ehedgehog.screens.help.HelpManager
 import com.ehedgehog.screens.help.HelpScreen
 import com.ehedgehog.screens.immunity_queue.ImmunityQueueConfirmAction
@@ -23,24 +24,17 @@ import com.ehedgehog.screens.inventory.InventoryManager
 import com.ehedgehog.screens.inventory.InventoryScreen
 import com.ehedgehog.screens.inventory.UseImmunityAction
 import com.ehedgehog.screens.inventory.UseUnwarnAction
-import com.ehedgehog.screens.marriage.AcceptProposalAction
-import com.ehedgehog.screens.marriage.ConfirmDivorceAction
-import com.ehedgehog.screens.marriage.DeclineDivorceAction
 import com.ehedgehog.screens.marriage.DivorceScreen
 import com.ehedgehog.screens.marriage.MarriageScreensManager
 import com.ehedgehog.screens.marriage.ProposalScreen
-import com.ehedgehog.screens.marriage.RejectProposalAction
+import com.ehedgehog.screens.marriage.registerMarriageActions
 import com.ehedgehog.screens.profile.ProfileManager
 import com.ehedgehog.screens.profile.ProfileScreen
 import com.ehedgehog.screens.request_unwarn.ConfirmUnwarnAction
 import com.ehedgehog.screens.request_unwarn.DeclineUnwarnAction
 import com.ehedgehog.screens.request_unwarn.UnwarnRequestManager
 import com.ehedgehog.screens.request_unwarn.UnwarnRequestScreen
-import com.ehedgehog.screens.shop.BuyImmunityAction
-import com.ehedgehog.screens.shop.BuyRingAction
-import com.ehedgehog.screens.shop.BuyUnwarnAction
-import com.ehedgehog.screens.shop.ShopManager
-import com.ehedgehog.screens.shop.ShopScreen
+import com.ehedgehog.screens.shop.*
 import com.ehedgehog.screens.start.StartManager
 import com.ehedgehog.screens.start.StartScreen
 import dev.inmo.tgbotapi.bot.TelegramBot
@@ -77,8 +71,6 @@ fun registerActions(bot: TelegramBot) {
     ActionRouter.registerAction(DeclineUnwarnAction(bot, UnwarnRequestManager()))
     ActionRouter.registerAction(ImmunityQueueConfirmAction(bot, ImmunityQueueManager(bot)))
     ActionRouter.registerAction(ImmunityQueueDeclineAction(bot))
-    ActionRouter.registerAction(AcceptProposalAction(bot, MarriageScreensManager(bot)))
-    ActionRouter.registerAction(RejectProposalAction(bot, MarriageScreensManager(bot)))
-    ActionRouter.registerAction(ConfirmDivorceAction(bot, MarriageScreensManager(bot)))
-    ActionRouter.registerAction(DeclineDivorceAction(bot, MarriageScreensManager(bot)))
+    registerMarriageActions(bot)
+    registerFamilyActions(bot)
 }

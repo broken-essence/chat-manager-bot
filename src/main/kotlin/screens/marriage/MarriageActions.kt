@@ -1,16 +1,13 @@
 package com.ehedgehog.screens.marriage
 
-import com.ehedgehog.base.BaseAction
+import com.ehedgehog.base.TargetedAction
 import com.ehedgehog.data.ActionResult
-import com.ehedgehog.data.Reason
 import com.ehedgehog.data.ScreenContext
 import com.ehedgehog.screens.ActionIds
-import com.ehedgehog.showPopup
+import com.ehedgehog.screens.ActionRouter
 import dev.inmo.tgbotapi.bot.TelegramBot
-import dev.inmo.tgbotapi.extensions.api.edit.text.editMessageText
-import dev.inmo.tgbotapi.types.message.MarkdownV2
 
-class AcceptProposalAction(bot: TelegramBot, private val manager: MarriageScreensManager) : MarriageAction(bot) {
+class AcceptProposalAction(bot: TelegramBot, private val manager: MarriageScreensManager) : TargetedAction(bot) {
 
     override val id: String = ActionIds.PROPOSAL_ACCEPT
 
@@ -22,7 +19,7 @@ class AcceptProposalAction(bot: TelegramBot, private val manager: MarriageScreen
 
 }
 
-class RejectProposalAction(bot: TelegramBot, private val manager: MarriageScreensManager) : MarriageAction(bot) {
+class RejectProposalAction(bot: TelegramBot, private val manager: MarriageScreensManager) : TargetedAction(bot) {
 
     override val id: String = ActionIds.PROPOSAL_REJECT
 
@@ -34,7 +31,7 @@ class RejectProposalAction(bot: TelegramBot, private val manager: MarriageScreen
 
 }
 
-class ConfirmDivorceAction(bot: TelegramBot, private val manager: MarriageScreensManager) : MarriageAction(bot) {
+class ConfirmDivorceAction(bot: TelegramBot, private val manager: MarriageScreensManager) : TargetedAction(bot) {
 
     override val id: String = ActionIds.DIVORCE_CONFIRM
 
@@ -46,7 +43,7 @@ class ConfirmDivorceAction(bot: TelegramBot, private val manager: MarriageScreen
 
 }
 
-class DeclineDivorceAction(bot: TelegramBot, private val manager: MarriageScreensManager) : MarriageAction(bot) {
+class DeclineDivorceAction(bot: TelegramBot, private val manager: MarriageScreensManager) : TargetedAction(bot) {
 
     override val id: String = ActionIds.DIVORCE_DECLINE
 
@@ -58,18 +55,11 @@ class DeclineDivorceAction(bot: TelegramBot, private val manager: MarriageScreen
 
 }
 
-abstract class MarriageAction(private val bot: TelegramBot): BaseAction {
+fun registerMarriageActions(bot: TelegramBot) {
+    val manager = MarriageScreensManager(bot)
 
-    protected suspend fun handleActionResult(result: ActionResult, context: ScreenContext) {
-        when (result) {
-            is ActionResult.Success -> if (context.messageId != null && result.data != null) {
-                bot.editMessageText(context.chatId, context.messageId, result.data, MarkdownV2)
-            }
-            is ActionResult.Failure -> when (result.reason) {
-                Reason.AccessDenied -> bot.showPopup(context, "Эта кнопка не для вас ❌")
-                else -> bot.showPopup(context, "Действие не удалось \uD83D\uDE14")
-            }
-        }
-    }
-
+    ActionRouter.registerAction(AcceptProposalAction(bot, manager))
+    ActionRouter.registerAction(RejectProposalAction(bot, manager))
+    ActionRouter.registerAction(ConfirmDivorceAction(bot, manager))
+    ActionRouter.registerAction(DeclineDivorceAction(bot, manager))
 }
