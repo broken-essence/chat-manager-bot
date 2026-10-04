@@ -49,15 +49,11 @@ class MarriageScreensManager(private val bot: TelegramBot) : BaseUserManager() {
             if (context.user.id.chatId.toString() == ids[1]) {
                 if (!marriageRepository.isAlreadyMarried(ids[0], ids[1])) {
                     if (usersPair.firstUser?.hasRing == true) {
-                        val secondUser = usersPair.secondUser ?: run {
-                            val newUser = UserEntity(
-                                ids[1],
-                                context.user.firstName,
-                                context.user.username?.username ?: ""
-                            )
-                            updateUserEntry(newUser)
-                            newUser
-                        }
+                         val secondUser = usersPair.secondUser ?: UserEntity(
+                            ids[1],
+                            context.user.firstName,
+                            context.user.username?.username ?: ""
+                        )
 
                         marriageRepository.marry(usersPair.firstUser.id, secondUser.id)
                         updateUserEntry(usersPair.firstUser.copy(hasRing = false))

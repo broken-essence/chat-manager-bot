@@ -93,7 +93,7 @@ fun BehaviourContext.registerMarriageCommands(manager: MarriageManager) {
                         bot,
                         ScreenContext(command.chat.id, it),
                         ScreenIds.FAMILY_INVITE,
-                        result.targetUserId
+                        "${it.id.chatId}&${result.targetUserId}"
                     )
                 }
                 is CommandResult.Failure -> when (result.reason) {
@@ -125,7 +125,7 @@ fun BehaviourContext.registerMarriageCommands(manager: MarriageManager) {
                         bot,
                         ScreenContext(command.chat.id, it),
                         ScreenIds.FAMILY_KICK,
-                        result.targetUserId
+                        "${it.id.chatId}&${result.targetUserId}"
                     )
                 }
                 is CommandResult.Failure -> when (result.reason) {

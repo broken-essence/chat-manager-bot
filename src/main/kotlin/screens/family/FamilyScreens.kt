@@ -16,12 +16,13 @@ class FamilyInviteScreen(private val manager: FamilyScreensManager) : BaseScreen
     override suspend fun render(context: ScreenContext, data: String?): ScreenContent {
         val keyboard = inlineKeyboard {
             row {
-                dataButton("Да", ActionIds.FAMILY_INVITE_ACCEPT)
-                dataButton("Нет", ActionIds.FAMILY_INVITE_REJECT)
+                dataButton("Да", "${ActionIds.FAMILY_INVITE_ACCEPT}?$data")
+                dataButton("Нет", "${ActionIds.FAMILY_INVITE_REJECT}?$data")
             }
         }
 
-        val text = manager.getInviteMessage(context.chatId, context.user.id.chatId.toString(), data ?: "")
+        val invitedUserId = data?.substringAfter("&") ?: ""
+        val text = manager.getInviteMessage(context.chatId, context.user.id.chatId.toString(), invitedUserId)
         return ScreenContent(text, keyboard)
     }
 
@@ -34,12 +35,13 @@ class KickFamilyMemberScreen(private val manager: FamilyScreensManager) : BaseSc
     override suspend fun render(context: ScreenContext, data: String?): ScreenContent {
         val keyboard = inlineKeyboard {
             row {
-                dataButton("Да", ActionIds.FAMILY_KICK_CONFIRM)
-                dataButton("Нет", ActionIds.FAMILY_KICK_DECLINE)
+                dataButton("Да", "${ActionIds.FAMILY_KICK_CONFIRM}?$data")
+                dataButton("Нет", "${ActionIds.FAMILY_KICK_DECLINE}?$data")
             }
         }
 
-        val text = manager.getKickMessage(data ?: "")
+        val targetUserId = data?.substringAfter("&") ?: ""
+        val text = manager.getKickMessage(targetUserId)
         return ScreenContent(text, keyboard)
     }
 
