@@ -12,6 +12,7 @@ object ScreenIds {
     const val DIVORCE = "divorce"
     const val FAMILY_INVITE = "family_invite"
     const val FAMILY_KICK = "family_kick"
+    const val FAMILY_LEAVE = "family_kick"
 }
 
 object ActionIds {
@@ -30,6 +31,8 @@ object ActionIds {
     const val DIVORCE_DECLINE = "action:${ScreenIds.DIVORCE}/decline_divorce"
     const val FAMILY_INVITE_ACCEPT = "action:${ScreenIds.FAMILY_INVITE}/accept_invite"
     const val FAMILY_INVITE_REJECT = "action:${ScreenIds.FAMILY_INVITE}/reject_invite"
-    const val FAMILY_KICK_CONFIRM = "action:${ScreenIds.FAMILY_INVITE}/confirm_kick"
-    const val FAMILY_KICK_DECLINE = "action:${ScreenIds.FAMILY_INVITE}/decline_kick"
+    const val FAMILY_KICK_CONFIRM = "action:${ScreenIds.FAMILY_KICK}/confirm_kick"
+    const val FAMILY_KICK_DECLINE = "action:${ScreenIds.FAMILY_KICK}/decline_kick"
+    const val FAMILY_LEAVE_CONFIRM = "action:${ScreenIds.FAMILY_LEAVE}/confirm_leave"
+    const val FAMILY_LEAVE_DECLINE = "action:${ScreenIds.FAMILY_LEAVE}/decline_leave"
 }

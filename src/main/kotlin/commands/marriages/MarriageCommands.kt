@@ -20,6 +20,7 @@ private const val COMMAND_MARRIAGES = "marriages"
 private const val COMMAND_FAMILY = "family"
 private const val COMMAND_FAMILY_ADD = "family_add"
 private const val COMMAND_FAMILY_KICK = "family_kick"
+private const val COMMAND_FAMILY_LEAVE = "family_leave"
 
 @OptIn(RiskFeature::class)
 fun BehaviourContext.registerMarriageCommands(manager: MarriageManager) {
@@ -151,6 +152,26 @@ fun BehaviourContext.registerMarriageCommands(manager: MarriageManager) {
                         )
                     }
                     else -> {}
+                }
+            }
+            result
+        }
+    }
+
+    onCommand(COMMAND_FAMILY_LEAVE) { command ->
+        loggedCommand(COMMAND_FAMILY_LEAVE, command.from?.id?.chatId.toString()) {
+            val result = manager.leaveFromFamily(command)
+            when (result) {
+                is CommandResult.Success -> command.from?.let {
+                    ScreenRouter.openScreen(
+                        bot,
+                        ScreenContext(command.chat.id, it),
+                        ScreenIds.FAMILY_LEAVE,
+                        it.id.chatId.toString()
+                    )
+                }
+                is CommandResult.Failure -> if (result.reason is Reason.WrongData) {
+                    bot.reply(command, "Вы не состоите в семье других пользователей!")
                 }
             }
             result

@@ -46,3 +46,21 @@ class KickFamilyMemberScreen(private val manager: FamilyScreensManager) : BaseSc
     }
 
 }
+
+class LeaveFromFamilyScreen(private val manager: FamilyScreensManager) : BaseScreen {
+
+    override val id: String = ScreenIds.FAMILY_LEAVE
+
+    override suspend fun render(context: ScreenContext, data: String?): ScreenContent {
+        val keyboard = inlineKeyboard {
+            row {
+                dataButton("Да", "${ActionIds.FAMILY_LEAVE_CONFIRM}?$data")
+                dataButton("Нет", "${ActionIds.FAMILY_LEAVE_DECLINE}?$data")
+            }
+        }
+
+        val text = manager.getLeaveMessage(data ?: "")
+        return ScreenContent(text, keyboard)
+    }
+
+}

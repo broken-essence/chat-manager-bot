@@ -55,6 +55,30 @@ class DeclineFamilyKickAction(bot: TelegramBot, private val manager: FamilyScree
 
 }
 
+class ConfirmFamilyLeaveAction(bot: TelegramBot, private val manager: FamilyScreensManager) : TargetedAction(bot) {
+
+    override val id: String = ActionIds.FAMILY_LEAVE_CONFIRM
+
+    override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
+        val result = manager.confirmLeave(context, data)
+        handleActionResult(result, context)
+        return result
+    }
+
+}
+
+class DeclineFamilyLeaveAction(bot: TelegramBot, private val manager: FamilyScreensManager) : TargetedAction(bot) {
+
+    override val id: String = ActionIds.FAMILY_LEAVE_DECLINE
+
+    override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
+        val result = manager.declineLeave(context, data)
+        handleActionResult(result, context)
+        return result
+    }
+
+}
+
 fun registerFamilyActions(bot: TelegramBot) {
     val manager = FamilyScreensManager(bot)
 
@@ -62,4 +86,6 @@ fun registerFamilyActions(bot: TelegramBot) {
     ActionRouter.registerAction(RejectFamilyAction(bot, manager))
     ActionRouter.registerAction(ConfirmFamilyKickAction(bot, manager))
     ActionRouter.registerAction(DeclineFamilyKickAction(bot, manager))
+    ActionRouter.registerAction(ConfirmFamilyLeaveAction(bot, manager))
+    ActionRouter.registerAction(DeclineFamilyLeaveAction(bot, manager))
 }
