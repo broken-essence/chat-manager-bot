@@ -13,6 +13,7 @@ import com.ehedgehog.screens.ScreenRouter
 import com.ehedgehog.screens.family.FamilyInviteScreen
 import com.ehedgehog.screens.family.FamilyScreensManager
 import com.ehedgehog.screens.family.KickFamilyMemberScreen
+import com.ehedgehog.screens.family.LeaveFromFamilyScreen
 import com.ehedgehog.screens.family.registerFamilyActions
 import com.ehedgehog.screens.help.HelpManager
 import com.ehedgehog.screens.help.HelpScreen
@@ -59,6 +60,7 @@ fun registerScreens(bot: TelegramBot) {
     ScreenRouter.registerScreen(DivorceScreen(MarriageScreensManager(bot)))
     ScreenRouter.registerScreen(FamilyInviteScreen(FamilyScreensManager(bot)))
     ScreenRouter.registerScreen(KickFamilyMemberScreen(FamilyScreensManager(bot)))
+    ScreenRouter.registerScreen(LeaveFromFamilyScreen(FamilyScreensManager(bot)))
 }
 
 fun registerActions(bot: TelegramBot) {

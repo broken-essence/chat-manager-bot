@@ -30,7 +30,14 @@ class FamilyScreensManager(private val bot: TelegramBot): BaseUserManager() {
         val user = userRepository.getUserById(userId)
         val markdownLink = createMarkdownLink(user!!.name, user.id)
 
-        return "Вы действительно хотите изгнать $markdownLink из семьи?"
+        return "\uD83E\uDD7E Вы действительно хотите изгнать $markdownLink из семьи?"
+    }
+
+    fun getLeaveMessage(userId: String): String {
+        val user = userRepository.getUserById(userId)
+        val markdownLink = createMarkdownLink(user!!.name, user.id)
+
+        return "\uD83D\uDC94 $markdownLink, вы действительно хотите покинуть свою семью?"
     }
 
     fun acceptFamily(context: ScreenContext, data: String?): ActionResult {
@@ -128,6 +135,43 @@ class FamilyScreensManager(private val bot: TelegramBot): BaseUserManager() {
                 return ActionResult.Success(
                     "$initiatorMarkdownLink решил оставить $targetUserMarkdownLink в семье\\."
                 )
+            }
+
+            return ActionResult.Failure(Reason.AccessDenied)
+        }
+
+        return ActionResult.Failure(Reason.UnexpectedError)
+    }
+
+    fun confirmLeave(context: ScreenContext, data: String?): ActionResult {
+        data?.let {
+            if (context.user.id.chatId.toString() == it) {
+                val user = userRepository.getUserById(it) ?: return ActionResult.Failure(Reason.UnexpectedError)
+                if (user.familyId != null) {
+                    updateUserEntry(user.copy(familyId = null))
+                    val markdownLink = createMarkdownLink(user.name, user.id)
+                    return ActionResult.Success("\uD83D\uDC94 $markdownLink покинул семью\\.")
+                }
+
+                return ActionResult.Failure(Reason.WrongData)
+            }
+
+            return ActionResult.Failure(Reason.AccessDenied)
+        }
+
+        return ActionResult.Failure(Reason.UnexpectedError)
+    }
+
+    fun declineLeave(context: ScreenContext, data: String?): ActionResult {
+        data?.let {
+            if (context.user.id.chatId.toString() == it) {
+                val user = userRepository.getUserById(it) ?: return ActionResult.Failure(Reason.UnexpectedError)
+                if (user.familyId != null) {
+                    val markdownLink = createMarkdownLink(user.name, user.id)
+                    return ActionResult.Success("$markdownLink решил остаться в семье\\.")
+                }
+
+                return ActionResult.Failure(Reason.WrongData)
             }
 
             return ActionResult.Failure(Reason.AccessDenied)

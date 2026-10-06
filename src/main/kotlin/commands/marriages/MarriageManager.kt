@@ -94,6 +94,17 @@ class MarriageManager : BaseUserManager() {
         return CommandResult.Failure(Reason.WrongData)
     }
 
+    fun leaveFromFamily(command: TextMessage): CommandResult {
+        val fromUser = command.from ?: return CommandResult.Failure(Reason.UnexpectedError)
+        val user = userRepository.getUserById(fromUser.id.chatId.toString())
+
+        if (user?.familyId != null) {
+            return CommandResult.Success()
+        }
+
+        return CommandResult.Failure(Reason.WrongData)
+    }
+
     private fun formatMarriageList(marriages: List<MarriageWithUsers>): String {
         if (marriages.isEmpty())
             return "Список пуст\\."
