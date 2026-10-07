@@ -6,6 +6,7 @@ import com.ehedgehog.base.getPartner
 import com.ehedgehog.data.CommandResult
 import com.ehedgehog.data.Reason
 import com.ehedgehog.database.MarriageWithUsers
+import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.repositories.MarriageRepository
 import com.ehedgehog.database.repositories.UserRepository
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
@@ -105,6 +106,46 @@ class MarriageManager : BaseUserManager() {
         return CommandResult.Failure(Reason.WrongData)
     }
 
+    fun showFamily(command: TextMessage): CommandResult {
+        val fromUser = command.from ?: return CommandResult.Failure(Reason.UnexpectedError)
+        val user = userRepository.getUserById(fromUser.id.chatId.toString())
+            ?: return CommandResult.Failure(Reason.UserNotFound)
+        val userMarkdownLink = createMarkdownLink(user.name, user.id)
+        val marriage = marriageRepository.getMarriage(user.id)
+
+        val resultString = buildString {
+            append("*\uD83C\uDFE1 Семья $userMarkdownLink:*\n\n")
+
+            val ownFamily = marriage?.let { userRepository.getFamilyMembers(it.familyId) }
+            val secondFamily = user.familyId?.let { userRepository.getFamilyMembers(it) }
+
+            if (!ownFamily.isNullOrEmpty()) {
+                val partner = marriage.getPartner(user.id)
+                append("\uD83D\uDC96 От брака с ${createMarkdownLink(partner.name, partner.userId)}:\n")
+                append(formatFamilyList(ownFamily))
+                append("\n\n")
+            }
+
+            if (!secondFamily.isNullOrEmpty()) {
+                val parentsMarriage = marriageRepository.getMarriageByFamilyId(user.familyId)
+                val firstParentMarkdownLink = createMarkdownLink(parentsMarriage!!.firstUserName, parentsMarriage.firstUserId)
+                val secondParentMarkdownLink = createMarkdownLink(parentsMarriage.secondUserName, parentsMarriage.secondUserId)
+                append("\uD83D\uDC76\uD83C\uDFFB Член семьи $firstParentMarkdownLink и $secondParentMarkdownLink:\n")
+                append(formatFamilyList(secondFamily))
+                append("\n\n")
+            }
+
+            if (ownFamily.isNullOrEmpty() && secondFamily.isNullOrEmpty())
+                append("Список пуст\\.\n\n")
+
+            append("_\uD83D\uDCCC Для приглашения в семью отправьте команду `/family_add` " +
+                    "в ответ на сообщение выбранного пользователя\\._")
+        }
+
+        return CommandResult.Success(resultString)
+
+    }
+
     private fun formatMarriageList(marriages: List<MarriageWithUsers>): String {
         if (marriages.isEmpty())
             return "Список пуст\\."
@@ -114,6 +155,12 @@ class MarriageManager : BaseUserManager() {
             val secondUserMarkdownLink = createMarkdownLink(users.secondUserName, users.secondUserId)
             "${index + 1}\\. $firstUserMarkdownLink \uD83D\uDC96 $secondUserMarkdownLink \\(${users.getMarriageDuration()} дн\\.\\)"
          }.joinToString("\n")
+    }
+
+    private fun formatFamilyList(family: List<UserEntity>): String {
+        return family.mapIndexed { index, user ->
+            "${index + 1}\\. ${createMarkdownLink(user.name, user.id)}"
+        }.joinToString("\n")
     }
 
 }

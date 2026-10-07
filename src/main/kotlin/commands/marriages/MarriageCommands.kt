@@ -180,7 +180,11 @@ fun BehaviourContext.registerMarriageCommands(manager: MarriageManager) {
 
     onCommand(COMMAND_FAMILY) { command ->
         loggedCommand(COMMAND_FAMILY, command.from?.id?.chatId.toString()) {
-            CommandResult.Success()
+            val result = manager.showFamily(command)
+            if (result is CommandResult.Success) {
+                result.message?.let { bot.sendMessage(command.chat.id, it, MarkdownV2) }
+            }
+            result
         }
     }
 

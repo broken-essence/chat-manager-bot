@@ -54,7 +54,11 @@ class FamilyScreensManager(private val bot: TelegramBot): BaseUserManager() {
                 )
 
                 if (user.familyId == null) {
-                    updateUserEntry(user.copy(familyId = marriage.familyId))
+                    updateUserEntry(user.copy(
+                        name = context.user.firstName,
+                        username = context.user.username?.username ?: "",
+                        familyId = marriage.familyId
+                    ))
 
                     val userMarkdownLink = createMarkdownLink(user.name, user.id)
                     val firstPartnerMarkdownLink = createMarkdownLink(marriage.firstUserName, marriage.firstUserId)

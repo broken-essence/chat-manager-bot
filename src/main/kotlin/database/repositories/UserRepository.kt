@@ -80,6 +80,14 @@ class UserRepository {
         }
     }
 
+    fun getFamilyMembers(familyId: String): List<UserEntity> {
+        return transaction {
+            Users.selectAll()
+                .where { Users.familyId eq familyId }
+                .map { it.toUserEntity() }
+        }
+    }
+
     fun getRandomUser(): UserEntity? {
         return transaction {
             Users.selectAll()
