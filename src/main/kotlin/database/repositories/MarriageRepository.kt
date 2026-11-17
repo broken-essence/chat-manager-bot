@@ -65,7 +65,8 @@ class MarriageRepository {
                 firstUser[Users.name],
                 Marriages.secondPartnerId,
                 secondUser[Users.name],
-                Marriages.marriedAt
+                Marriages.marriedAt,
+                Marriages.familyId
             )
             .orderBy(Marriages.marriedAt, SortOrder.ASC)
             .map {
