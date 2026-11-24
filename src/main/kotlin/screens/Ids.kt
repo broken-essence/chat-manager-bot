@@ -12,7 +12,7 @@ object ScreenIds {
     const val DIVORCE = "divorce"
     const val FAMILY_INVITE = "family_invite"
     const val FAMILY_KICK = "family_kick"
-    const val FAMILY_LEAVE = "family_kick"
+    const val FAMILY_LEAVE = "family_leave"
 }
 
 object ActionIds {
