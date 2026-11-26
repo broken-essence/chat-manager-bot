@@ -14,7 +14,7 @@ interface Config {
 
     val databaseUrl: String
     val user: String
-    val password: String
+    val dbPassword: String
 
     fun connectDatabase()
 }

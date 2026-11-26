@@ -58,7 +58,7 @@ suspend fun main(args: Array<String>) {
     SLF4JBridgeHandler.install()
 
     Flyway.configure()
-        .dataSource(AppContext.config.databaseUrl, AppContext.config.user, AppContext.config.password)
+        .dataSource(AppContext.config.databaseUrl, AppContext.config.user, AppContext.config.dbPassword)
         .baselineOnMigrate(true)
         .baselineVersion("0")
         .load()

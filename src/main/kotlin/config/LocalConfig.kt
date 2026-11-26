@@ -16,7 +16,7 @@ data class LocalConfig(
     override val immunityCooldown: Long,
     override val databaseUrl: String,
     override val user: String,
-    override val password: String,
+    override val dbPassword: String,
 ): Config {
     override fun connectDatabase() {
         Database.connect(databaseUrl, driver = "org.sqlite.JDBC")
