@@ -21,13 +21,13 @@ class ProductionConfig: Config {
     private val database = System.getenv("PGDATABASE") ?: "postgres"
     override val databaseUrl: String = "jdbc:postgresql://$host:$port/$database"
     override val user: String = System.getenv("PGUSER") ?: "postgres"
-    override val password: String = System.getenv("PGPASSWORD") ?: ""
+    override val dbPassword: String = System.getenv("PGPASSWORD") ?: ""
 
     override fun connectDatabase() {
         val config = HikariConfig().apply {
             this.jdbcUrl = databaseUrl
             this.username = user
-            this.password = password
+            this.password = dbPassword
             this.driverClassName = "org.postgresql.Driver"
 
             maximumPoolSize = 5
