@@ -6,8 +6,15 @@ import com.ehedgehog.commands.event.EventManager
 import com.ehedgehog.commands.event.registerEventCommands
 import com.ehedgehog.commands.general.GeneralManager
 import com.ehedgehog.commands.general.registerGeneralCommands
+import com.ehedgehog.commands.marriages.MarriageManager
+import com.ehedgehog.commands.marriages.registerMarriageCommands
 import com.ehedgehog.screens.ActionRouter
 import com.ehedgehog.screens.ScreenRouter
+import com.ehedgehog.screens.family.FamilyInviteScreen
+import com.ehedgehog.screens.family.FamilyScreensManager
+import com.ehedgehog.screens.family.KickFamilyMemberScreen
+import com.ehedgehog.screens.family.LeaveFromFamilyScreen
+import com.ehedgehog.screens.family.registerFamilyActions
 import com.ehedgehog.screens.help.HelpManager
 import com.ehedgehog.screens.help.HelpScreen
 import com.ehedgehog.screens.immunity_queue.ImmunityQueueConfirmAction
@@ -18,16 +25,17 @@ import com.ehedgehog.screens.inventory.InventoryManager
 import com.ehedgehog.screens.inventory.InventoryScreen
 import com.ehedgehog.screens.inventory.UseImmunityAction
 import com.ehedgehog.screens.inventory.UseUnwarnAction
+import com.ehedgehog.screens.marriage.DivorceScreen
+import com.ehedgehog.screens.marriage.MarriageScreensManager
+import com.ehedgehog.screens.marriage.ProposalScreen
+import com.ehedgehog.screens.marriage.registerMarriageActions
 import com.ehedgehog.screens.profile.ProfileManager
 import com.ehedgehog.screens.profile.ProfileScreen
 import com.ehedgehog.screens.request_unwarn.ConfirmUnwarnAction
 import com.ehedgehog.screens.request_unwarn.DeclineUnwarnAction
 import com.ehedgehog.screens.request_unwarn.UnwarnRequestManager
 import com.ehedgehog.screens.request_unwarn.UnwarnRequestScreen
-import com.ehedgehog.screens.shop.BuyImmunityAction
-import com.ehedgehog.screens.shop.BuyUnwarnAction
-import com.ehedgehog.screens.shop.ShopManager
-import com.ehedgehog.screens.shop.ShopScreen
+import com.ehedgehog.screens.shop.*
 import com.ehedgehog.screens.start.StartManager
 import com.ehedgehog.screens.start.StartScreen
 import dev.inmo.tgbotapi.bot.TelegramBot
@@ -35,8 +43,9 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 
 fun registerCommands(bot: TelegramBot, context: BehaviourContext) {
     context.registerEventCommands(EventManager())
-    context.registerGeneralCommands(GeneralManager())
+    context.registerGeneralCommands(GeneralManager(bot))
     context.registerAdminCommands(AdminManager(bot))
+    context.registerMarriageCommands(MarriageManager())
 }
 
 fun registerScreens(bot: TelegramBot) {
@@ -47,6 +56,11 @@ fun registerScreens(bot: TelegramBot) {
     ScreenRouter.registerScreen(ShopScreen(ShopManager()))
     ScreenRouter.registerScreen(UnwarnRequestScreen(UnwarnRequestManager()))
     ScreenRouter.registerScreen(ImmunityQueueScreen(ImmunityQueueManager(bot)))
+    ScreenRouter.registerScreen(ProposalScreen(MarriageScreensManager(bot)))
+    ScreenRouter.registerScreen(DivorceScreen(MarriageScreensManager(bot)))
+    ScreenRouter.registerScreen(FamilyInviteScreen(FamilyScreensManager(bot)))
+    ScreenRouter.registerScreen(KickFamilyMemberScreen(FamilyScreensManager(bot)))
+    ScreenRouter.registerScreen(LeaveFromFamilyScreen(FamilyScreensManager(bot)))
 }
 
 fun registerActions(bot: TelegramBot) {
@@ -54,8 +68,11 @@ fun registerActions(bot: TelegramBot) {
     ActionRouter.registerAction(UseImmunityAction(bot,InventoryManager(bot)))
     ActionRouter.registerAction(BuyUnwarnAction(bot, ShopManager()))
     ActionRouter.registerAction(BuyImmunityAction(bot, ShopManager()))
+    ActionRouter.registerAction(BuyRingAction(bot, ShopManager()))
     ActionRouter.registerAction(ConfirmUnwarnAction(bot, UnwarnRequestManager()))
     ActionRouter.registerAction(DeclineUnwarnAction(bot, UnwarnRequestManager()))
     ActionRouter.registerAction(ImmunityQueueConfirmAction(bot, ImmunityQueueManager(bot)))
     ActionRouter.registerAction(ImmunityQueueDeclineAction(bot))
+    registerMarriageActions(bot)
+    registerFamilyActions(bot)
 }

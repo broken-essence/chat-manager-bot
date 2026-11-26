@@ -16,15 +16,16 @@ class ProductionConfig: Config {
     override val immunitiesCountLimit: Int = 5
     override val immunityCooldown: Long = 24 * 60 * 60 * 1000
 
-    override fun connectDatabase() {
-        val host = System.getenv("PGHOST") ?: "localhost"
-        val port = System.getenv("PGPORT") ?: "5432"
-        val database = System.getenv("PGDATABASE") ?: "postgres"
-        val user = System.getenv("PGUSER") ?: "postgres"
-        val password = System.getenv("PGPASSWORD") ?: ""
+    private val host = System.getenv("PGHOST") ?: "localhost"
+    private val port = System.getenv("PGPORT") ?: "5432"
+    private val database = System.getenv("PGDATABASE") ?: "postgres"
+    override val databaseUrl: String = "jdbc:postgresql://$host:$port/$database"
+    override val user: String = System.getenv("PGUSER") ?: "postgres"
+    override val password: String = System.getenv("PGPASSWORD") ?: ""
 
+    override fun connectDatabase() {
         val config = HikariConfig().apply {
-            this.jdbcUrl = "jdbc:postgresql://$host:$port/$database"
+            this.jdbcUrl = databaseUrl
             this.username = user
             this.password = password
             this.driverClassName = "org.postgresql.Driver"

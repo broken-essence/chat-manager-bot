@@ -20,6 +20,7 @@ import dev.inmo.tgbotapi.extensions.utils.types.buttons.urlButton
 import dev.inmo.tgbotapi.types.message.MarkdownV2
 import dev.inmo.tgbotapi.utils.RiskFeature
 import dev.inmo.tgbotapi.utils.row
+import kotlinx.coroutines.delay
 
 private const val COMMAND_START = "start"
 private const val COMMAND_PROFILE = "gmprofile"
@@ -27,6 +28,8 @@ private const val COMMAND_IMMUNITIES = "immunities"
 private const val COMMAND_RANDOM = "random"
 private const val COMMAND_GIFT = "gift"
 private const val COMMAND_HELP = "gmhelp"
+private const val COMMAND_GOOSE = "goose"
+private const val COMMAND_LAST_GEESE = "last_geese"
 
 @OptIn(RiskFeature::class)
 fun BehaviourContext.registerGeneralCommands(manager: GeneralManager) {
@@ -118,6 +121,29 @@ fun BehaviourContext.registerGeneralCommands(manager: GeneralManager) {
             }
 
             CommandResult.Failure(Reason.UnexpectedError)
+        }
+    }
+
+    onCommand(COMMAND_GOOSE) { command ->
+        loggedCommand(COMMAND_GOOSE, command.from?.id?.chatId.toString()) {
+            val result = manager.showGooseOfTheDay(command)
+            if (result is CommandResult.Success) {
+                result.message?.split("|")?.forEach {
+                    bot.sendMessage(command.chat.id, it, MarkdownV2)
+                    delay(500)
+                }
+            }
+            result
+        }
+    }
+
+    onCommand(COMMAND_LAST_GEESE) { command ->
+        loggedCommand(COMMAND_LAST_GEESE, command.from?.id?.chatId.toString()) {
+            val result = manager.showLastGeese()
+            if (result is CommandResult.Success) {
+                result.message?.let { text -> bot.sendMessage(command.chat.id, text, MarkdownV2) }
+            }
+            result
         }
     }
 

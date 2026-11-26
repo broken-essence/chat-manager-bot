@@ -4,12 +4,15 @@ import com.ehedgehog.database.BotUsersStats
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus
 import com.ehedgehog.database.Users
+import com.ehedgehog.database.UsersPair
 import org.jetbrains.exposed.v1.core.Op
 import org.jetbrains.exposed.v1.core.ResultRow
 import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.greater
 import org.jetbrains.exposed.v1.core.greaterEq
+import org.jetbrains.exposed.v1.core.inList
 import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
@@ -33,6 +36,8 @@ class UserRepository {
                 it[immunityExpiresAt] = user.immunityExpiresAt
                 it[isBlocked] = user.isBlocked
                 it[isActive] = user.isActive
+                it[hasRing] = user.hasRing
+                it[familyId] = user.familyId
             }
         }
     }
@@ -72,6 +77,36 @@ class UserRepository {
                 .where { Users.immunityExpiresAt greaterEq System.currentTimeMillis() }
                 .orderBy(Users.immunityExpiresAt)
                 .map { it.toUserEntity() }
+        }
+    }
+
+    fun getFamilyMembers(familyId: String): List<UserEntity> {
+        return transaction {
+            Users.selectAll()
+                .where { Users.familyId eq familyId }
+                .map { it.toUserEntity() }
+        }
+    }
+
+    fun getRandomUser(): UserEntity? {
+        return transaction {
+            Users.selectAll()
+                .where ((Users.isActive eq true) and (Users.isBlocked eq false))
+                .map { it.toUserEntity() }
+                .randomOrNull()
+        }
+    }
+
+    fun getUsersPair(firstId: String, secondId: String): UsersPair {
+        return transaction {
+            val userList = Users.selectAll()
+                .where { Users.userId inList listOf(firstId, secondId) }
+                .map { it.toUserEntity() }
+
+            UsersPair(
+                userList.firstOrNull { it.id == firstId },
+                userList.firstOrNull {  it.id == secondId }
+            )
         }
     }
 
@@ -158,5 +193,7 @@ fun ResultRow.toUserEntity(): UserEntity = UserEntity(
     balance = this[Users.balance],
     immunityExpiresAt = this[Users.immunityExpiresAt],
     isBlocked = this[Users.isBlocked],
-    isActive = this[Users.isActive]
+    isActive = this[Users.isActive],
+    hasRing = this[Users.hasRing],
+    familyId = this[Users.familyId]
 )

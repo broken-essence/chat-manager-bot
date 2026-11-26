@@ -25,7 +25,9 @@ data class UserEntity(
     val immunities: Int = 0,
     val immunityExpiresAt: Long = 0,
     val isBlocked: Boolean = false,
-    val isActive: Boolean = false
+    val isActive: Boolean = false,
+    val hasRing: Boolean = false,
+    val familyId: String? = null
 )
 
 data class ChatUser(
@@ -50,3 +52,34 @@ data class EventConfig(
     val emoji: String,
     val noun: String
 )
+
+data class Marriage(
+    val firstPartnerId: String,
+    val secondPartnerId: String,
+    val marriedAt: Long,
+    val familyId: String
+)
+
+data class UsersPair(
+    val firstUser: UserEntity?,
+    val secondUser: UserEntity?
+)
+
+data class MarriageWithUsers(
+    val firstUserId: String,
+    val firstUserName: String,
+    val secondUserId: String,
+    val secondUserName: String,
+    val marriedAt: Long,
+    val familyId: String
+)
+
+data class IdWithName(
+    val userId: String,
+    val name: String
+)
+
+sealed class GooseResult(val user: UserEntity) {
+    data class New(val resultUser: UserEntity): GooseResult(resultUser)
+    data class Existing(val resultUser: UserEntity): GooseResult(resultUser)
+}

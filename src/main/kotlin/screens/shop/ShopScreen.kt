@@ -22,6 +22,9 @@ class ShopScreen(private val manager: ShopManager) : BaseScreen {
                 dataButton("\uD83D\uDC8A Иммунитет – $PRICE_IMMUNITY \uD83D\uDCB8", ActionIds.BUY_IMMUNITY)
             }
             row {
+                dataButton("\uD83D\uDC8D Кольцо для предложения – $PRICE_RING \uD83D\uDCB8", ActionIds.BUY_RING)
+            }
+            row {
                 dataButton("\uD83D\uDD19 Назад", ScreenIds.PROFILE)
             }
         }

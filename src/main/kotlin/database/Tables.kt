@@ -16,6 +16,8 @@ object Users : Table("users") {
     val immunityExpiresAt = long("immunity_expires_at").default(0)
     val isBlocked = bool("is_blocked").default(false)
     val isActive = bool("is_active").default(false)
+    val hasRing = bool("has_ring").default(false)
+    val familyId = varchar("family_id", 36).nullable().default(null)
 }
 
 object UnwarnRequests : IntIdTable("unwarn_requests") {
@@ -23,7 +25,23 @@ object UnwarnRequests : IntIdTable("unwarn_requests") {
     val createdAt = long("created_at").default(0)
 }
 
+object Marriages : Table("marriages") {
+    val firstPartnerId = varchar("first_partner_id", 50)
+    val secondPartnerId = varchar("second_partner_id", 50)
+    val marriedAt = long("married_at").default(0)
+    val familyId = varchar("family_id", 36)
+
+    override val primaryKey = PrimaryKey(firstPartnerId, secondPartnerId)
+}
+
 object Settings : Table("settings") {
     val key = varchar("key", 50).uniqueIndex()
     val value = varchar("value", 255)
+}
+
+object DailyGoose : Table("daily_goose") {
+    val dateMillis = long("date_millis")
+    val userId = varchar("user_id", length = 50)
+
+    override val primaryKey = PrimaryKey(dateMillis)
 }

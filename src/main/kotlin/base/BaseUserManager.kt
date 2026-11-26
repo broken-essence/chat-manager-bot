@@ -2,6 +2,8 @@ package com.ehedgehog.base
 
 import com.ehedgehog.AppContext
 import com.ehedgehog.database.ChatUser
+import com.ehedgehog.database.IdWithName
+import com.ehedgehog.database.MarriageWithUsers
 import com.ehedgehog.database.UserEntity
 import com.ehedgehog.database.UserStatus
 import com.ehedgehog.database.repositories.UserRepository
@@ -87,8 +89,17 @@ fun UserEntity.isInImmunityQueue(): Boolean = immunityStartsAt > System.currentT
 
 fun UserEntity.hasImmunityCooldown(): Boolean = System.currentTimeMillis() - immunityExpiresAt < AppContext.config.immunityCooldown
 
+fun UserEntity.getRingStatus(): String = if (hasRing) "приобретено" else "отсутствует"
+
 fun UserStatus.getDescription(): String = when (this) {
     UserStatus.PLAYER -> "Игрок"
     UserStatus.ADMIN -> "Администратор"
     UserStatus.SENIOR_ADMIN -> "Старший администратор"
+}
+
+fun MarriageWithUsers.getMarriageDuration() = (System.currentTimeMillis() - marriedAt) / (1000 * 60 * 60 * 24)
+
+fun MarriageWithUsers.getPartner(userId: String) = when (userId) {
+    firstUserId -> IdWithName(secondUserId, secondUserName)
+    else -> IdWithName(firstUserId, firstUserName)
 }

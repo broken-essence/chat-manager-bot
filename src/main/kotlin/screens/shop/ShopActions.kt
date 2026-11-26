@@ -33,6 +33,17 @@ class BuyImmunityAction(bot: TelegramBot, private val manager: ShopManager): Sho
 
 }
 
+class BuyRingAction(bot: TelegramBot, private val manager: ShopManager): ShopAction(bot) {
+    override val id: String = ActionIds.BUY_RING
+
+    override suspend fun execute(context: ScreenContext, data: String?): ActionResult {
+        val result = manager.buyRing(context)
+        handleActionResult(result, context)
+        return result
+    }
+
+}
+
 abstract class ShopAction(private val bot: TelegramBot): BaseAction {
 
     protected suspend fun handleActionResult(result: ActionResult, context: ScreenContext) {
@@ -42,8 +53,10 @@ abstract class ShopAction(private val bot: TelegramBot): BaseAction {
                 ScreenRouter.refreshScreen(bot, context)
             }
 
-            is ActionResult.Failure -> if (result.reason is Reason.NotEnoughBalance) {
-                bot.showPopup(context, "Недостаточно средств ❌")
+            is ActionResult.Failure -> when (result.reason) {
+                is Reason.NotEnoughBalance -> bot.showPopup(context, "Недостаточно средств ❌")
+                is Reason.LimitExceeded -> bot.showPopup(context, "Товар недоступен ❌")
+                else -> {}
             }
         }
     }
